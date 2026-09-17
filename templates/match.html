@@ -2,2904 +2,2555 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>
-        {{ match.event_name if match else "CrickBet Match" }}
-    </title>
+    <title>{{ match.event_name if match else "CrickBet Match" }}</title>
 
     <style>
-
         * {
             box-sizing: border-box;
         }
 
+        html,
         body {
             margin: 0;
+            padding: 0;
             background: #071b12;
             color: #ffffff;
             font-family: Arial, Helvetica, sans-serif;
         }
 
+        body {
+            min-height: 100vh;
+        }
+
         .page {
             width: 100%;
-            max-width: 1150px;
-            margin: auto;
-            padding: 15px;
-            padding-bottom: 120px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 16px;
         }
 
         .topbar {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 13px 16px;
-            margin-bottom: 15px;
-            background: #0c2b1d;
-            border: 1px solid #174732;
-            border-radius: 12px;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 9px 14px;
+            border-radius: 8px;
+            background: #123d28;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-btn:hover {
+            background: #185234;
         }
 
         .brand {
-            color: #39d98a;
-            font-size: 21px;
-            font-weight: bold;
-            text-decoration: none;
+            font-size: 20px;
+            font-weight: 800;
+            color: #38d996;
         }
 
-        .back-link {
-            padding: 8px 12px;
-            background: #123b28;
-            color: #d5e8de;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 13px;
-        }
-
-        .match {
-            margin-bottom: 15px;
-            padding: 20px;
-            background: #0c2b1d;
-            border: 1px solid #174732;
+        .match-header {
+            background: #0b2418;
+            border: 1px solid #174a30;
             border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 14px;
         }
 
-        .match-top {
-            display: flex;
-            justify-content: space-between;
-            gap: 15px;
-        }
-
-        .title {
-            margin: 0;
-            font-size: 24px;
-        }
-
-        .league {
-            margin-top: 5px;
-            color: #8eae9d;
-            font-size: 13px;
-        }
-
-        .badge {
-            height: fit-content;
-            padding: 6px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-
-        .live {
-            background: #d92323;
-        }
-
-        .upcoming {
-            background: #164a32;
-            color: #8fe0b6;
+        .event-name {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 8px;
         }
 
         .teams {
-            display: grid;
-            grid-template-columns: 1fr 50px 1fr;
+            display: flex;
             align-items: center;
-            gap: 10px;
-            margin-top: 20px;
+            justify-content: center;
+            gap: 20px;
+            font-size: 18px;
+            font-weight: 700;
+            text-align: center;
         }
 
         .team {
-            padding: 17px 10px;
-            background: #09251a;
-            border: 1px solid #174932;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 17px;
-            font-weight: bold;
+            flex: 1;
+            min-width: 0;
         }
 
         .vs {
-            color: #729988;
-            text-align: center;
-            font-size: 12px;
-            font-weight: bold;
+            color: #61b995;
+            font-size: 13px;
+            flex-shrink: 0;
         }
 
-        .meta {
+        .match-info {
             display: flex;
+            justify-content: center;
             flex-wrap: wrap;
             gap: 8px;
-            margin-top: 15px;
+            margin-top: 12px;
         }
 
-        .meta span {
-            padding: 7px 10px;
-            background: #102f22;
-            border-radius: 7px;
-            color: #9fbeae;
-            font-size: 11px;
+        .badge {
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: #123d28;
+            color: #b9d8ca;
+            font-size: 12px;
         }
 
-        .refresh {
+        .live-badge {
+            background: #6e201d !important;
+            color: #ffb5b0 !important;
+        }
+
+        .status-bar {
             display: flex;
+            align-items: center;
             justify-content: space-between;
+            gap: 10px;
+            padding: 10px 12px;
             margin-bottom: 12px;
-            padding: 10px 13px;
-            background: #0a2519;
-            border: 1px solid #153e2b;
             border-radius: 9px;
-            color: #8fae9f;
-            font-size: 11px;
+            background: #0a2116;
+            border: 1px solid #123d28;
+            font-size: 13px;
+            color: #9dc4b2;
         }
 
-        #status {
-            color: #73d99d;
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #f3b33e;
+            flex-shrink: 0;
+        }
+
+        .status-dot.online {
+            background: #32d583;
+        }
+
+        .status-dot.error {
+            background: #e65c5c;
+        }
+
+        .refresh-text {
+            color: #719c89;
+            font-size: 12px;
         }
 
         .market {
             margin-bottom: 14px;
-            overflow: hidden;
-            background: #0b291c;
-            border: 1px solid #174932;
+            border: 1px solid #174a30;
             border-radius: 12px;
+            overflow: hidden;
+            background: #091f14;
         }
 
-        .market.fancy-market {
-            border-color: #6a5422;
-        }
-
-        .market.fancy-market .market-title {
-            background: #342b13;
-            border-bottom-color: #6a5422;
+        .market-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 12px 14px;
+            background: #0d2b1d;
+            border-bottom: 1px solid #174a30;
         }
 
         .market-title {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 13px 15px;
-            background: #0e3323;
-            border-bottom: 1px solid #174932;
-        }
-
-        .market-name {
             font-size: 15px;
-            font-weight: bold;
-        }
-
-        .fancy-market .market-name {
-            color: #ffd76a;
+            font-weight: 800;
         }
 
         .market-status {
-            color: #7fd7a8;
-            font-size: 10px;
-            font-weight: bold;
-        }
-
-        .fancy-market .market-status {
-            color: #e4bd54;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: #143c28;
+            color: #8ed9b4;
         }
 
         .market-body {
-            padding: 8px;
+            width: 100%;
         }
 
-        /*
-         * NORMAL MATCH / BOOKMAKER
-         */
-
-        .normal-head,
-        .normal-row {
+        .market-columns {
             display: grid;
             grid-template-columns:
-                minmax(180px, 1fr)
-                repeat(6, minmax(65px, 90px));
-            gap: 5px;
-            align-items: center;
+                minmax(150px, 1fr)
+                100px
+                100px;
+            gap: 6px;
+            padding: 8px 10px;
+            color: #719c89;
+            font-size: 11px;
+            text-transform: uppercase;
         }
 
-        .normal-head {
-            padding: 5px 8px;
-            color: #6f9381;
-            font-size: 8px;
-            font-weight: bold;
-            text-transform: uppercase;
+        .market-columns > div:not(:first-child) {
             text-align: center;
         }
 
-        .normal-head .runner-header {
-            text-align: left;
-        }
-
-        .normal-row {
-            padding: 8px;
-            border-top: 1px solid #133b29;
-        }
-
         .runner {
+            display: grid;
+            grid-template-columns:
+                minmax(150px, 1fr)
+                100px
+                100px;
+            gap: 6px;
+            align-items: center;
+            padding: 9px 10px;
+            border-top: 1px solid #123622;
+        }
+
+        .runner-name {
+            font-size: 14px;
+            font-weight: 700;
+            min-width: 0;
             overflow: hidden;
-            color: #f0f7f3;
-            font-size: 13px;
-            font-weight: bold;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
 
-        .runner-status {
-            display: block;
-            margin-top: 3px;
-            color: #628473;
-            font-size: 8px;
-        }
-
-        /*
-         * FANCY
-         */
-
-        .fancy-head,
-        .fancy-row {
-            display: grid;
-            grid-template-columns: minmax(180px, 1fr) 120px 120px;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .fancy-head {
-            padding: 5px 8px;
-            color: #bda961;
-            font-size: 9px;
-            font-weight: bold;
-            text-transform: uppercase;
-            text-align: center;
-        }
-
-        .fancy-head .runner-header {
-            text-align: left;
-        }
-
-        .fancy-row {
-            padding: 8px;
-            border-top: 1px solid #4b3e1d;
-        }
-
-        .fancy-row .runner {
-            color: #fff6d1;
-        }
-
-        /*
-         * ODDS
-         */
-
-        .odd {
+        .odd-box {
             min-height: 48px;
+            border-radius: 7px;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
-            border-radius: 8px;
+            justify-content: center;
+            flex-direction: column;
             cursor: pointer;
             user-select: none;
             transition:
-                transform .08s,
-                opacity .15s;
+                transform 0.08s ease,
+                filter 0.08s ease;
         }
 
-        .odd:hover {
-            transform: translateY(-1px);
+        .odd-box:hover {
+            filter: brightness(1.15);
         }
 
-        .odd:active {
-            transform: scale(.97);
+        .odd-box:active {
+            transform: scale(0.97);
         }
 
-        .back {
-            background: #0f4260;
-            border: 1px solid #155b7e;
+        .back-box {
+            background: #153f64;
+            border: 1px solid #225e91;
         }
 
-        .lay {
-            background: #56302f;
-            border: 1px solid #743d3b;
+        .lay-box {
+            background: #612f3b;
+            border: 1px solid #873f50;
         }
 
         .fancy-yes {
-            background: #315b35;
-            border: 1px solid #4d884f;
+            background: #164c35;
+            border: 1px solid #237d54;
         }
 
         .fancy-no {
-            background: #5b3030;
-            border: 1px solid #884b4b;
+            background: #612f3b;
+            border: 1px solid #873f50;
         }
 
-        .odd.disabled {
-            opacity: .35;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        .odd.selected {
-            outline: 2px solid #ffffff;
-            outline-offset: 1px;
-        }
-
-        .price {
+        .odd-price {
             font-size: 15px;
-            font-weight: bold;
+            font-weight: 800;
         }
 
-        .size {
-            margin-top: 2px;
-            color: #a6c4b6;
-            font-size: 8px;
+        .odd-size {
+            margin-top: 3px;
+            font-size: 10px;
+            color: #b6d1c4;
         }
 
-        .empty-market {
-            padding: 20px;
+        .empty {
+            padding: 22px 14px;
             text-align: center;
-            color: #759888;
-            font-size: 11px;
+            color: #6f9886;
+            font-size: 13px;
         }
 
-        .state {
-            padding: 30px;
-            background: #0b291c;
-            border: 1px solid #174932;
-            border-radius: 12px;
+        .loading {
+            padding: 28px 14px;
             text-align: center;
-            color: #759888;
+            color: #8bb5a2;
         }
 
-        .error {
-            margin-bottom: 12px;
-            padding: 12px;
-            background: #381c1c;
-            border: 1px solid #653030;
-            border-radius: 8px;
-            color: #f0a0a0;
-            font-size: 12px;
+        .spinner {
+            width: 22px;
+            height: 22px;
+            margin: 0 auto 9px;
+            border: 2px solid #214b37;
+            border-top-color: #36d48d;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
         }
 
-        /*
-         * BET SLIP
-         */
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
-        .betslip {
+        .bet-slip {
             position: fixed;
-            right: 20px;
-            bottom: 20px;
-            width: 350px;
-            max-width: calc(100vw - 30px);
-            background: #0c2b1d;
-            border: 1px solid #2b684b;
-            border-radius: 14px;
-            box-shadow: 0 15px 45px rgba(0,0,0,.45);
-            z-index: 9999;
+            right: 18px;
+            bottom: 18px;
+            width: 330px;
+            max-width: calc(100vw - 36px);
+            padding: 14px;
+            background: #0c2619;
+            border: 1px solid #23633f;
+            border-radius: 12px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.45);
+            z-index: 100;
             display: none;
-            overflow: hidden;
         }
 
-        .betslip.show {
+        .bet-slip.show {
             display: block;
         }
 
-        .betslip-header {
+        .slip-title {
+            font-size: 15px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .slip-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 13px 15px;
-            background: #123b28;
-            border-bottom: 1px solid #24563d;
-        }
-
-        .betslip-title {
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .betslip-close {
-            border: 0;
-            background: transparent;
-            color: #ffffff;
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        .betslip-body {
-            padding: 14px;
-        }
-
-        .bet-type {
-            display: inline-block;
-            padding: 4px 7px;
-            margin-bottom: 8px;
-            border-radius: 5px;
-            background: #164a32;
-            color: #8fe0b6;
-            font-size: 9px;
-            font-weight: bold;
-        }
-
-        .bet-name {
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-
-        .bet-market {
-            color: #8eae9d;
-            font-size: 10px;
-            margin-bottom: 12px;
-        }
-
-        .bet-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        .bet-info-box {
-            padding: 9px;
-            background: #09251a;
-            border-radius: 7px;
-        }
-
-        .bet-info-label {
-            display: block;
-            color: #6f9381;
-            font-size: 8px;
-            margin-bottom: 3px;
-        }
-
-        .bet-info-value {
+            gap: 10px;
+            margin-bottom: 7px;
             font-size: 13px;
-            font-weight: bold;
         }
 
-        .stake-label {
-            display: block;
-            margin-top: 13px;
-            margin-bottom: 5px;
-            color: #8eae9d;
-            font-size: 10px;
+        .slip-label {
+            color: #86aa9a;
+        }
+
+        .slip-value {
+            font-weight: 700;
+            text-align: right;
+            word-break: break-word;
         }
 
         .stake-input {
             width: 100%;
-            padding: 11px;
-            border: 1px solid #24563d;
-            border-radius: 8px;
-            outline: none;
+            margin-top: 8px;
+            padding: 10px;
+            border-radius: 7px;
+            border: 1px solid #275e43;
             background: #071b12;
-            color: white;
-            font-size: 14px;
+            color: #ffffff;
+            outline: none;
         }
 
         .stake-input:focus {
-            border-color: #39d98a;
+            border-color: #38d996;
         }
 
-        .place-bet {
+        .place-btn {
             width: 100%;
-            margin-top: 12px;
-            padding: 12px;
+            margin-top: 10px;
+            padding: 11px;
             border: 0;
-            border-radius: 8px;
-            background: #39d98a;
-            color: #062014;
-            font-size: 13px;
-            font-weight: bold;
+            border-radius: 7px;
+            background: #1fa66a;
+            color: white;
+            font-weight: 800;
             cursor: pointer;
         }
 
-        .place-bet:disabled {
-            opacity: .5;
+        .place-btn:hover {
+            background: #25bd78;
+        }
+
+        .place-btn:disabled {
+            opacity: 0.6;
             cursor: not-allowed;
         }
 
-        .betslip-message {
-            margin-top: 9px;
-            color: #e4bd54;
-            font-size: 10px;
-            line-height: 1.4;
-        }
-
-        @media (max-width: 850px) {
-
-            .normal-head,
-            .normal-row {
-                grid-template-columns:
-                    minmax(130px, 1fr)
-                    repeat(6, 58px);
-            }
-
-            .page {
-                overflow-x: auto;
-            }
-
+        .close-slip {
+            float: right;
+            border: 0;
+            background: transparent;
+            color: #86aa9a;
+            cursor: pointer;
+            font-size: 18px;
         }
 
         @media (max-width: 650px) {
-
             .page {
                 padding: 10px;
-                padding-bottom: 100px;
-            }
-
-            .title {
-                font-size: 19px;
             }
 
             .teams {
-                grid-template-columns: 1fr;
+                font-size: 15px;
+                gap: 10px;
             }
 
-            .vs {
-                display: none;
-            }
-
-            .team {
-                padding: 13px;
-                font-size: 14px;
-            }
-
-            .normal-head,
-            .normal-row {
-                grid-template-columns:
-                    minmax(120px, 1fr)
-                    repeat(6, 55px);
-            }
-
-            .fancy-head,
-            .fancy-row {
-                grid-template-columns:
-                    minmax(130px, 1fr)
-                    75px
-                    75px;
-            }
-
+            .market-columns,
             .runner {
-                font-size: 11px;
+                grid-template-columns:
+                    minmax(110px, 1fr)
+                    82px
+                    82px;
             }
 
-            .price {
+            .odd-box {
+                min-height: 44px;
+            }
+
+            .odd-price {
                 font-size: 13px;
             }
 
-            .betslip {
+            .odd-size {
+                font-size: 9px;
+            }
+
+            .bet-slip {
                 right: 10px;
                 bottom: 10px;
                 width: calc(100vw - 20px);
             }
-
         }
-
     </style>
-
 </head>
-
 
 <body>
 
 <div class="page">
 
+    <!-- =====================================================
+         TOP BAR
+    ====================================================== -->
+
     <div class="topbar">
 
-        <a href="/dashboard" class="brand">
+        <a href="/dashboard" class="back-btn">
+            ← Back
+        </a>
+
+        <div class="brand">
             CrickBet
-        </a>
-
-        <a href="/dashboard" class="back-link">
-            ← Matches
-        </a>
-
-    </div>
-
-
-    {% if error %}
-
-    <div class="error">
-        {{ error }}
-    </div>
-
-    {% endif %}
-
-
-    {% if match %}
-
-    <div class="match">
-
-        <div class="match-top">
-
-            <div>
-
-                <h1 class="title">
-                    {{ match.event_name or "Cricket Match" }}
-                </h1>
-
-                <div class="league">
-                    {{ match.league or "Cricket" }}
-                </div>
-
-            </div>
-
-            {% if match.in_play %}
-
-            <div class="badge live">
-                LIVE
-            </div>
-
-            {% else %}
-
-            <div class="badge upcoming">
-                UPCOMING
-            </div>
-
-            {% endif %}
-
         </div>
 
+    </div>
+
+
+    <!-- =====================================================
+         MATCH HEADER
+    ====================================================== -->
+
+    <section class="match-header">
+
+        <div class="event-name" id="eventName">
+            {{ match.event_name if match else "Cricket Match" }}
+        </div>
 
         <div class="teams">
 
-            <div class="team">
-                {{ match.team1 or "Team 1" }}
+            <div class="team" id="team1">
+                {{ match.team1 if match else "" }}
             </div>
 
             <div class="vs">
                 VS
             </div>
 
-            <div class="team">
-                {{ match.team2 or "Team 2" }}
+            <div class="team" id="team2">
+                {{ match.team2 if match else "" }}
             </div>
 
         </div>
 
+        <div class="match-info">
 
-        <div class="meta">
+            <span class="badge" id="matchStatus">
+                Loading
+            </span>
 
-            {% if match.team3 %}
-            <span>{{ match.team3 }}</span>
-            {% endif %}
-
-            {% if match.event_time %}
-            <span>{{ match.event_time }}</span>
-            {% endif %}
-
-            <span>ProExch</span>
+            <span class="badge" id="matchTime">
+                --
+            </span>
 
         </div>
 
-    </div>
+    </section>
 
 
-    <div class="refresh">
+    <!-- =====================================================
+         STATUS BAR
+    ====================================================== -->
 
-        <span id="status">
-            Connecting to live odds...
-        </span>
+    <div class="status-bar">
 
-        <span id="updated">
+        <div class="status-left">
+
+            <span
+                class="status-dot"
+                id="statusDot"
+            ></span>
+
+            <span id="statusText">
+                Loading odds...
+            </span>
+
+        </div>
+
+        <span
+            class="refresh-text"
+            id="refreshText"
+        >
             --
         </span>
 
     </div>
 
 
-    <div id="markets">
+    <!-- =====================================================
+         MARKETS
+    ====================================================== -->
 
-        <div class="state">
+    <main id="marketsContainer">
+
+        <div class="loading">
+
+            <div class="spinner"></div>
+
             Loading markets...
+
         </div>
 
-    </div>
-
-
-    {% else %}
-
-    <div class="state">
-        Match not found
-    </div>
-
-    {% endif %}
+    </main>
 
 </div>
 
 
 <!-- =========================================================
+     MATCH DATA
+
+     Jinja is used ONLY in HTML attributes.
+     Nothing is injected directly into JavaScript.
+========================================================= -->
+
+<div
+    id="matchData"
+    data-game-id="{{ match.game_id if match else '' }}"
+    data-event-id="{{ match.event_id if match else '' }}"
+    data-market-id="{{ match.market_id if match else '' }}"
+    data-event-name="{{ match.event_name if match else '' }}"
+    data-team1="{{ match.team1 if match else '' }}"
+    data-team2="{{ match.team2 if match else '' }}"
+    data-event-time="{{ match.event_time if match else '' }}"
+    data-in-play="{{ 'true' if match and match.in_play else 'false' }}"
+    hidden
+></div>
+
+
+<!-- =========================================================
      BET SLIP
-========================================================== -->
+========================================================= -->
 
-<div id="betslip" class="betslip">
+<div class="bet-slip" id="betSlip">
 
-    <div class="betslip-header">
+    <button
+        type="button"
+        class="close-slip"
+        id="closeSlipButton"
+    >
+        ×
+    </button>
 
-        <span class="betslip-title">
-            Bet Slip
+    <div class="slip-title">
+        Bet Slip
+    </div>
+
+    <div class="slip-row">
+
+        <span class="slip-label">
+            Market
         </span>
 
-        <button
-            type="button"
-            class="betslip-close"
-            onclick="closeBetSlip()"
+        <span
+            class="slip-value"
+            id="slipMarket"
         >
-            ×
-        </button>
+            --
+        </span>
 
     </div>
 
+    <div class="slip-row">
 
-    <div class="betslip-body">
+        <span class="slip-label">
+            Selection
+        </span>
 
-        <div id="betType" class="bet-type">
-            BACK
-        </div>
-
-        <div id="betName" class="bet-name">
+        <span
+            class="slip-value"
+            id="slipSelection"
+        >
             --
-        </div>
-
-        <div id="betMarket" class="bet-market">
-            --
-        </div>
-
-
-        <div class="bet-info">
-
-            <div class="bet-info-box">
-
-                <span class="bet-info-label">
-                    ODDS
-                </span>
-
-                <span
-                    id="betOdds"
-                    class="bet-info-value"
-                >
-                    --
-                </span>
-
-            </div>
-
-
-            <div class="bet-info-box">
-
-                <span class="bet-info-label">
-                    AVAILABLE
-                </span>
-
-                <span
-                    id="betAvailable"
-                    class="bet-info-value"
-                >
-                    --
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <label
-            class="stake-label"
-            for="stake"
-        >
-            STAKE
-        </label>
-
-
-        <input
-            id="stake"
-            class="stake-input"
-            type="number"
-            min="1"
-            step="1"
-            placeholder="Enter stake"
-        >
-
-
-        <button
-            id="placeBetButton"
-            class="place-bet"
-            type="button"
-        >
-            Place Bet
-        </button>
-
-
-        <div id="betslipMessage" class="betslip-message">
-            Select a price to add it to your bet slip.
-        </div>
+        </span>
 
     </div>
+
+    <div class="slip-row">
+
+        <span class="slip-label">
+            Type
+        </span>
+
+        <span
+            class="slip-value"
+            id="slipType"
+        >
+            --
+        </span>
+
+    </div>
+
+    <div class="slip-row">
+
+        <span class="slip-label">
+            Odds
+        </span>
+
+        <span
+            class="slip-value"
+            id="slipOdds"
+        >
+            --
+        </span>
+
+    </div>
+
+    <input
+        type="number"
+        id="stake"
+        class="stake-input"
+        placeholder="Enter stake"
+        min="1"
+        step="1"
+    >
+
+    <button
+        type="button"
+        class="place-btn"
+        id="placeBetButton"
+    >
+        Place Bet
+    </button>
 
 </div>
 
 
-{% if match %}
-
 <script>
+"use strict";
 
-    /*
-     * =========================================================
-     * IDS
-     * =========================================================
-     */
+/* =========================================================
+   STATE
+========================================================= */
 
-    const pathParts =
+let gameId = "";
+let eventId = "";
+let marketId = "";
+
+let oddsLoading = false;
+let selectedBet = null;
+let refreshTimer = null;
+
+
+/* =========================================================
+   READ SERVER MATCH DATA
+========================================================= */
+
+function readServerMatch() {
+
+    const element =
+        document.getElementById("matchData");
+
+    if (!element) {
+        return null;
+    }
+
+    const data = element.dataset;
+
+    if (!data.gameId) {
+        return null;
+    }
+
+    return {
+        game_id: data.gameId,
+        event_id: data.eventId || data.gameId,
+        market_id: data.marketId || "",
+        event_name: data.eventName || "",
+        team1: data.team1 || "",
+        team2: data.team2 || "",
+        event_time: data.eventTime || "",
+        in_play: data.inPlay === "true"
+    };
+}
+
+
+/* =========================================================
+   GET GAME ID FROM URL
+========================================================= */
+
+function getGameIdFromUrl() {
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    const queryGameId =
+        params.get("gameId") ||
+        params.get("game_id");
+
+    if (queryGameId) {
+        return queryGameId;
+    }
+
+    const parts =
         window.location.pathname
             .split("/")
             .filter(Boolean);
 
-    const gameId =
-        pathParts[pathParts.length - 1];
+    if (parts.length > 0) {
 
-    let eventId = "";
-    let marketId = "";
-
-    let selectedBet = null;
-
-    let oddsLoading = false;
-
-
-    /*
-     * =========================================================
-     * HELPERS
-     * =========================================================
-     */
-
-    function safeNumber(value) {
+        const last =
+            parts[parts.length - 1];
 
         if (
-            value === null ||
-            value === undefined ||
-            value === ""
+            last &&
+            last !== "match" &&
+            last !== "matches"
         ) {
-            return null;
+            return last;
         }
-
-        const n = Number(value);
-
-        if (!Number.isFinite(n)) {
-            return null;
-        }
-
-        return n;
-
     }
 
-
-    function validPrice(value) {
-
-        const n = safeNumber(value);
-
-        return n !== null && n > 0;
-
-    }
+    return "";
+}
 
 
-    function displayPrice(value) {
+/* =========================================================
+   INITIALIZE MATCH
+========================================================= */
 
-        if (!validPrice(value)) {
-            return "-";
-        }
+function initializeMatch() {
 
-        return String(value);
+    const serverMatch =
+        readServerMatch();
 
-    }
-
-
-    function displaySize(value) {
-
-        const n = safeNumber(value);
-
-        if (
-            n === null ||
-            n <= 0
-        ) {
-            return "";
-        }
-
-        return String(value);
-
-    }
-
-
-    /*
-     * =========================================================
-     * PRICE BOX
-     * =========================================================
-     */
-
-    function createOddBox(
-        runner,
-        market,
-        side,
-        price,
-        size,
-        level
+    if (
+        serverMatch &&
+        serverMatch.game_id
     ) {
 
-        const isBack =
-            side === "back";
-
-        const isFancy =
-            market.type === "fancy";
-
-        const valid =
-            validPrice(price);
-
-        const box =
-            document.createElement("div");
-
-
-        if (isFancy) {
-
-            box.className =
-                "odd " +
-                (
-                    isBack
-                        ? "fancy-yes"
-                        : "fancy-no"
-                );
-
-        } else {
-
-            box.className =
-                "odd " +
-                (
-                    isBack
-                        ? "back"
-                        : "lay"
-                );
-
-        }
-
-
-        if (!valid) {
-
-            box.classList.add(
-                "disabled"
+        gameId =
+            String(
+                serverMatch.game_id
             );
 
+        eventId =
+            String(
+                serverMatch.event_id ||
+                serverMatch.game_id
+            );
+
+        marketId =
+            String(
+                serverMatch.market_id ||
+                ""
+            );
+
+        updateMatchHeader(
+            serverMatch
+        );
+
+        return;
+    }
+
+
+    gameId =
+        getGameIdFromUrl();
+
+    if (!gameId) {
+
+        setStatus(
+            "error",
+            "Match ID missing"
+        );
+
+        return;
+    }
+
+    resolveMatchIds();
+}
+
+
+/* =========================================================
+   UPDATE MATCH HEADER
+========================================================= */
+
+function updateMatchHeader(match) {
+
+    if (!match) {
+        return;
+    }
+
+    const eventName =
+        document.getElementById(
+            "eventName"
+        );
+
+    const team1 =
+        document.getElementById(
+            "team1"
+        );
+
+    const team2 =
+        document.getElementById(
+            "team2"
+        );
+
+    const status =
+        document.getElementById(
+            "matchStatus"
+        );
+
+    const time =
+        document.getElementById(
+            "matchTime"
+        );
+
+
+    if (eventName) {
+
+        eventName.textContent =
+            match.event_name ||
+            "Cricket Match";
+    }
+
+
+    if (team1) {
+
+        team1.textContent =
+            match.team1 ||
+            "";
+    }
+
+
+    if (team2) {
+
+        team2.textContent =
+            match.team2 ||
+            "";
+    }
+
+
+    if (status) {
+
+        const isLive =
+            match.in_play === true ||
+            match.in_play === 1 ||
+            match.in_play === "true";
+
+        status.textContent =
+            isLive
+                ? "LIVE"
+                : "UPCOMING";
+
+        status.classList.toggle(
+            "live-badge",
+            isLive
+        );
+    }
+
+
+    if (time) {
+
+        time.textContent =
+            formatTime(
+                match.event_time
+            );
+    }
+}
+
+
+/* =========================================================
+   FORMAT TIME
+========================================================= */
+
+function formatTime(value) {
+
+    if (!value) {
+        return "--";
+    }
+
+    const date =
+        new Date(value);
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+        return String(value);
+    }
+
+    return date.toLocaleString(
+        "en-IN",
+        {
+            day: "2-digit",
+            month: "short",
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+function setStatus(
+    state,
+    text
+) {
+
+    const dot =
+        document.getElementById(
+            "statusDot"
+        );
+
+    const status =
+        document.getElementById(
+            "statusText"
+        );
+
+
+    if (dot) {
+
+        dot.className =
+            "status-dot";
+
+        if (state === "online") {
+
+            dot.classList.add(
+                "online"
+            );
+        }
+
+        if (state === "error") {
+
+            dot.classList.add(
+                "error"
+            );
+        }
+    }
+
+
+    if (status) {
+
+        status.textContent =
+            text;
+    }
+}
+
+
+/* =========================================================
+   LOAD ODDS
+========================================================= */
+
+async function loadOdds(
+    force = false
+) {
+
+    if (oddsLoading) {
+        return;
+    }
+
+
+    if (!gameId) {
+
+        setStatus(
+            "error",
+            "Game ID missing"
+        );
+
+        return;
+    }
+
+
+    if (!marketId) {
+
+        await resolveMatchIds();
+
+        if (!marketId) {
+
+            setStatus(
+                "error",
+                "Market ID unavailable"
+            );
+
+            return;
+        }
+    }
+
+
+    oddsLoading = true;
+
+
+    try {
+
+        const query =
+            new URLSearchParams();
+
+
+        query.set(
+            "gameId",
+            gameId
+        );
+
+
+        query.set(
+            "eventId",
+            eventId || gameId
+        );
+
+
+        query.set(
+            "marketId",
+            marketId
+        );
+
+
+        if (force) {
+
+            query.set(
+                "refresh",
+                "true"
+            );
         }
 
 
-        box.dataset.side =
-            side;
-
-        box.dataset.price =
-            valid
-                ? String(price)
-                : "";
-
-        box.dataset.size =
-            size != null
-                ? String(size)
-                : "";
+        const response =
+            await fetch(
+                "/api/cricket/odds?" +
+                query.toString(),
+                {
+                    method: "GET",
+                    credentials: "same-origin",
+                    cache: "no-store"
+                }
+            );
 
 
-        const priceElement =
-            document.createElement("span");
+        if (!response.ok) {
 
-        priceElement.className =
-            "price";
-
-        priceElement.textContent =
-            displayPrice(price);
-
-
-        const sizeElement =
-            document.createElement("span");
-
-        sizeElement.className =
-            "size";
-
-        sizeElement.textContent =
-            displaySize(size);
+            throw new Error(
+                "HTTP " +
+                response.status
+            );
+        }
 
 
-        box.appendChild(
-            priceElement
+        const data =
+            await response.json();
+
+
+        if (!data.success) {
+
+            throw new Error(
+                data.detail ||
+                data.message ||
+                "Odds unavailable"
+            );
+        }
+
+
+        renderMarkets(data);
+
+
+        setStatus(
+            "online",
+            "Odds live"
         );
 
-        box.appendChild(
-            sizeElement
+
+        const refreshText =
+            document.getElementById(
+                "refreshText"
+            );
+
+
+        if (refreshText) {
+
+            refreshText.textContent =
+                "Updated just now";
+        }
+
+    } catch (error) {
+
+        console.error(
+            "[MATCH] odds error:",
+            error
         );
 
 
-        if (valid) {
+        setStatus(
+            "error",
+            "Odds unavailable"
+        );
+
+    } finally {
+
+        oddsLoading = false;
+    }
+}
+
+
+/* =========================================================
+   RESOLVE MATCH IDS
+========================================================= */
+
+async function resolveMatchIds() {
+
+    if (!gameId) {
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/cricket/matches",
+                {
+                    method: "GET",
+                    credentials: "same-origin",
+                    cache: "no-store"
+                }
+            );
+
+
+        if (!response.ok) {
+            return;
+        }
+
+
+        const payload =
+            await response.json();
+
+
+        const matches =
+            Array.isArray(
+                payload.data
+            )
+                ? payload.data
+                : [];
+
+
+        const found =
+            matches.find(
+                function(item) {
+
+                    return String(
+                        item.game_id
+                    ) === String(
+                        gameId
+                    );
+                }
+            );
+
+
+        if (!found) {
+            return;
+        }
+
+
+        eventId =
+            String(
+                found.event_id ||
+                gameId
+            );
+
+
+        marketId =
+            String(
+                found.market_id ||
+                ""
+            );
+
+
+        updateMatchHeader(
+            found
+        );
+
+    } catch (error) {
+
+        console.error(
+            "[MATCH] resolve error:",
+            error
+        );
+    }
+}
+
+
+/* =========================================================
+   RENDER MARKETS
+========================================================= */
+
+function renderMarkets(data) {
+
+    const container =
+        document.getElementById(
+            "marketsContainer"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    const fragments = [];
+
+
+    const matchOdds =
+        Array.isArray(
+            data.match_odds
+        )
+            ? data.match_odds
+            : [];
+
+
+    const bookmakerOdds =
+        Array.isArray(
+            data.bookmaker_odds
+        )
+            ? data.bookmaker_odds
+            : [];
+
+
+    const fancyOdds =
+        Array.isArray(
+            data.fancy_odds
+        )
+            ? data.fancy_odds
+            : [];
+
+
+    /* =====================================================
+       MATCH ODDS
+    ===================================================== */
+
+    if (matchOdds.length > 0) {
+
+        matchOdds.forEach(
+            function(market) {
+
+                fragments.push(
+                    buildMatchMarket(
+                        market
+                    )
+                );
+            }
+        );
+
+    } else {
+
+        fragments.push(
+            buildEmptyMarket(
+                "Match Odds",
+                "Match odds currently unavailable"
+            )
+        );
+    }
+
+
+    /* =====================================================
+       BOOKMAKER
+    ===================================================== */
+
+    bookmakerOdds.forEach(
+        function(market) {
+
+            fragments.push(
+                buildBookmakerMarket(
+                    market
+                )
+            );
+        }
+    );
+
+
+    /* =====================================================
+       FANCY
+    ===================================================== */
+
+    if (fancyOdds.length > 0) {
+
+        fancyOdds.forEach(
+            function(market) {
+
+                fragments.push(
+                    buildFancyMarket(
+                        market
+                    )
+                );
+            }
+        );
+
+    } else {
+
+        fragments.push(
+            buildEmptyMarket(
+                "🎯 Fancy / Session",
+                "No fancy/session markets available for this match"
+            )
+        );
+    }
+
+
+    container.innerHTML =
+        fragments.join("");
+
+
+    attachBetEvents();
+}
+
+
+/* =========================================================
+   MATCH ODDS
+========================================================= */
+
+function buildMatchMarket(
+    market
+) {
+
+    const runners =
+        Array.isArray(
+            market.runners
+        )
+            ? market.runners
+            : [];
+
+
+    let html = "";
+
+
+    html +=
+        '<section class="market">';
+
+
+    html +=
+        '<div class="market-header">';
+
+
+    html +=
+        '<div class="market-title">' +
+        escapeHtml(
+            market.name ||
+            "Match Odds"
+        ) +
+        "</div>";
+
+
+    html +=
+        '<div class="market-status">' +
+        escapeHtml(
+            market.status ||
+            "OPEN"
+        ) +
+        "</div>";
+
+
+    html +=
+        "</div>";
+
+
+    html +=
+        '<div class="market-body">';
+
+
+    html +=
+        '<div class="market-columns">' +
+        "<div>Runner</div>" +
+        "<div>Back</div>" +
+        "<div>Lay</div>" +
+        "</div>";
+
+
+    if (runners.length === 0) {
+
+        html +=
+            '<div class="empty">' +
+            "No runners available" +
+            "</div>";
+
+    } else {
+
+        runners.forEach(
+            function(runner) {
+
+                const runnerName =
+                    runner.name ||
+                    runner.rname ||
+                    "Runner";
+
+
+                html +=
+                    '<div class="runner">';
+
+
+                html +=
+                    '<div class="runner-name">' +
+                    escapeHtml(
+                        runnerName
+                    ) +
+                    "</div>";
+
+
+                html += createOddBox(
+                    runner.back,
+                    runner.back_size,
+                    "back-box",
+                    market.name ||
+                        "Match Odds",
+                    runnerName,
+                    "BACK"
+                );
+
+
+                html += createOddBox(
+                    runner.lay,
+                    runner.lay_size,
+                    "lay-box",
+                    market.name ||
+                        "Match Odds",
+                    runnerName,
+                    "LAY"
+                );
+
+
+                html +=
+                    "</div>";
+            }
+        );
+    }
+
+
+    html +=
+        "</div>";
+
+
+    html +=
+        "</section>";
+
+
+    return html;
+}
+
+
+/* =========================================================
+   BOOKMAKER
+========================================================= */
+
+function buildBookmakerMarket(
+    market
+) {
+
+    const runners =
+        Array.isArray(
+            market.runners
+        )
+            ? market.runners
+            : [];
+
+
+    let html = "";
+
+
+    html +=
+        '<section class="market">';
+
+
+    html +=
+        '<div class="market-header">';
+
+
+    html +=
+        '<div class="market-title">' +
+        "🏏 Bookmaker" +
+        "</div>";
+
+
+    html +=
+        '<div class="market-status">' +
+        escapeHtml(
+            market.status ||
+            "OPEN"
+        ) +
+        "</div>";
+
+
+    html +=
+        "</div>";
+
+
+    html +=
+        '<div class="market-body">';
+
+
+    html +=
+        '<div class="market-columns">' +
+        "<div>Runner</div>" +
+        "<div>Back</div>" +
+        "<div>Lay</div>" +
+        "</div>";
+
+
+    if (runners.length === 0) {
+
+        html +=
+            '<div class="empty">' +
+            "No bookmaker runners available" +
+            "</div>";
+
+    } else {
+
+        runners.forEach(
+            function(runner) {
+
+                const runnerName =
+                    runner.name ||
+                    runner.rname ||
+                    "Runner";
+
+
+                html +=
+                    '<div class="runner">';
+
+
+                html +=
+                    '<div class="runner-name">' +
+                    escapeHtml(
+                        runnerName
+                    ) +
+                    "</div>";
+
+
+                html += createOddBox(
+                    runner.back,
+                    runner.back_size,
+                    "back-box",
+                    market.name ||
+                        "Bookmaker",
+                    runnerName,
+                    "BACK"
+                );
+
+
+                html += createOddBox(
+                    runner.lay,
+                    runner.lay_size,
+                    "lay-box",
+                    market.name ||
+                        "Bookmaker",
+                    runnerName,
+                    "LAY"
+                );
+
+
+                html +=
+                    "</div>";
+            }
+        );
+    }
+
+
+    html +=
+        "</div>";
+
+
+    html +=
+        "</section>";
+
+
+    return html;
+}
+
+
+/* =========================================================
+   FANCY / SESSION
+========================================================= */
+
+function buildFancyMarket(
+    market
+) {
+
+    let rows = [];
+
+
+    if (
+        Array.isArray(
+            market.rows
+        )
+    ) {
+
+        rows =
+            market.rows;
+
+    } else if (
+        Array.isArray(
+            market.runners
+        )
+    ) {
+
+        rows =
+            market.runners;
+    }
+
+
+    let html = "";
+
+
+    html +=
+        '<section class="market">';
+
+
+    html +=
+        '<div class="market-header">';
+
+
+    html +=
+        '<div class="market-title">' +
+        "🎯 Fancy / Session" +
+        "</div>";
+
+
+    html +=
+        '<div class="market-status">' +
+        escapeHtml(
+            market.status ||
+            "OPEN"
+        ) +
+        "</div>";
+
+
+    html +=
+        "</div>";
+
+
+    html +=
+        '<div class="market-body">';
+
+
+    html +=
+        '<div class="market-columns">' +
+        "<div>Session</div>" +
+        "<div>Yes</div>" +
+        "<div>No</div>" +
+        "</div>";
+
+
+    if (rows.length === 0) {
+
+        html +=
+            '<div class="empty">' +
+            "No session rows available" +
+            "</div>";
+
+    } else {
+
+        rows.forEach(
+            function(row) {
+
+                const yes =
+                    row.yes !== undefined &&
+                    row.yes !== null
+                        ? row.yes
+                        : row.back;
+
+
+                const yesSize =
+                    row.yes_size !== undefined &&
+                    row.yes_size !== null
+                        ? row.yes_size
+                        : row.back_size;
+
+
+                const no =
+                    row.no !== undefined &&
+                    row.no !== null
+                        ? row.no
+                        : row.lay;
+
+
+                const noSize =
+                    row.no_size !== undefined &&
+                    row.no_size !== null
+                        ? row.no_size
+                        : row.lay_size;
+
+
+                const sessionName =
+                    row.name ||
+                    row.rname ||
+                    row.session ||
+                    "Session";
+
+
+                html +=
+                    '<div class="runner">';
+
+
+                html +=
+                    '<div class="runner-name">' +
+                    escapeHtml(
+                        sessionName
+                    ) +
+                    "</div>";
+
+
+                html += createFancyBox(
+                    yes,
+                    yesSize,
+                    "fancy-yes",
+                    market.name ||
+                        "Fancy / Session",
+                    sessionName,
+                    "YES"
+                );
+
+
+                html += createFancyBox(
+                    no,
+                    noSize,
+                    "fancy-no",
+                    market.name ||
+                        "Fancy / Session",
+                    sessionName,
+                    "NO"
+                );
+
+
+                html +=
+                    "</div>";
+            }
+        );
+    }
+
+
+    html +=
+        "</div>";
+
+
+    html +=
+        "</section>";
+
+
+    return html;
+}
+
+
+/* =========================================================
+   EMPTY MARKET
+========================================================= */
+
+function buildEmptyMarket(
+    title,
+    message
+) {
+
+    return (
+        '<section class="market">' +
+
+        '<div class="market-header">' +
+
+        '<div class="market-title">' +
+        escapeHtml(title) +
+        "</div>" +
+
+        "</div>" +
+
+        '<div class="empty">' +
+        escapeHtml(message) +
+        "</div>" +
+
+        "</section>"
+    );
+}
+
+
+/* =========================================================
+   NORMAL ODD BOX
+========================================================= */
+
+function createOddBox(
+    price,
+    size,
+    cssClass,
+    market,
+    selection,
+    type
+) {
+
+    const numericPrice =
+        Number(price);
+
+
+    const valid =
+        price !== null &&
+        price !== undefined &&
+        price !== "" &&
+        Number.isFinite(
+            numericPrice
+        ) &&
+        numericPrice > 0;
+
+
+    if (!valid) {
+
+        return (
+            '<div class="odd-box ' +
+            cssClass +
+            '">' +
+
+            '<div class="odd-price">' +
+            "-" +
+            "</div>" +
+
+            "</div>"
+        );
+    }
+
+
+    const numericSize =
+        Number(size);
+
+
+    const displaySize =
+        Number.isFinite(
+            numericSize
+        ) &&
+        numericSize > 0
+            ? numericSize.toFixed(2)
+            : "";
+
+
+    let html =
+        '<div ' +
+        'class="odd-box ' +
+        cssClass +
+        '" ' +
+
+        'data-bet-market="' +
+        escapeAttribute(market) +
+        '" ' +
+
+        'data-bet-selection="' +
+        escapeAttribute(selection) +
+        '" ' +
+
+        'data-bet-type="' +
+        escapeAttribute(type) +
+        '" ' +
+
+        'data-bet-odds="' +
+        escapeAttribute(
+            numericPrice
+        ) +
+        '">';
+
+
+    html +=
+        '<div class="odd-price">' +
+        numericPrice.toFixed(2) +
+        "</div>";
+
+
+    if (displaySize) {
+
+        html +=
+            '<div class="odd-size">' +
+            displaySize +
+            "</div>";
+    }
+
+
+    html +=
+        "</div>";
+
+
+    return html;
+}
+
+
+/* =========================================================
+   FANCY ODD BOX
+========================================================= */
+
+function createFancyBox(
+    price,
+    size,
+    cssClass,
+    market,
+    selection,
+    type
+) {
+
+    const numericPrice =
+        Number(price);
+
+
+    const valid =
+        price !== null &&
+        price !== undefined &&
+        price !== "" &&
+        Number.isFinite(
+            numericPrice
+        ) &&
+        numericPrice > 0;
+
+
+    if (!valid) {
+
+        return (
+            '<div class="odd-box ' +
+            cssClass +
+            '">' +
+
+            '<div class="odd-price">' +
+            "-" +
+            "</div>" +
+
+            "</div>"
+        );
+    }
+
+
+    const numericSize =
+        Number(size);
+
+
+    const displaySize =
+        Number.isFinite(
+            numericSize
+        ) &&
+        numericSize > 0
+            ? numericSize.toFixed(2)
+            : "";
+
+
+    let html =
+        '<div ' +
+        'class="odd-box ' +
+        cssClass +
+        '" ' +
+
+        'data-bet-market="' +
+        escapeAttribute(market) +
+        '" ' +
+
+        'data-bet-selection="' +
+        escapeAttribute(selection) +
+        '" ' +
+
+        'data-bet-type="' +
+        escapeAttribute(type) +
+        '" ' +
+
+        'data-bet-odds="' +
+        escapeAttribute(
+            numericPrice
+        ) +
+        '">';
+
+
+    html +=
+        '<div class="odd-price">' +
+        numericPrice.toFixed(2) +
+        "</div>";
+
+
+    if (displaySize) {
+
+        html +=
+            '<div class="odd-size">' +
+            displaySize +
+            "</div>";
+    }
+
+
+    html +=
+        "</div>";
+
+
+    return html;
+}
+
+
+/* =========================================================
+   ATTACH BET EVENTS
+========================================================= */
+
+function attachBetEvents() {
+
+    const boxes =
+        document.querySelectorAll(
+            "[data-bet-market]"
+        );
+
+
+    boxes.forEach(
+        function(box) {
 
             box.addEventListener(
                 "click",
                 function() {
 
+                    const odds =
+                        Number(
+                            box.dataset.betOdds
+                        );
+
+
+                    if (
+                        !Number.isFinite(
+                            odds
+                        ) ||
+                        odds <= 0
+                    ) {
+                        return;
+                    }
+
+
                     selectBet(
-                        runner,
-                        market,
-                        side,
-                        price,
-                        size,
-                        box
+                        box.dataset.betMarket,
+                        box.dataset.betSelection,
+                        box.dataset.betType,
+                        odds
                     );
-
                 }
             );
-
         }
+    );
+}
 
 
-        return box;
+/* =========================================================
+   SELECT BET
+========================================================= */
 
+function selectBet(
+    market,
+    selection,
+    type,
+    odds
+) {
+
+    selectedBet = {
+        market: market,
+        selection: selection,
+        type: type,
+        odds: odds
+    };
+
+
+    const slipMarket =
+        document.getElementById(
+            "slipMarket"
+        );
+
+
+    const slipSelection =
+        document.getElementById(
+            "slipSelection"
+        );
+
+
+    const slipType =
+        document.getElementById(
+            "slipType"
+        );
+
+
+    const slipOdds =
+        document.getElementById(
+            "slipOdds"
+        );
+
+
+    const betSlip =
+        document.getElementById(
+            "betSlip"
+        );
+
+
+    if (slipMarket) {
+
+        slipMarket.textContent =
+            market;
     }
 
 
-    /*
-     * =========================================================
-     * NORMAL MARKET
-     * =========================================================
-     */
+    if (slipSelection) {
 
-    function buildNormalMarket(
-        market
-    ) {
-
-        const box =
-            document.createElement(
-                "div"
-            );
-
-        box.className =
-            "market";
-
-
-        const header =
-            document.createElement(
-                "div"
-            );
-
-        header.className =
-            "market-title";
-
-
-        const name =
-            document.createElement(
-                "span"
-            );
-
-        name.className =
-            "market-name";
-
-        name.textContent =
-            market.name ||
-            "Match Odds";
-
-
-        const status =
-            document.createElement(
-                "span"
-            );
-
-        status.className =
-            "market-status";
-
-        status.textContent =
-            market.status ||
-            "OPEN";
-
-
-        header.appendChild(name);
-        header.appendChild(status);
-
-
-        const body =
-            document.createElement(
-                "div"
-            );
-
-        body.className =
-            "market-body";
-
-
-        /*
-         * HEADER
-         */
-
-        const head =
-            document.createElement(
-                "div"
-            );
-
-        head.className =
-            "normal-head";
-
-
-        const runnerHead =
-            document.createElement(
-                "span"
-            );
-
-        runnerHead.className =
-            "runner-header";
-
-        runnerHead.textContent =
-            "Runner";
-
-
-        head.appendChild(
-            runnerHead
-        );
-
-
-        const columns = [
-            "Back 1",
-            "Back 2",
-            "Back 3",
-            "Lay 1",
-            "Lay 2",
-            "Lay 3"
-        ];
-
-
-        columns.forEach(
-            function(text) {
-
-                const span =
-                    document.createElement(
-                        "span"
-                    );
-
-                span.textContent =
-                    text;
-
-                head.appendChild(span);
-
-            }
-        );
-
-
-        body.appendChild(head);
-
-
-        /*
-         * RUNNERS
-         */
-
-        const runners =
-            Array.isArray(
-                market.runners
-            )
-                ? market.runners
-                : [];
-
-
-        if (runners.length === 0) {
-
-            const empty =
-                document.createElement(
-                    "div"
-                );
-
-            empty.className =
-                "empty-market";
-
-            empty.textContent =
-                "No runners available.";
-
-            body.appendChild(empty);
-
-        }
-
-
-        runners.forEach(
-            function(runner) {
-
-                const row =
-                    document.createElement(
-                        "div"
-                    );
-
-                row.className =
-                    "normal-row";
-
-
-                row.dataset.selectionId =
-                    String(
-                        runner.id ??
-                        runner.sid ??
-                        runner.selection_id ??
-                        ""
-                    );
-
-
-                const runnerElement =
-                    document.createElement(
-                        "div"
-                    );
-
-                runnerElement.className =
-                    "runner";
-
-                runnerElement.textContent =
-                    runner.name ||
-                    "Unknown";
-
-
-                if (runner.status) {
-
-                    const runnerStatus =
-                        document.createElement(
-                            "span"
-                        );
-
-                    runnerStatus.className =
-                        "runner-status";
-
-                    runnerStatus.textContent =
-                        runner.status;
-
-                    runnerElement.appendChild(
-                        runnerStatus
-                    );
-
-                }
-
-
-                row.appendChild(
-                    runnerElement
-                );
-
-
-                /*
-                 * BACK 1
-                 */
-
-                row.appendChild(
-                    createOddBox(
-                        runner,
-                        market,
-                        "back",
-                        runner.back,
-                        runner.back_size,
-                        1
-                    )
-                );
-
-
-                /*
-                 * BACK 2
-                 */
-
-                row.appendChild(
-                    createOddBox(
-                        runner,
-                        market,
-                        "back",
-                        runner.back2,
-                        runner.back2_size,
-                        2
-                    )
-                );
-
-
-                /*
-                 * BACK 3
-                 */
-
-                row.appendChild(
-                    createOddBox(
-                        runner,
-                        market,
-                        "back",
-                        runner.back3,
-                        runner.back3_size,
-                        3
-                    )
-                );
-
-
-                /*
-                 * LAY 1
-                 */
-
-                row.appendChild(
-                    createOddBox(
-                        runner,
-                        market,
-                        "lay",
-                        runner.lay,
-                        runner.lay_size,
-                        1
-                    )
-                );
-
-
-                /*
-                 * LAY 2
-                 */
-
-                row.appendChild(
-                    createOddBox(
-                        runner,
-                        market,
-                        "lay",
-                        runner.lay2,
-                        runner.lay2_size,
-                        2
-                    )
-                );
-
-
-                /*
-                 * LAY 3
-                 */
-
-                row.appendChild(
-                    createOddBox(
-                        runner,
-                        market,
-                        "lay",
-                        runner.lay3,
-                        runner.lay3_size,
-                        3
-                    )
-                );
-
-
-                body.appendChild(row);
-
-            }
-        );
-
-
-        box.appendChild(header);
-        box.appendChild(body);
-
-        return box;
-
+        slipSelection.textContent =
+            selection;
     }
 
 
-    /*
-     * =========================================================
-     * FANCY MARKET
-     * =========================================================
-     */
+    if (slipType) {
 
-    function buildFancyMarket(
-        market
-    ) {
-
-        const box =
-            document.createElement(
-                "div"
-            );
-
-        box.className =
-            "market fancy-market";
-
-
-        const header =
-            document.createElement(
-                "div"
-            );
-
-        header.className =
-            "market-title";
-
-
-        const name =
-            document.createElement(
-                "span"
-            );
-
-        name.className =
-            "market-name";
-
-        name.textContent =
-            "🎯 " +
-            (
-                market.name ||
-                "Fancy / Session"
-            );
-
-
-        const status =
-            document.createElement(
-                "span"
-            );
-
-        status.className =
-            "market-status";
-
-        status.textContent =
-            market.status ||
-            "SESSION";
-
-
-        header.appendChild(name);
-        header.appendChild(status);
-
-
-        const body =
-            document.createElement(
-                "div"
-            );
-
-        body.className =
-            "market-body";
-
-
-        /*
-         * IMPORTANT:
-         *
-         * ProExch fancy parser returns:
-         *
-         * market.rows
-         *
-         * It also returns market.runners.
-         *
-         * Prefer rows and fallback to runners.
-         */
-
-        const rows =
-            Array.isArray(market.rows)
-                ? market.rows
-                : (
-                    Array.isArray(
-                        market.runners
-                    )
-                        ? market.runners
-                        : []
-                );
-
-
-        /*
-         * HEADER
-         */
-
-        const head =
-            document.createElement(
-                "div"
-            );
-
-        head.className =
-            "fancy-head";
-
-
-        const runnerHead =
-            document.createElement(
-                "span"
-            );
-
-        runnerHead.className =
-            "runner-header";
-
-        runnerHead.textContent =
-            "Session";
-
-
-        const yesHead =
-            document.createElement(
-                "span"
-            );
-
-        yesHead.textContent =
-            "YES";
-
-
-        const noHead =
-            document.createElement(
-                "span"
-            );
-
-        noHead.textContent =
-            "NO";
-
-
-        head.appendChild(
-            runnerHead
-        );
-
-        head.appendChild(
-            yesHead
-        );
-
-        head.appendChild(
-            noHead
-        );
-
-
-        body.appendChild(head);
-
-
-        /*
-         * NO FANCY ROWS
-         */
-
-        if (rows.length === 0) {
-
-            const empty =
-                document.createElement(
-                    "div"
-                );
-
-            empty.className =
-                "empty-market";
-
-            empty.textContent =
-                "No Session/Fancy odds available.";
-
-            body.appendChild(empty);
-
-        }
-
-
-        /*
-         * FANCY ROWS
-         */
-
-        rows.forEach(
-            function(rowData) {
-
-                const row =
-                    document.createElement(
-                        "div"
-                    );
-
-                row.className =
-                    "fancy-row";
-
-
-                row.dataset.selectionId =
-                    String(
-                        rowData.id ??
-                        rowData.sid ??
-                        rowData.selection_id ??
-                        ""
-                    );
-
-
-                const runnerElement =
-                    document.createElement(
-                        "div"
-                    );
-
-                runnerElement.className =
-                    "runner";
-
-                runnerElement.textContent =
-                    rowData.name ||
-                    "Session";
-
-
-                if (rowData.status) {
-
-                    const runnerStatus =
-                        document.createElement(
-                            "span"
-                        );
-
-                    runnerStatus.className =
-                        "runner-status";
-
-                    runnerStatus.textContent =
-                        rowData.status;
-
-                    runnerElement.appendChild(
-                        runnerStatus
-                    );
-
-                }
-
-
-                row.appendChild(
-                    runnerElement
-                );
-
-
-                /*
-                 * YES
-                 *
-                 * ProExch:
-                 *
-                 * b1 = YES
-                 * bs1 = YES SIZE
-                 */
-
-                const yesPrice =
-                    rowData.yes ??
-                    rowData.back;
-
-
-                const yesSize =
-                    rowData.yes_size ??
-                    rowData.back_size;
-
-
-                row.appendChild(
-                    createOddBox(
-                        rowData,
-                        {
-                            ...market,
-                            type: "fancy"
-                        },
-                        "back",
-                        yesPrice,
-                        yesSize
-                    )
-                );
-
-
-                /*
-                 * NO
-                 *
-                 * ProExch:
-                 *
-                 * l1 = NO
-                 * ls1 = NO SIZE
-                 */
-
-                const noPrice =
-                    rowData.no ??
-                    rowData.lay;
-
-
-                const noSize =
-                    rowData.no_size ??
-                    rowData.lay_size;
-
-
-                row.appendChild(
-                    createOddBox(
-                        rowData,
-                        {
-                            ...market,
-                            type: "fancy"
-                        },
-                        "lay",
-                        noPrice,
-                        noSize
-                    )
-                );
-
-
-                body.appendChild(row);
-
-            }
-        );
-
-
-        box.appendChild(header);
-        box.appendChild(body);
-
-        return box;
-
+        slipType.textContent =
+            type;
     }
 
 
-    /*
-     * =========================================================
-     * RENDER MARKETS
-     * =========================================================
-     */
+    if (slipOdds) {
 
-    function renderMarkets(data) {
-
-        const container =
-            document.getElementById(
-                "markets"
-            );
-
-
-        if (!container) {
-            return;
-        }
-
-
-        console.log(
-            "[MATCH] FULL NORMALIZED ODDS:",
-            data
-        );
-
-
-        console.log(
-            "[MATCH] FANCY ODDS:",
-            data.fancy_odds
-        );
-
-
-        const fragment =
-            document.createDocumentFragment();
-
-
-        let totalMarkets = 0;
-
-
-        /*
-         * MATCH ODDS
-         */
-
-        if (
-            Array.isArray(
-                data.match_odds
-            )
-        ) {
-
-            data.match_odds.forEach(
-                function(market) {
-
-                    totalMarkets++;
-
-                    fragment.appendChild(
-                        buildNormalMarket(
-                            {
-                                ...market,
-                                type: "match"
-                            }
-                        )
-                    );
-
-                }
-            );
-
-        }
-
-
-        /*
-         * BOOKMAKER
-         */
-
-        if (
-            Array.isArray(
-                data.bookmaker_odds
-            )
-        ) {
-
-            data.bookmaker_odds.forEach(
-                function(market) {
-
-                    totalMarkets++;
-
-                    fragment.appendChild(
-                        buildNormalMarket(
-                            {
-                                ...market,
-                                type: "bookmaker"
-                            }
-                        )
-                    );
-
-                }
-            );
-
-        }
-
-
-        /*
-         * FANCY / SESSION
-         */
-
-        if (
-            Array.isArray(
-                data.fancy_odds
-            )
-        ) {
-
-            data.fancy_odds.forEach(
-                function(market) {
-
-                    totalMarkets++;
-
-                    fragment.appendChild(
-                        buildFancyMarket(
-                            {
-                                ...market,
-                                type: "fancy"
-                            }
-                        )
-                    );
-
-                }
-            );
-
-        }
-
-
-        /*
-         * OTHER MARKETS
-         *
-         * Currently provider-specific and not
-         * rendered as betting rows.
-         */
-
-        console.log(
-            "[MATCH] Other markets:",
-            data.other_market_odds
-        );
-
-
-        /*
-         * NOTHING
-         */
-
-        if (totalMarkets === 0) {
-
-            container.innerHTML =
-                '<div class="state">' +
-                'No live markets available from ProExch.' +
-                '</div>';
-
-            return;
-
-        }
-
-
-        container.innerHTML = "";
-
-        container.appendChild(
-            fragment
-        );
-
+        slipOdds.textContent =
+            Number(
+                odds
+            ).toFixed(2);
     }
 
 
-    /*
-     * =========================================================
-     * FIND MATCH IDS
-     * =========================================================
-     */
+    if (betSlip) {
 
-    async function getMatchIds() {
-
-        const status =
-            document.getElementById(
-                "status"
-            );
-
-
-        if (status) {
-
-            status.textContent =
-                "Finding market...";
-
-        }
-
-
-        try {
-
-            const response =
-                await fetch(
-                    "/api/cricket/matches",
-                    {
-                        credentials:
-                            "same-origin",
-
-                        cache:
-                            "no-store"
-                    }
-                );
-
-
-            if (!response.ok) {
-
-                throw new Error(
-                    "Unable to load matches"
-                );
-
-            }
-
-
-            const data =
-                await response.json();
-
-
-            if (!data.success) {
-
-                throw new Error(
-                    data.error ||
-                    "Unable to load matches"
-                );
-
-            }
-
-
-            const matches =
-                Array.isArray(
-                    data.matches
-                )
-                    ? data.matches
-                    : [];
-
-
-            const found =
-                matches.find(
-                    function(item) {
-
-                        const id =
-                            item.game_id ??
-                            item.gameId ??
-                            "";
-
-                        return String(id) ===
-                            String(gameId);
-
-                    }
-                );
-
-
-            if (!found) {
-
-                throw new Error(
-                    "Match not found in ProExch"
-                );
-
-            }
-
-
-            eventId =
-                found.event_id ??
-                found.eventId ??
-                gameId;
-
-
-            marketId =
-                found.market_id ??
-                found.marketId ??
-                "";
-
-
-            console.log(
-                "[MATCH] Resolved IDs:",
-                {
-                    gameId,
-                    eventId,
-                    marketId
-                }
-            );
-
-
-            if (status) {
-
-                status.textContent =
-                    "Market found";
-
-            }
-
-
-            await loadOdds();
-
-        } catch (error) {
-
-            console.error(
-                "[MATCH] Match ID error:",
-                error
-            );
-
-
-            if (status) {
-
-                status.textContent =
-                    error.message ||
-                    "Unable to find market";
-
-            }
-
-        }
-
-    }
-
-
-    /*
-     * =========================================================
-     * LOAD ODDS
-     * =========================================================
-     */
-
-    async function loadOdds() {
-
-        if (oddsLoading) {
-            return;
-        }
-
-
-        if (!gameId) {
-            return;
-        }
-
-
-        if (!marketId) {
-
-            console.warn(
-                "[MATCH] No marketId"
-            );
-
-            return;
-
-        }
-
-
-        oddsLoading = true;
-
-
-        const status =
-            document.getElementById(
-                "status"
-            );
-
-
-        const updated =
-            document.getElementById(
-                "updated"
-            );
-
-
-        try {
-
-            const params =
-                new URLSearchParams();
-
-
-            params.set(
-                "gameId",
-                gameId
-            );
-
-
-            /*
-             * Keep eventId for our own backend
-             * compatibility.
-             *
-             * ProExch service does not send it
-             * to the provider.
-             */
-
-            params.set(
-                "eventId",
-                eventId
-            );
-
-
-            params.set(
-                "marketId",
-                marketId
-            );
-
-
-            const url =
-                "/api/cricket/odds?" +
-                params.toString();
-
-
-            console.log(
-                "[MATCH] Loading odds:",
-                url
-            );
-
-
-            const response =
-                await fetch(
-                    url,
-                    {
-                        credentials:
-                            "same-origin",
-
-                        cache:
-                            "no-store"
-                    }
-                );
-
-
-            if (!response.ok) {
-
-                throw new Error(
-                    "Odds request failed: " +
-                    response.status
-                );
-
-            }
-
-
-            const data =
-                await response.json();
-
-
-            console.log(
-                "[MATCH] Odds received:",
-                data
-            );
-
-
-            if (!data.success) {
-
-                throw new Error(
-                    data.error ||
-                    "Odds unavailable"
-                );
-
-            }
-
-
-            renderMarkets(data);
-
-
-            const matchCount =
-                Array.isArray(
-                    data.match_odds
-                )
-                    ? data.match_odds.length
-                    : 0;
-
-
-            const bookmakerCount =
-                Array.isArray(
-                    data.bookmaker_odds
-                )
-                    ? data.bookmaker_odds.length
-                    : 0;
-
-
-            const fancyCount =
-                Array.isArray(
-                    data.fancy_odds
-                )
-                    ? data.fancy_odds.length
-                    : 0;
-
-
-            const fancyRows =
-                Array.isArray(
-                    data.fancy_odds
-                )
-                    ? data.fancy_odds.reduce(
-                        function(total, market) {
-
-                            const rows =
-                                Array.isArray(
-                                    market.rows
-                                )
-                                    ? market.rows
-                                    : (
-                                        Array.isArray(
-                                            market.runners
-                                        )
-                                            ? market.runners
-                                            : []
-                                    );
-
-                            return total +
-                                rows.length;
-
-                        },
-                        0
-                    )
-                    : 0;
-
-
-            if (status) {
-
-                if (fancyRows > 0) {
-
-                    status.textContent =
-                        "Live odds + Fancy/Session connected";
-
-                } else if (matchCount > 0) {
-
-                    status.textContent =
-                        "Live Match Odds connected";
-
-                } else {
-
-                    status.textContent =
-                        "No live odds available";
-
-                }
-
-            }
-
-
-            if (updated) {
-
-                updated.textContent =
-                    new Date()
-                        .toLocaleTimeString();
-
-            }
-
-
-            console.log(
-                "[MATCH] Market counts:",
-                {
-                    match_markets:
-                        matchCount,
-
-                    bookmaker_markets:
-                        bookmakerCount,
-
-                    fancy_markets:
-                        fancyCount,
-
-                    fancy_rows:
-                        fancyRows
-                }
-            );
-
-        } catch (error) {
-
-            console.error(
-                "[MATCH] Odds error:",
-                error
-            );
-
-
-            if (status) {
-
-                status.textContent =
-                    error.message ||
-                    "Unable to update odds";
-
-            }
-
-        } finally {
-
-            oddsLoading = false;
-
-        }
-
-    }
-
-
-    /*
-     * =========================================================
-     * SELECT BET
-     * =========================================================
-     */
-
-    function selectBet(
-        runner,
-        market,
-        side,
-        price,
-        size,
-        element
-    ) {
-
-        if (!validPrice(price)) {
-            return;
-        }
-
-
-        document
-            .querySelectorAll(
-                ".odd.selected"
-            )
-            .forEach(
-                function(item) {
-
-                    item.classList.remove(
-                        "selected"
-                    );
-
-                }
-            );
-
-
-        element.classList.add(
-            "selected"
-        );
-
-
-        selectedBet = {
-
-            game_id:
-                String(gameId),
-
-            event_id:
-                String(eventId),
-
-            market_id:
-                String(
-                    market.id ||
-                    market.market_id ||
-                    marketId ||
-                    ""
-                ),
-
-            market_type:
-                market.type ||
-                "match",
-
-            market_name:
-                market.name ||
-                (
-                    market.type === "fancy"
-                        ? "Fancy / Session"
-                        : "Match Odds"
-                ),
-
-            selection_id:
-                String(
-                    runner.id ??
-                    runner.sid ??
-                    runner.selection_id ??
-                    ""
-                ),
-
-            selection_name:
-                runner.name ||
-                "",
-
-            side:
-                side,
-
-            odds:
-                Number(price),
-
-            available_size:
-                size != null
-                    ? Number(size)
-                    : null
-
-        };
-
-
-        console.log(
-            "[BET] Selected:",
-            selectedBet
-        );
-
-
-        openBetSlip();
-
-    }
-
-
-    /*
-     * =========================================================
-     * OPEN BET SLIP
-     * =========================================================
-     */
-
-    function openBetSlip() {
-
-        if (!selectedBet) {
-            return;
-        }
-
-
-        const slip =
-            document.getElementById(
-                "betslip"
-            );
-
-
-        const type =
-            document.getElementById(
-                "betType"
-            );
-
-
-        const name =
-            document.getElementById(
-                "betName"
-            );
-
-
-        const market =
-            document.getElementById(
-                "betMarket"
-            );
-
-
-        const odds =
-            document.getElementById(
-                "betOdds"
-            );
-
-
-        const available =
-            document.getElementById(
-                "betAvailable"
-            );
-
-
-        const message =
-            document.getElementById(
-                "betslipMessage"
-            );
-
-
-        type.textContent =
-            selectedBet.market_type === "fancy"
-                ? (
-                    selectedBet.side === "back"
-                        ? "YES"
-                        : "NO"
-                )
-                : (
-                    selectedBet.side === "back"
-                        ? "BACK"
-                        : "LAY"
-                );
-
-
-        name.textContent =
-            selectedBet.selection_name;
-
-
-        market.textContent =
-            selectedBet.market_name;
-
-
-        odds.textContent =
-            selectedBet.odds;
-
-
-        available.textContent =
-            selectedBet.available_size != null
-                ? selectedBet.available_size
-                : "--";
-
-
-        message.textContent =
-            "Selection ready. Enter your stake.";
-
-
-        slip.classList.add(
+        betSlip.classList.add(
             "show"
         );
-
     }
+}
 
 
-    /*
-     * =========================================================
-     * CLOSE BET SLIP
-     * =========================================================
-     */
+/* =========================================================
+   CLOSE BET SLIP
+========================================================= */
 
-    function closeBetSlip() {
+function closeBetSlip() {
 
-        const slip =
-            document.getElementById(
-                "betslip"
-            );
-
-
-        slip.classList.remove(
-            "show"
+    const betSlip =
+        document.getElementById(
+            "betSlip"
         );
 
 
-        document
-            .querySelectorAll(
-                ".odd.selected"
-            )
-            .forEach(
-                function(item) {
+    if (betSlip) {
 
-                    item.classList.remove(
-                        "selected"
-                    );
-
-                }
-            );
-
-
-        selectedBet = null;
-
+        betSlip.classList.remove(
+            "show"
+        );
     }
 
 
-    /*
-     * =========================================================
-     * PLACE BET
-     * =========================================================
-     */
+    selectedBet = null;
+}
 
-    const placeBetButton =
+
+/* =========================================================
+   PLACE BET
+========================================================= */
+
+async function placeBet() {
+
+    if (!selectedBet) {
+
+        alert(
+            "Please select odds first."
+        );
+
+        return;
+    }
+
+
+    const stakeInput =
+        document.getElementById(
+            "stake"
+        );
+
+
+    const stake =
+        Number(
+            stakeInput
+                ? stakeInput.value
+                : 0
+        );
+
+
+    if (
+        !Number.isFinite(stake) ||
+        stake <= 0
+    ) {
+
+        alert(
+            "Enter a valid stake."
+        );
+
+
+        if (stakeInput) {
+            stakeInput.focus();
+        }
+
+
+        return;
+    }
+
+
+    const placeButton =
         document.getElementById(
             "placeBetButton"
         );
 
 
-    if (placeBetButton) {
+    if (placeButton) {
 
-        placeBetButton.addEventListener(
-            "click",
-            async function() {
+        placeButton.disabled =
+            true;
 
-                if (!selectedBet) {
-
-                    const message =
-                        document.getElementById(
-                            "betslipMessage"
-                        );
-
-                    if (message) {
-
-                        message.textContent =
-                            "Select an odd first.";
-
-                    }
-
-                    return;
-
-                }
-
-
-                const stakeInput =
-                    document.getElementById(
-                        "stake"
-                    );
-
-
-                const message =
-                    document.getElementById(
-                        "betslipMessage"
-                    );
-
-
-                const stake =
-                    Number(
-                        stakeInput
-                            ? stakeInput.value
-                            : 0
-                    );
-
-
-                if (
-                    !Number.isFinite(stake) ||
-                    stake <= 0
-                ) {
-
-                    if (message) {
-
-                        message.textContent =
-                            "Enter a valid stake.";
-
-                    }
-
-                    return;
-
-                }
-
-
-                if (
-                    !Number.isFinite(
-                        Number(
-                            selectedBet.odds
-                        )
-                    ) ||
-                    Number(
-                        selectedBet.odds
-                    ) <= 1
-                ) {
-
-                    if (message) {
-
-                        message.textContent =
-                            "Invalid odds.";
-
-                    }
-
-                    return;
-
-                }
-
-
-                placeBetButton.disabled =
-                    true;
-
-
-                const originalText =
-                    placeBetButton.textContent;
-
-
-                placeBetButton.textContent =
-                    "Placing...";
-
-
-                if (message) {
-
-                    message.textContent =
-                        "Placing your bet...";
-
-                }
-
-
-                try {
-
-                    const response =
-                        await fetch(
-                            "/bets/place",
-                            {
-                                method: "POST",
-
-                                credentials:
-                                    "same-origin",
-
-                                headers: {
-                                    "Content-Type":
-                                        "application/json",
-
-                                    "Accept":
-                                        "application/json"
-                                },
-
-                                body:
-                                    JSON.stringify(
-                                        {
-                                            game_id:
-                                                String(
-                                                    selectedBet.game_id ||
-                                                    gameId ||
-                                                    ""
-                                                ),
-
-                                            event_id:
-                                                String(
-                                                    selectedBet.event_id ||
-                                                    eventId ||
-                                                    ""
-                                                ),
-
-                                            market_id:
-                                                String(
-                                                    selectedBet.market_id ||
-                                                    marketId ||
-                                                    ""
-                                                ),
-
-                                            market_type:
-                                                selectedBet.market_type ||
-                                                "match",
-
-                                            market_name:
-                                                selectedBet.market_name ||
-                                                "Match Odds",
-
-                                            selection_id:
-                                                String(
-                                                    selectedBet.selection_id ||
-                                                    ""
-                                                ),
-
-                                            selection_name:
-                                                String(
-                                                    selectedBet.selection_name ||
-                                                    ""
-                                                ),
-
-                                            side:
-                                                String(
-                                                    selectedBet.side ||
-                                                    ""
-                                                ).toUpperCase(),
-
-                                            odds:
-                                                Number(
-                                                    selectedBet.odds
-                                                ),
-
-                                            stake:
-                                                stake
-                                        }
-                                    )
-                            }
-                        );
-
-
-                    let data = null;
-
-
-                    try {
-
-                        data =
-                            await response.json();
-
-                    } catch (jsonError) {
-
-                        throw new Error(
-                            "Server returned an invalid response."
-                        );
-
-                    }
-
-
-                    if (
-                        !response.ok ||
-                        !data.success
-                    ) {
-
-                        throw new Error(
-                            data.message ||
-                            data.detail ||
-                            "Could not place bet."
-                        );
-
-                    }
-
-
-                    if (message) {
-
-                        message.textContent =
-                            data.message ||
-                            "Bet placed successfully.";
-
-                    }
-
-
-                    const newBalance =
-                        Number(
-                            data.balance
-                        );
-
-
-                    if (
-                        Number.isFinite(
-                            newBalance
-                        )
-                    ) {
-
-                        document
-                            .querySelectorAll(
-                                "[data-user-balance], #userBalance, #balance, .user-balance"
-                            )
-                            .forEach(
-                                function(element) {
-
-                                    element.textContent =
-                                        "₹" +
-                                        newBalance.toFixed(2);
-
-                                }
-                            );
-
-                    }
-
-
-                    selectedBet = null;
-
-
-                    document
-                        .querySelectorAll(
-                            ".odd.selected"
-                        )
-                        .forEach(
-                            function(item) {
-
-                                item.classList.remove(
-                                    "selected"
-                                );
-
-                            }
-                        );
-
-
-                    if (stakeInput) {
-
-                        stakeInput.value =
-                            "";
-
-                    }
-
-
-                    setTimeout(
-                        function() {
-
-                            const slip =
-                                document.getElementById(
-                                    "betslip"
-                                );
-
-                            if (slip) {
-
-                                slip.classList.remove(
-                                    "show"
-                                );
-
-                            }
-
-                        },
-                        1800
-                    );
-
-
-                } catch (error) {
-
-                    console.error(
-                        "[BET] Place bet error:",
-                        error
-                    );
-
-
-                    if (message) {
-
-                        message.textContent =
-                            error.message ||
-                            "Could not place bet.";
-
-                    }
-
-                } finally {
-
-                    placeBetButton.disabled =
-                        false;
-
-
-                    placeBetButton.textContent =
-                        originalText ||
-                        "Place Bet";
-
-                }
-
-            }
-        );
-
+        placeButton.textContent =
+            "Placing...";
     }
 
 
-    /*
-     * =========================================================
-     * INITIAL LOAD
-     * =========================================================
-     */
+    try {
 
-    getMatchIds();
+        const response =
+            await fetch(
+                "/bets/place",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    credentials:
+                        "same-origin",
+
+                    body:
+                        JSON.stringify(
+                            {
+                                game_id:
+                                    gameId,
+
+                                event_id:
+                                    eventId,
+
+                                market_id:
+                                    marketId,
+
+                                market:
+                                    selectedBet.market,
+
+                                selection:
+                                    selectedBet.selection,
+
+                                bet_type:
+                                    selectedBet.type,
+
+                                odds:
+                                    selectedBet.odds,
+
+                                stake:
+                                    stake
+                            }
+                        )
+                }
+            );
 
 
-    /*
-     * =========================================================
-     * LIVE REFRESH
-     * =========================================================
-     */
+        let data = {};
 
-    setInterval(
-        function() {
 
-            if (
-                gameId &&
-                marketId
-            ) {
+        try {
 
-                loadOdds();
+            data =
+                await response.json();
 
-            }
+        } catch {
 
-        },
-        5000
-    );
+            data = {};
+        }
 
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.detail ||
+                data.message ||
+                "Bet placement failed"
+            );
+        }
+
+
+        alert(
+            data.message ||
+            "Bet placed successfully."
+        );
+
+
+        closeBetSlip();
+
+
+        if (stakeInput) {
+            stakeInput.value = "";
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "[BET] error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Unable to place bet."
+        );
+
+    } finally {
+
+        if (placeButton) {
+
+            placeButton.disabled =
+                false;
+
+            placeButton.textContent =
+                "Place Bet";
+        }
+    }
+}
+
+
+/* =========================================================
+   HTML ESCAPE
+========================================================= */
+
+function escapeHtml(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+        return "";
+    }
+
+
+    return String(value)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+}
+
+
+/* =========================================================
+   ATTRIBUTE ESCAPE
+========================================================= */
+
+function escapeAttribute(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+        return "";
+    }
+
+
+    return String(value)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        );
+}
+
+
+/* =========================================================
+   START POLLING
+========================================================= */
+
+function startOddsPolling() {
+
+    if (refreshTimer) {
+
+        clearInterval(
+            refreshTimer
+        );
+    }
+
+
+    loadOdds(false);
+
+
+    refreshTimer =
+        setInterval(
+            function() {
+
+                if (
+                    document.visibilityState ===
+                    "visible"
+                ) {
+
+                    loadOdds(false);
+                }
+
+            },
+            3000
+        );
+}
+
+
+/* =========================================================
+   STOP POLLING
+========================================================= */
+
+function stopOddsPolling() {
+
+    if (refreshTimer) {
+
+        clearInterval(
+            refreshTimer
+        );
+
+        refreshTimer = null;
+    }
+}
+
+
+/* =========================================================
+   PAGE INITIALIZATION
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        initializeMatch();
+
+
+        const closeButton =
+            document.getElementById(
+                "closeSlipButton"
+            );
+
+
+        if (closeButton) {
+
+            closeButton.addEventListener(
+                "click",
+                closeBetSlip
+            );
+        }
+
+
+        const placeButton =
+            document.getElementById(
+                "placeBetButton"
+            );
+
+
+        if (placeButton) {
+
+            placeButton.addEventListener(
+                "click",
+                placeBet
+            );
+        }
+
+
+        startOddsPolling();
+    }
+);
+
+
+/* =========================================================
+   TAB VISIBILITY
+========================================================= */
+
+document.addEventListener(
+    "visibilitychange",
+    function() {
+
+        if (
+            document.visibilityState ===
+            "hidden"
+        ) {
+
+            stopOddsPolling();
+
+        } else {
+
+            startOddsPolling();
+        }
+    }
+);
 </script>
 
-{% endif %}
-
 </body>
-
 </html>
