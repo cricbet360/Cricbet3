@@ -2,12 +2,20 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ match.event_name if match else "CrickBet Match" }}</title>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {{ match.event_name if match else "CrickBet Match" }}
+    </title>
 
     <style>
+
         * {
             box-sizing: border-box;
         }
@@ -18,7 +26,10 @@
             padding: 0;
             background: #071b12;
             color: #ffffff;
-            font-family: Arial, Helvetica, sans-serif;
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
         }
 
         body {
@@ -158,6 +169,10 @@
             color: #719c89;
             font-size: 12px;
         }
+
+        /* =================================================
+           MARKET
+        ================================================= */
 
         .market {
             margin-bottom: 14px;
@@ -314,57 +329,211 @@
             }
         }
 
-        /* =====================================================
+        /* =================================================
            BET SLIP
-        ===================================================== */
+        ================================================= */
 
         .bet-slip {
             position: fixed;
             right: 18px;
             bottom: 18px;
-            width: 330px;
-            max-width: calc(100vw - 36px);
-            padding: 14px;
-            background: #0c2619;
-            border: 1px solid #23633f;
-            border-radius: 12px;
-            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.45);
-            z-index: 100;
+            width: 380px;
+            max-width: calc(100vw - 30px);
+            background: #0b2418;
+            border: 1px solid #28734b;
+            border-radius: 14px;
+            box-shadow:
+                0 18px 55px
+                rgba(0, 0, 0, 0.55);
+            z-index: 9999;
+            overflow: hidden;
             display: none;
         }
 
-        .bet-slip.show {
+        .bet-slip.open {
             display: block;
         }
 
-        .slip-title {
-            font-size: 15px;
-            font-weight: 800;
-            margin-bottom: 10px;
-        }
-
-        .slip-row {
+        .bet-slip-header {
             display: flex;
+            align-items: center;
             justify-content: space-between;
             gap: 10px;
-            margin-bottom: 7px;
+            padding: 12px 14px;
+            background: #0e3020;
+            border-bottom: 1px solid #1b5437;
+        }
+
+        .bet-slip-heading {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bet-slip-title {
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .bet-slip-count {
+            min-width: 21px;
+            height: 21px;
+            padding: 0 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            background: #1fa66a;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .minimize-slip {
+            width: 30px;
+            height: 30px;
+            border: 0;
+            border-radius: 7px;
+            background: #153d2a;
+            color: #ffffff;
+            font-size: 19px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .minimize-slip:hover {
+            background: #1d583b;
+        }
+
+        .bet-slip-body {
+            padding: 12px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .slip-empty {
+            padding: 20px 10px;
+            text-align: center;
+            color: #769b89;
             font-size: 13px;
         }
 
-        .slip-label {
-            color: #86aa9a;
+        .slip-event {
+            margin-bottom: 10px;
+            border: 1px solid #1a5135;
+            border-radius: 10px;
+            overflow: hidden;
         }
 
-        .slip-value {
-            font-weight: 700;
-            text-align: right;
-            word-break: break-word;
+        .slip-event:last-child {
+            margin-bottom: 0;
+        }
+
+        .slip-event-title {
+            padding: 9px 10px;
+            background: #0e3020;
+            color: #bfe3d1;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .slip-selection {
+            padding: 10px;
+            border-top: 1px solid #17462f;
+        }
+
+        .slip-selection:first-child {
+            border-top: 0;
+        }
+
+        .slip-selection-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .slip-selection-name {
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+
+        .remove-selection {
+            border: 0;
+            background: transparent;
+            color: #a06d6d;
+            cursor: pointer;
+            font-size: 17px;
+            line-height: 1;
+            padding: 0 2px;
+        }
+
+        .remove-selection:hover {
+            color: #ff8585;
+        }
+
+        .slip-market {
+            margin-top: 4px;
+            color: #759b88;
+            font-size: 11px;
+        }
+
+        .slip-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .slip-type {
+            padding: 4px 7px;
+            border-radius: 5px;
+            background: #153d2a;
+            color: #8fceb0;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .slip-side {
+            padding: 4px 7px;
+            border-radius: 5px;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .slip-side.back {
+            background: #153f64;
+            color: #9ed2ff;
+        }
+
+        .slip-side.lay {
+            background: #612f3b;
+            color: #ffc0c9;
+        }
+
+        .slip-odds {
+            margin-left: auto;
+            font-size: 15px;
+            font-weight: 900;
+        }
+
+        .slip-stake-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 9px;
+        }
+
+        .slip-stake-label {
+            color: #789f8c;
+            font-size: 11px;
         }
 
         .stake-input {
-            width: 100%;
-            margin-top: 8px;
-            padding: 10px;
+            flex: 1;
+            min-width: 0;
+            padding: 9px 10px;
             border-radius: 7px;
             border: 1px solid #275e43;
             background: #071b12;
@@ -376,62 +545,127 @@
             border-color: #38d996;
         }
 
-        .place-btn {
-            width: 100%;
-            margin-top: 10px;
-            padding: 11px;
-            border: 0;
+        .bet-slip-footer {
+            padding: 12px;
+            border-top: 1px solid #1a5135;
+            background: #091f14;
+        }
+
+        .slip-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .summary-box {
+            padding: 9px;
             border-radius: 7px;
+            background: #0d2b1d;
+        }
+
+        .summary-label {
+            color: #719c89;
+            font-size: 10px;
+        }
+
+        .summary-value {
+            margin-top: 3px;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .place-all-btn {
+            width: 100%;
+            padding: 12px;
+            border: 0;
+            border-radius: 8px;
             background: #1fa66a;
-            color: white;
+            color: #ffffff;
             font-weight: 800;
             cursor: pointer;
         }
 
-        .place-btn:hover {
+        .place-all-btn:hover {
             background: #25bd78;
         }
 
-        .place-btn:disabled {
-            opacity: 0.6;
+        .place-all-btn:disabled {
+            opacity: 0.55;
             cursor: not-allowed;
         }
 
-        .close-slip {
-            float: right;
-            border: 0;
-            background: transparent;
-            color: #86aa9a;
-            cursor: pointer;
-            font-size: 18px;
-        }
-
-        .message {
+        .bet-message {
             display: none;
-            margin-top: 10px;
+            margin-top: 9px;
             padding: 9px 10px;
             border-radius: 7px;
             font-size: 12px;
             line-height: 1.4;
         }
 
-        .message.show {
+        .bet-message.show {
             display: block;
         }
 
-        .message.error {
+        .bet-message.error {
             background: #4a1f22;
             border: 1px solid #813b42;
             color: #ffb9bd;
         }
 
-        .message.success {
+        .bet-message.success {
             background: #123f2b;
             border: 1px solid #287d55;
             color: #9cf0c3;
         }
 
+        /* =================================================
+           REOPEN BUTTON
+        ================================================= */
+
+        .bet-slip-reopen {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            z-index: 9998;
+            display: none;
+            align-items: center;
+            gap: 7px;
+            padding: 11px 15px;
+            border: 1px solid #28734b;
+            border-radius: 9px;
+            background: #0d3020;
+            color: #ffffff;
+            box-shadow:
+                0 10px 30px
+                rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .bet-slip-reopen.show {
+            display: inline-flex;
+        }
+
+        .reopen-count {
+            min-width: 19px;
+            height: 19px;
+            padding: 0 5px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            background: #1fa66a;
+        }
+
+        /* =================================================
+           MOBILE
+        ================================================= */
+
         @media (max-width: 650px) {
+
             .page {
                 padding: 10px;
             }
@@ -462,21 +696,35 @@
             }
 
             .bet-slip {
+                right: 8px;
+                bottom: 8px;
+                width: calc(100vw - 16px);
+                max-width: none;
+            }
+
+            .bet-slip-reopen {
                 right: 10px;
                 bottom: 10px;
-                width: calc(100vw - 20px);
             }
         }
+
     </style>
+
 </head>
+
 
 <body>
 
+
 <div class="page">
+
 
     <div class="topbar">
 
-        <a href="/dashboard" class="back-btn">
+        <a
+            href="/dashboard"
+            class="back-btn"
+        >
             ← Back
         </a>
 
@@ -487,15 +735,26 @@
     </div>
 
 
+    <!-- =====================================================
+         MATCH HEADER
+    ====================================================== -->
+
     <section class="match-header">
 
-        <div class="event-name" id="eventName">
+        <div
+            class="event-name"
+            id="eventName"
+        >
             {{ match.event_name if match else "Cricket Match" }}
         </div>
 
+
         <div class="teams">
 
-            <div class="team" id="team1">
+            <div
+                class="team"
+                id="team1"
+            >
                 {{ match.team1 if match else "" }}
             </div>
 
@@ -503,19 +762,29 @@
                 VS
             </div>
 
-            <div class="team" id="team2">
+            <div
+                class="team"
+                id="team2"
+            >
                 {{ match.team2 if match else "" }}
             </div>
 
         </div>
 
+
         <div class="match-info">
 
-            <span class="badge" id="matchStatus">
+            <span
+                class="badge"
+                id="matchStatus"
+            >
                 Loading
             </span>
 
-            <span class="badge" id="matchTime">
+            <span
+                class="badge"
+                id="matchTime"
+            >
                 --
             </span>
 
@@ -523,6 +792,10 @@
 
     </section>
 
+
+    <!-- =====================================================
+         STATUS
+    ====================================================== -->
 
     <div class="status-bar">
 
@@ -549,6 +822,10 @@
     </div>
 
 
+    <!-- =====================================================
+         MARKETS
+    ====================================================== -->
+
     <main id="marketsContainer">
 
         <div class="loading">
@@ -560,6 +837,7 @@
         </div>
 
     </main>
+
 
 </div>
 
@@ -591,109 +869,136 @@
     id="betSlip"
 >
 
-    <button
-        type="button"
-        class="close-slip"
-        id="closeSlipButton"
-    >
-        ×
-    </button>
+    <div class="bet-slip-header">
 
-    <div class="slip-title">
-        Bet Slip
-    </div>
+        <div class="bet-slip-heading">
 
-    <div class="slip-row">
+            <div class="bet-slip-title">
+                Bet Slip
+            </div>
 
-        <span class="slip-label">
-            Market
-        </span>
+            <span
+                class="bet-slip-count"
+                id="betSlipCount"
+            >
+                0
+            </span>
 
-        <span
-            class="slip-value"
-            id="slipMarket"
+        </div>
+
+
+        <button
+            type="button"
+            class="minimize-slip"
+            id="minimizeSlipButton"
+            aria-label="Minimize bet slip"
+            title="Minimize"
         >
-            --
-        </span>
+            −
+        </button>
 
     </div>
 
-    <div class="slip-row">
-
-        <span class="slip-label">
-            Selection
-        </span>
-
-        <span
-            class="slip-value"
-            id="slipSelection"
-        >
-            --
-        </span>
-
-    </div>
-
-    <div class="slip-row">
-
-        <span class="slip-label">
-            Type
-        </span>
-
-        <span
-            class="slip-value"
-            id="slipType"
-        >
-            --
-        </span>
-
-    </div>
-
-    <div class="slip-row">
-
-        <span class="slip-label">
-            Odds
-        </span>
-
-        <span
-            class="slip-value"
-            id="slipOdds"
-        >
-            --
-        </span>
-
-    </div>
-
-    <input
-        type="number"
-        id="stake"
-        class="stake-input"
-        placeholder="Enter stake"
-        min="1"
-        step="1"
-    >
-
-    <button
-        type="button"
-        class="place-btn"
-        id="placeBetButton"
-    >
-        Place Bet
-    </button>
 
     <div
-        id="betMessage"
-        class="message"
-    ></div>
+        class="bet-slip-body"
+        id="betSlipBody"
+    >
+
+        <div class="slip-empty">
+            Select odds from a market to add a bet.
+        </div>
+
+    </div>
+
+
+    <div class="bet-slip-footer">
+
+        <div class="slip-summary">
+
+            <div class="summary-box">
+
+                <div class="summary-label">
+                    Total Stake
+                </div>
+
+                <div
+                    class="summary-value"
+                    id="totalStake"
+                >
+                    ₹0.00
+                </div>
+
+            </div>
+
+
+            <div class="summary-box">
+
+                <div class="summary-label">
+                    Potential Return
+                </div>
+
+                <div
+                    class="summary-value"
+                    id="potentialReturn"
+                >
+                    ₹0.00
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <button
+            type="button"
+            class="place-all-btn"
+            id="placeAllButton"
+            disabled
+        >
+            Place Bet
+        </button>
+
+
+        <div
+            class="bet-message"
+            id="betMessage"
+        ></div>
+
+    </div>
 
 </div>
 
 
+<!-- =========================================================
+     REOPEN BET SLIP BUTTON
+========================================================= -->
+
+<button
+    type="button"
+    class="bet-slip-reopen"
+    id="reopenSlipButton"
+>
+
+    BET SLIP
+
+    <span
+        class="reopen-count"
+        id="reopenSlipCount"
+    >
+        0
+    </span>
+
+</button>
+
+
 <script>
+
 "use strict";
 
 
 /* =========================================================
-   STATE
+   GLOBAL STATE
 ========================================================= */
 
 let gameId = "";
@@ -701,12 +1006,16 @@ let eventId = "";
 let marketId = "";
 
 let oddsLoading = false;
-let selectedBet = null;
 let refreshTimer = null;
+
+let betSlipItems = [];
+
+const BET_SLIP_STORAGE =
+    "crickbet_bet_slip";
 
 
 /* =========================================================
-   ESCAPE HTML
+   HELPERS
 ========================================================= */
 
 function escapeHtml(value) {
@@ -727,98 +1036,77 @@ function escapeHtml(value) {
 }
 
 
-/* =========================================================
-   ESCAPE ATTRIBUTE
-========================================================= */
-
 function escapeAttribute(value) {
 
-    if (
-        value === null ||
-        value === undefined
-    ) {
-        return "";
-    }
+    return escapeHtml(value);
+}
 
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/"/g, "&quot;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
+
+function numberValue(value) {
+
+    const number =
+        Number(value);
+
+    return Number.isFinite(number)
+        ? number
+        : 0;
 }
 
 
 /* =========================================================
-   READ SERVER MATCH
+   READ MATCH
 ========================================================= */
 
 function readServerMatch() {
 
     const element =
-        document.getElementById("matchData");
+        document.getElementById(
+            "matchData"
+        );
 
     if (!element) {
         return null;
     }
 
-    const data = element.dataset;
+    const data =
+        element.dataset;
 
     if (!data.gameId) {
         return null;
     }
 
     return {
-        game_id: data.gameId,
-        event_id: data.eventId || data.gameId,
-        market_id: data.marketId || "",
-        event_name: data.eventName || "",
-        team1: data.team1 || "",
-        team2: data.team2 || "",
-        event_time: data.eventTime || "",
-        in_play: data.inPlay === "true"
+
+        game_id:
+            data.gameId,
+
+        event_id:
+            data.eventId ||
+            data.gameId,
+
+        market_id:
+            data.marketId ||
+            "",
+
+        event_name:
+            data.eventName ||
+            "",
+
+        team1:
+            data.team1 ||
+            "",
+
+        team2:
+            data.team2 ||
+            "",
+
+        event_time:
+            data.eventTime ||
+            "",
+
+        in_play:
+            data.inPlay === "true"
     };
-}
-
-
-/* =========================================================
-   URL GAME ID
-========================================================= */
-
-function getGameIdFromUrl() {
-
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
-
-    const queryGameId =
-        params.get("gameId") ||
-        params.get("game_id");
-
-    if (queryGameId) {
-        return queryGameId;
-    }
-
-    const parts =
-        window.location.pathname
-            .split("/")
-            .filter(Boolean);
-
-    if (parts.length > 0) {
-
-        const last =
-            parts[parts.length - 1];
-
-        if (
-            last &&
-            last !== "match" &&
-            last !== "matches"
-        ) {
-            return last;
-        }
-    }
-
-    return "";
 }
 
 
@@ -828,53 +1116,33 @@ function getGameIdFromUrl() {
 
 function initializeMatch() {
 
-    const serverMatch =
+    const match =
         readServerMatch();
 
-    if (
-        serverMatch &&
-        serverMatch.game_id
-    ) {
-
-        gameId =
-            String(
-                serverMatch.game_id
-            );
-
-        eventId =
-            String(
-                serverMatch.event_id ||
-                serverMatch.game_id
-            );
-
-        marketId =
-            String(
-                serverMatch.market_id ||
-                ""
-            );
-
-        updateMatchHeader(
-            serverMatch
-        );
-
+    if (!match) {
         return;
     }
-
 
     gameId =
-        getGameIdFromUrl();
-
-    if (!gameId) {
-
-        setStatus(
-            "error",
-            "Match ID missing"
+        String(
+            match.game_id
         );
 
-        return;
-    }
+    eventId =
+        String(
+            match.event_id ||
+            match.game_id
+        );
 
-    resolveMatchIds();
+    marketId =
+        String(
+            match.market_id ||
+            ""
+        );
+
+    updateMatchHeader(
+        match
+    );
 }
 
 
@@ -882,7 +1150,9 @@ function initializeMatch() {
    MATCH HEADER
 ========================================================= */
 
-function updateMatchHeader(match) {
+function updateMatchHeader(
+    match
+) {
 
     if (!match) {
         return;
@@ -915,6 +1185,7 @@ function updateMatchHeader(match) {
 
 
     if (eventName) {
+
         eventName.textContent =
             match.event_name ||
             "Cricket Match";
@@ -922,6 +1193,7 @@ function updateMatchHeader(match) {
 
 
     if (team1) {
+
         team1.textContent =
             match.team1 ||
             "";
@@ -929,6 +1201,7 @@ function updateMatchHeader(match) {
 
 
     if (team2) {
+
         team2.textContent =
             match.team2 ||
             "";
@@ -937,19 +1210,19 @@ function updateMatchHeader(match) {
 
     if (status) {
 
-        const isLive =
+        const live =
             match.in_play === true ||
             match.in_play === 1 ||
             match.in_play === "true";
 
         status.textContent =
-            isLive
+            live
                 ? "LIVE"
                 : "UPCOMING";
 
         status.classList.toggle(
             "live-badge",
-            isLive
+            live
         );
     }
 
@@ -1016,69 +1289,28 @@ function setStatus(
             "statusText"
         );
 
-
     if (dot) {
 
         dot.className =
             "status-dot";
 
         if (state === "online") {
-            dot.classList.add("online");
+            dot.classList.add(
+                "online"
+            );
         }
 
         if (state === "error") {
-            dot.classList.add("error");
+            dot.classList.add(
+                "error"
+            );
         }
     }
 
-
     if (status) {
-        status.textContent = text;
+        status.textContent =
+            text;
     }
-}
-
-
-/* =========================================================
-   MESSAGE
-========================================================= */
-
-function showBetMessage(
-    message,
-    type = "error"
-) {
-
-    const element =
-        document.getElementById(
-            "betMessage"
-        );
-
-    if (!element) {
-        return;
-    }
-
-    element.textContent =
-        message;
-
-    element.className =
-        "message show " + type;
-}
-
-
-function hideBetMessage() {
-
-    const element =
-        document.getElementById(
-            "betMessage"
-        );
-
-    if (!element) {
-        return;
-    }
-
-    element.textContent = "";
-
-    element.className =
-        "message";
 }
 
 
@@ -1086,41 +1318,17 @@ function hideBetMessage() {
    LOAD ODDS
 ========================================================= */
 
-async function loadOdds(force = false) {
+async function loadOdds() {
 
-    if (oddsLoading) {
+    if (
+        oddsLoading ||
+        !gameId ||
+        !marketId
+    ) {
         return;
     }
-
-    if (!gameId) {
-
-        setStatus(
-            "error",
-            "Game ID missing"
-        );
-
-        return;
-    }
-
-
-    if (!marketId) {
-
-        await resolveMatchIds();
-
-        if (!marketId) {
-
-            setStatus(
-                "error",
-                "Market ID unavailable"
-            );
-
-            return;
-        }
-    }
-
 
     oddsLoading = true;
-
 
     try {
 
@@ -1134,21 +1342,14 @@ async function loadOdds(force = false) {
 
         query.set(
             "eventId",
-            eventId || gameId
+            eventId ||
+            gameId
         );
 
         query.set(
             "marketId",
             marketId
         );
-
-        if (force) {
-
-            query.set(
-                "refresh",
-                "true"
-            );
-        }
 
 
         const response =
@@ -1157,7 +1358,8 @@ async function loadOdds(force = false) {
                 query.toString(),
                 {
                     method: "GET",
-                    credentials: "same-origin",
+                    credentials:
+                        "same-origin",
                     cache: "no-store"
                 }
             );
@@ -1179,8 +1381,8 @@ async function loadOdds(force = false) {
         if (!data.success) {
 
             throw new Error(
-                data.detail ||
                 data.message ||
+                data.detail ||
                 "Odds unavailable"
             );
         }
@@ -1227,88 +1429,31 @@ async function loadOdds(force = false) {
 
 
 /* =========================================================
-   RESOLVE MATCH IDS
+   GET ODDS ROOT
 ========================================================= */
 
-async function resolveMatchIds() {
+function getOddsRoot(
+    payload
+) {
 
-    if (!gameId) {
-        return;
+    if (
+        payload &&
+        payload.odds
+    ) {
+        return payload.odds;
     }
 
-    try {
-
-        const response =
-            await fetch(
-                "/api/cricket/matches",
-                {
-                    method: "GET",
-                    credentials: "same-origin",
-                    cache: "no-store"
-                }
-            );
-
-
-        if (!response.ok) {
-            return;
-        }
-
-
-        const payload =
-            await response.json();
-
-
-        const matches =
-            Array.isArray(payload.matches)
-                ? payload.matches
-                : Array.isArray(payload.data)
-                    ? payload.data
-                    : [];
-
-
-        const found =
-            matches.find(
-                function(item) {
-
-                    return String(
-                        item.game_id
-                    ) === String(
-                        gameId
-                    );
-                }
-            );
-
-
-        if (!found) {
-            return;
-        }
-
-
-        eventId =
-            String(
-                found.event_id ||
-                gameId
-            );
-
-
-        marketId =
-            String(
-                found.market_id ||
-                ""
-            );
-
-
-        updateMatchHeader(
-            found
-        );
-
-    } catch (error) {
-
-        console.error(
-            "[MATCH] resolve error:",
-            error
-        );
+    if (
+        payload &&
+        payload.data &&
+        !Array.isArray(
+            payload.data
+        )
+    ) {
+        return payload.data;
     }
+
+    return payload || {};
 }
 
 
@@ -1316,7 +1461,9 @@ async function resolveMatchIds() {
    RENDER MARKETS
 ========================================================= */
 
-function renderMarkets(data) {
+function renderMarkets(
+    payload
+) {
 
     const container =
         document.getElementById(
@@ -1328,117 +1475,211 @@ function renderMarkets(data) {
     }
 
 
-    const fragments = [];
+    const root =
+        getOddsRoot(
+            payload
+        );
 
 
     const matchOdds =
         Array.isArray(
-            data.match_odds
+            root.match_odds
         )
-            ? data.match_odds
+            ? root.match_odds
             : [];
 
 
     const bookmakerOdds =
         Array.isArray(
-            data.bookmaker_odds
+            root.bookmaker_odds
         )
-            ? data.bookmaker_odds
+            ? root.bookmaker_odds
             : [];
 
 
     const fancyOdds =
         Array.isArray(
-            data.fancy_odds
+            root.fancy_odds
         )
-            ? data.fancy_odds
+            ? root.fancy_odds
             : [];
 
 
-    if (matchOdds.length > 0) {
+    const otherOdds =
+        Array.isArray(
+            root.other_market_odds
+        )
+            ? root.other_market_odds
+            : [];
+
+
+    let html = "";
+
+
+    /* -----------------------------------------------------
+       MATCH ODDS
+    ----------------------------------------------------- */
+
+    if (
+        matchOdds.length
+    ) {
 
         matchOdds.forEach(
-            function(market) {
+            market => {
 
-                fragments.push(
+                html +=
                     buildMatchMarket(
                         market
-                    )
-                );
+                    );
             }
         );
 
     } else {
 
-        fragments.push(
+        html +=
             buildEmptyMarket(
                 "Match Odds",
-                "Match odds currently unavailable"
-            )
-        );
+                "Match odds currently unavailable."
+            );
     }
 
 
-    bookmakerOdds.forEach(
-        function(market) {
+    /* -----------------------------------------------------
+       BOOKMAKER
+    ----------------------------------------------------- */
 
-            fragments.push(
-                buildBookmakerMarket(
-                    market
-                )
+    if (
+        bookmakerOdds.length
+    ) {
+
+        bookmakerOdds.forEach(
+            market => {
+
+                html +=
+                    buildBookmakerMarket(
+                        market
+                    );
+            }
+        );
+
+    } else {
+
+        html +=
+            buildEmptyMarket(
+                "🏏 Bookmaker",
+                "ProExch did not provide bookmaker runners for this match."
             );
+    }
+
+
+    /* -----------------------------------------------------
+       FANCY / SESSION
+    ----------------------------------------------------- */
+
+    if (
+        fancyOdds.length
+    ) {
+
+        html +=
+            '<section class="market">';
+
+        html +=
+            '<div class="market-header">';
+
+        html +=
+            '<div class="market-title">' +
+            '🎯 Fancy / Session' +
+            "</div>";
+
+        html +=
+            '<div class="market-status">' +
+            fancyOdds.length +
+            " market" +
+            (
+                fancyOdds.length === 1
+                    ? ""
+                    : "s"
+            ) +
+            "</div>";
+
+        html +=
+            "</div>";
+
+        html +=
+            '<div class="market-body">';
+
+
+        fancyOdds.forEach(
+            market => {
+
+                html +=
+                    buildFancyMarket(
+                        market
+                    );
+            }
+        );
+
+
+        html +=
+            "</div>";
+
+        html +=
+            "</section>";
+
+    } else {
+
+        html +=
+            buildEmptyMarket(
+                "🎯 Fancy / Session",
+                "No fancy/session markets are currently available."
+            );
+    }
+
+
+    /* -----------------------------------------------------
+       OTHER MARKETS
+    ----------------------------------------------------- */
+
+    otherOdds.forEach(
+        market => {
+
+            html +=
+                buildGenericMarket(
+                    market
+                );
         }
     );
 
 
-    if (fancyOdds.length > 0) {
-
-        fancyOdds.forEach(
-            function(market) {
-
-                fragments.push(
-                    buildFancyMarket(
-                        market
-                    )
-                );
-            }
-        );
-
-    } else {
-
-        fragments.push(
-            buildEmptyMarket(
-                "🎯 Fancy / Session",
-                "No fancy/session markets available for this match"
-            )
-        );
-    }
-
-
     container.innerHTML =
-        fragments.join("");
+        html;
+
 
     attachBetEvents();
 }
 
 
 /* =========================================================
-   MATCH ODDS
+   MATCH MARKET
 ========================================================= */
 
-function buildMatchMarket(market) {
+function buildMatchMarket(
+    market
+) {
 
     const runners =
-        Array.isArray(market.runners)
+        Array.isArray(
+            market.runners
+        )
             ? market.runners
             : [];
 
 
-    let html = "";
+    let html =
+        '<section class="market">';
 
-    html += '<section class="market">';
-
-    html += '<div class="market-header">';
+    html +=
+        '<div class="market-header">';
 
     html +=
         '<div class="market-title">' +
@@ -1456,9 +1697,11 @@ function buildMatchMarket(market) {
         ) +
         "</div>";
 
-    html += "</div>";
+    html +=
+        "</div>";
 
-    html += '<div class="market-body">';
+    html +=
+        '<div class="market-body">';
 
     html +=
         '<div class="market-columns">' +
@@ -1468,28 +1711,28 @@ function buildMatchMarket(market) {
         "</div>";
 
 
-    if (runners.length === 0) {
+    if (!runners.length) {
 
         html +=
             '<div class="empty">' +
-            "No runners available" +
+            "No match runners available." +
             "</div>";
 
     } else {
 
         runners.forEach(
-            function(runner) {
+            runner => {
 
-                const runnerName =
+                const name =
                     runner.name ||
                     runner.rname ||
                     "Runner";
-
 
                 const selectionId =
                     runner.sid ||
                     runner.selection_id ||
                     runner.selectionId ||
+                    runner.id ||
                     "";
 
 
@@ -1498,45 +1741,50 @@ function buildMatchMarket(market) {
 
                 html +=
                     '<div class="runner-name">' +
-                    escapeHtml(
-                        runnerName
-                    ) +
+                    escapeHtml(name) +
                     "</div>";
 
 
-                html += createOddBox(
-                    runner.back,
-                    runner.back_size,
-                    "back-box",
-                    market.name ||
-                        "Match Odds",
-                    runnerName,
-                    "BACK",
-                    selectionId
-                );
+                html +=
+                    createOddBox(
+                        runner.back,
+                        runner.back_size,
+                        "back-box",
+                        "MATCH_ODDS",
+                        market.name ||
+                            "Match Odds",
+                        name,
+                        selectionId,
+                        "BACK"
+                    );
 
 
-                html += createOddBox(
-                    runner.lay,
-                    runner.lay_size,
-                    "lay-box",
-                    market.name ||
-                        "Match Odds",
-                    runnerName,
-                    "LAY",
-                    selectionId
-                );
+                html +=
+                    createOddBox(
+                        runner.lay,
+                        runner.lay_size,
+                        "lay-box",
+                        "MATCH_ODDS",
+                        market.name ||
+                            "Match Odds",
+                        name,
+                        selectionId,
+                        "LAY"
+                    );
 
 
-                html += "</div>";
+                html +=
+                    "</div>";
             }
         );
     }
 
 
-    html += "</div>";
+    html +=
+        "</div>";
 
-    html += "</section>";
+    html +=
+        "</section>";
 
     return html;
 }
@@ -1546,19 +1794,23 @@ function buildMatchMarket(market) {
    BOOKMAKER
 ========================================================= */
 
-function buildBookmakerMarket(market) {
+function buildBookmakerMarket(
+    market
+) {
 
     const runners =
-        Array.isArray(market.runners)
+        Array.isArray(
+            market.runners
+        )
             ? market.runners
             : [];
 
 
-    let html = "";
+    let html =
+        '<section class="market">';
 
-    html += '<section class="market">';
-
-    html += '<div class="market-header">';
+    html +=
+        '<div class="market-header">';
 
     html +=
         '<div class="market-title">' +
@@ -1573,9 +1825,11 @@ function buildBookmakerMarket(market) {
         ) +
         "</div>";
 
-    html += "</div>";
+    html +=
+        "</div>";
 
-    html += '<div class="market-body">';
+    html +=
+        '<div class="market-body">';
 
     html +=
         '<div class="market-columns">' +
@@ -1585,28 +1839,28 @@ function buildBookmakerMarket(market) {
         "</div>";
 
 
-    if (runners.length === 0) {
+    if (!runners.length) {
 
         html +=
             '<div class="empty">' +
-            "No bookmaker runners available" +
+            "ProExch returned this bookmaker market without runners." +
             "</div>";
 
     } else {
 
         runners.forEach(
-            function(runner) {
+            runner => {
 
-                const runnerName =
+                const name =
                     runner.name ||
                     runner.rname ||
                     "Runner";
-
 
                 const selectionId =
                     runner.sid ||
                     runner.selection_id ||
                     runner.selectionId ||
+                    runner.id ||
                     "";
 
 
@@ -1615,81 +1869,126 @@ function buildBookmakerMarket(market) {
 
                 html +=
                     '<div class="runner-name">' +
-                    escapeHtml(
-                        runnerName
-                    ) +
+                    escapeHtml(name) +
                     "</div>";
 
 
-                html += createOddBox(
-                    runner.back,
-                    runner.back_size,
-                    "back-box",
-                    market.name ||
-                        "Bookmaker",
-                    runnerName,
-                    "BACK",
-                    selectionId
-                );
+                html +=
+                    createOddBox(
+                        runner.back,
+                        runner.back_size,
+                        "back-box",
+                        "BOOKMAKER",
+                        market.name ||
+                            "Bookmaker",
+                        name,
+                        selectionId,
+                        "BACK"
+                    );
 
 
-                html += createOddBox(
-                    runner.lay,
-                    runner.lay_size,
-                    "lay-box",
-                    market.name ||
-                        "Bookmaker",
-                    runnerName,
-                    "LAY",
-                    selectionId
-                );
+                html +=
+                    createOddBox(
+                        runner.lay,
+                        runner.lay_size,
+                        "lay-box",
+                        "BOOKMAKER",
+                        market.name ||
+                            "Bookmaker",
+                        name,
+                        selectionId,
+                        "LAY"
+                    );
 
 
-                html += "</div>";
+                html +=
+                    "</div>";
             }
         );
     }
 
 
-    html += "</div>";
+    html +=
+        "</div>";
 
-    html += "</section>";
+    html +=
+        "</section>";
 
     return html;
 }
 
 
 /* =========================================================
-   FANCY
+   FANCY MARKET
 ========================================================= */
 
-function buildFancyMarket(market) {
+function buildFancyMarket(
+    market
+) {
 
-    let rows = [];
-
-    if (Array.isArray(market.rows)) {
-
-        rows =
-            market.rows;
-
-    } else if (
-        Array.isArray(market.runners)
-    ) {
-
-        rows =
-            market.runners;
-    }
+    const rows =
+        Array.isArray(
+            market.rows
+        )
+            ? market.rows
+            : (
+                Array.isArray(
+                    market.runners
+                )
+                    ? market.runners
+                    : []
+            );
 
 
-    let html = "";
+    const rawName =
+        market.name ||
+        market.market_name ||
+        market.mname ||
+        "Fancy";
 
-    html += '<section class="market">';
 
-    html += '<div class="market-header">';
+    const rawType =
+        String(
+            market.market_type ||
+            market.type ||
+            market.gtype ||
+            ""
+        ).toUpperCase();
+
+
+    const isSession =
+        rawType.includes(
+            "SESSION"
+        ) ||
+        rawType.includes(
+            "SESSION_ODDS"
+        );
+
+
+    const marketType =
+        isSession
+            ? "SESSION"
+            : "FANCY";
+
+
+    const marketTitle =
+        marketType === "SESSION"
+            ? "Session"
+            : "Fancy";
+
+
+    let html =
+        '<div class="fancy-market-block">';
+
+
+    html +=
+        '<div class="market-header">';
 
     html +=
         '<div class="market-title">' +
-        "🎯 Fancy / Session" +
+        escapeHtml(
+            rawName
+        ) +
         "</div>";
 
     html +=
@@ -1700,62 +1999,43 @@ function buildFancyMarket(market) {
         ) +
         "</div>";
 
-    html += "</div>";
+    html +=
+        "</div>";
 
-    html += '<div class="market-body">';
+
+    html +=
+        '<div class="market-body">';
+
 
     html +=
         '<div class="market-columns">' +
-        "<div>Session</div>" +
+        "<div>" +
+        escapeHtml(
+            marketTitle
+        ) +
+        "</div>" +
         "<div>Yes</div>" +
         "<div>No</div>" +
         "</div>";
 
 
-    if (rows.length === 0) {
+    if (!rows.length) {
 
         html +=
             '<div class="empty">' +
-            "No session rows available" +
+            "No rows available in this market." +
             "</div>";
 
     } else {
 
         rows.forEach(
-            function(row) {
+            row => {
 
-                const yes =
-                    row.yes !== undefined &&
-                    row.yes !== null
-                        ? row.yes
-                        : row.back;
-
-
-                const yesSize =
-                    row.yes_size !== undefined &&
-                    row.yes_size !== null
-                        ? row.yes_size
-                        : row.back_size;
-
-
-                const no =
-                    row.no !== undefined &&
-                    row.no !== null
-                        ? row.no
-                        : row.lay;
-
-
-                const noSize =
-                    row.no_size !== undefined &&
-                    row.no_size !== null
-                        ? row.no_size
-                        : row.lay_size;
-
-
-                const sessionName =
+                const name =
                     row.name ||
                     row.rname ||
                     row.session ||
+                    row.runner_name ||
                     "Session";
 
 
@@ -1767,50 +2047,201 @@ function buildFancyMarket(market) {
                     "";
 
 
+                const yes =
+                    row.yes ??
+                    row.back;
+
+
+                const yesSize =
+                    row.yes_size ??
+                    row.back_size;
+
+
+                const no =
+                    row.no ??
+                    row.lay;
+
+
+                const noSize =
+                    row.no_size ??
+                    row.lay_size;
+
+
                 html +=
                     '<div class="runner">';
 
+
                 html +=
                     '<div class="runner-name">' +
-                    escapeHtml(
-                        sessionName
-                    ) +
+                    escapeHtml(name) +
                     "</div>";
 
 
-                html += createFancyBox(
-                    yes,
-                    yesSize,
-                    "fancy-yes",
-                    market.name ||
-                        "Fancy / Session",
-                    sessionName,
-                    "YES",
-                    selectionId
-                );
+                /*
+                 * YES = BACK internally
+                 */
+
+                html +=
+                    createOddBox(
+                        yes,
+                        yesSize,
+                        "fancy-yes",
+                        marketType,
+                        rawName,
+                        name,
+                        selectionId,
+                        "BACK"
+                    );
 
 
-                html += createFancyBox(
-                    no,
-                    noSize,
-                    "fancy-no",
-                    market.name ||
-                        "Fancy / Session",
-                    sessionName,
-                    "NO",
-                    selectionId
-                );
+                /*
+                 * NO = LAY internally
+                 */
+
+                html +=
+                    createOddBox(
+                        no,
+                        noSize,
+                        "fancy-no",
+                        marketType,
+                        rawName,
+                        name,
+                        selectionId,
+                        "LAY"
+                    );
 
 
-                html += "</div>";
+                html +=
+                    "</div>";
             }
         );
     }
 
 
-    html += "</div>";
+    html +=
+        "</div>";
 
-    html += "</section>";
+    html +=
+        "</div>";
+
+    return html;
+}
+
+
+/* =========================================================
+   GENERIC MARKET
+========================================================= */
+
+function buildGenericMarket(
+    market
+) {
+
+    const runners =
+        Array.isArray(
+            market.runners
+        )
+            ? market.runners
+            : [];
+
+
+    if (!runners.length) {
+        return "";
+    }
+
+
+    let html =
+        '<section class="market">';
+
+    html +=
+        '<div class="market-header">';
+
+    html +=
+        '<div class="market-title">' +
+        escapeHtml(
+            market.name ||
+            "Other Market"
+        ) +
+        "</div>";
+
+    html +=
+        '<div class="market-status">' +
+        escapeHtml(
+            market.status ||
+            "OPEN"
+        ) +
+        "</div>";
+
+    html +=
+        "</div>";
+
+    html +=
+        '<div class="market-body">';
+
+
+    runners.forEach(
+        runner => {
+
+            const name =
+                runner.name ||
+                runner.rname ||
+                "Runner";
+
+            const selectionId =
+                runner.sid ||
+                runner.selection_id ||
+                runner.selectionId ||
+                runner.id ||
+                "";
+
+
+            html +=
+                '<div class="runner">';
+
+            html +=
+                '<div class="runner-name">' +
+                escapeHtml(name) +
+                "</div>";
+
+
+            html +=
+                createOddBox(
+                    runner.back,
+                    runner.back_size,
+                    "back-box",
+                    "MATCH_ODDS",
+                    market.name ||
+                        "Other Market",
+                    name,
+                    selectionId,
+                    "BACK"
+                );
+
+
+            html +=
+                createOddBox(
+                    runner.lay,
+                    runner.lay_size,
+                    "lay-box",
+                    "MATCH_ODDS",
+                    market.name ||
+                        "Other Market",
+                    name,
+                    selectionId,
+                    "LAY"
+                );
+
+
+            html +=
+                "</div>";
+        }
+    );
+
+
+    html +=
+        "</div>";
+
+    html +=
+        "</section>";
 
     return html;
 }
@@ -1826,19 +2257,20 @@ function buildEmptyMarket(
 ) {
 
     return (
+
         '<section class="market">' +
 
-        '<div class="market-header">' +
+            '<div class="market-header">' +
 
-        '<div class="market-title">' +
-        escapeHtml(title) +
-        "</div>" +
+                '<div class="market-title">' +
+                    escapeHtml(title) +
+                "</div>" +
 
-        "</div>" +
+            "</div>" +
 
-        '<div class="empty">' +
-        escapeHtml(message) +
-        "</div>" +
+            '<div class="empty">' +
+                escapeHtml(message) +
+            "</div>" +
 
         "</section>"
     );
@@ -1846,17 +2278,18 @@ function buildEmptyMarket(
 
 
 /* =========================================================
-   NORMAL ODD BOX
+   ODD BOX
 ========================================================= */
 
 function createOddBox(
     price,
     size,
     cssClass,
-    market,
+    marketType,
+    marketName,
     selection,
-    type,
-    selectionId
+    selectionId,
+    side
 ) {
 
     const numericPrice =
@@ -1864,25 +2297,23 @@ function createOddBox(
 
 
     const valid =
-        price !== null &&
-        price !== undefined &&
-        price !== "" &&
         Number.isFinite(
             numericPrice
         ) &&
-        numericPrice > 0;
+        numericPrice > 1;
 
 
     if (!valid) {
 
         return (
+
             '<div class="odd-box ' +
             cssClass +
             '">' +
 
-            '<div class="odd-price">' +
-            "-" +
-            "</div>" +
+                '<div class="odd-price">' +
+                    "-" +
+                "</div>" +
 
             "</div>"
         );
@@ -1893,7 +2324,7 @@ function createOddBox(
         Number(size);
 
 
-    const displaySize =
+    const sizeText =
         Number.isFinite(
             numericSize
         ) &&
@@ -1903,28 +2334,40 @@ function createOddBox(
 
 
     let html =
-        '<div ' +
-        'class="odd-box ' +
-        cssClass +
-        '" ' +
+        '<div class="odd-box ' +
+        cssClass + '"' +
 
-        'data-bet-market="' +
-        escapeAttribute(market) +
-        '" ' +
+        ' data-bet-market-type="' +
+        escapeAttribute(
+            marketType
+        ) +
+        '"' +
 
-        'data-bet-selection="' +
-        escapeAttribute(selection) +
-        '" ' +
+        ' data-bet-market-name="' +
+        escapeAttribute(
+            marketName
+        ) +
+        '"' +
 
-        'data-bet-selection-id="' +
-        escapeAttribute(selectionId) +
-        '" ' +
+        ' data-bet-selection="' +
+        escapeAttribute(
+            selection
+        ) +
+        '"' +
 
-        'data-bet-type="' +
-        escapeAttribute(type) +
-        '" ' +
+        ' data-bet-selection-id="' +
+        escapeAttribute(
+            selectionId
+        ) +
+        '"' +
 
-        'data-bet-odds="' +
+        ' data-bet-side="' +
+        escapeAttribute(
+            side
+        ) +
+        '"' +
+
+        ' data-bet-odds="' +
         escapeAttribute(
             numericPrice
         ) +
@@ -1932,610 +2375,1247 @@ function createOddBox(
 
 
     html +=
-        '<div class="odd-price">' +
-        numericPrice.toFixed(2) +
-        "</div>";
+        '<div class="odd-price">';
 
+    /*
+     * Fancy / Session display
+     */
 
-    if (displaySize) {
+    if (
+        marketType === "FANCY" ||
+        marketType === "SESSION"
+    ) {
 
         html +=
-            '<div class="odd-size">' +
-            displaySize +
-            "</div>";
+            side === "BACK"
+                ? "YES "
+                : "NO ";
     }
-
-
-    html += "</div>";
-
-    return html;
-}
-
-
-/* =========================================================
-   FANCY ODD BOX
-========================================================= */
-
-function createFancyBox(
-    price,
-    size,
-    cssClass,
-    market,
-    selection,
-    type,
-    selectionId
-) {
-
-    const numericPrice =
-        Number(price);
-
-
-    const valid =
-        price !== null &&
-        price !== undefined &&
-        price !== "" &&
-        Number.isFinite(
-            numericPrice
-        ) &&
-        numericPrice > 0;
-
-
-    if (!valid) {
-
-        return (
-            '<div class="odd-box ' +
-            cssClass +
-            '">' +
-
-            '<div class="odd-price">' +
-            "-" +
-            "</div>" +
-
-            "</div>"
-        );
-    }
-
-
-    const numericSize =
-        Number(size);
-
-
-    const displaySize =
-        Number.isFinite(
-            numericSize
-        ) &&
-        numericSize > 0
-            ? numericSize.toFixed(2)
-            : "";
-
-
-    let html =
-        '<div ' +
-        'class="odd-box ' +
-        cssClass +
-        '" ' +
-
-        'data-bet-market="' +
-        escapeAttribute(market) +
-        '" ' +
-
-        'data-bet-selection="' +
-        escapeAttribute(selection) +
-        '" ' +
-
-        'data-bet-selection-id="' +
-        escapeAttribute(selectionId) +
-        '" ' +
-
-        'data-bet-type="' +
-        escapeAttribute(type) +
-        '" ' +
-
-        'data-bet-odds="' +
-        escapeAttribute(
-            numericPrice
-        ) +
-        '">';
 
 
     html +=
-        '<div class="odd-price">' +
-        numericPrice.toFixed(2) +
+        numericPrice.toFixed(2);
+
+    html +=
         "</div>";
 
 
-    if (displaySize) {
+    if (sizeText) {
 
         html +=
             '<div class="odd-size">' +
-            displaySize +
+            sizeText +
             "</div>";
     }
 
 
-    html += "</div>";
+    html +=
+        "</div>";
+
 
     return html;
 }
 
 
 /* =========================================================
-   ATTACH BET EVENTS
+   BET EVENTS
 ========================================================= */
 
 function attachBetEvents() {
 
-    const boxes =
-        document.querySelectorAll(
-            "[data-bet-market]"
+    document
+        .querySelectorAll(
+            "[data-bet-market-type]"
+        )
+        .forEach(
+            box => {
+
+                box.addEventListener(
+                    "click",
+                    function() {
+
+                        const odds =
+                            Number(
+                                box.dataset.betOdds
+                            );
+
+
+                        const selectionId =
+                            box.dataset
+                                .betSelectionId;
+
+
+                        if (
+                            !Number.isFinite(
+                                odds
+                            ) ||
+                            odds <= 1
+                        ) {
+                            return;
+                        }
+
+
+                        if (!selectionId) {
+
+                            showBetMessage(
+                                "Selection ID is unavailable. Refresh the odds and try again.",
+                                "error"
+                            );
+
+                            return;
+                        }
+
+
+                        addToBetSlip({
+
+                            gameId:
+                                String(
+                                    gameId
+                                ),
+
+                            eventId:
+                                String(
+                                    eventId ||
+                                    gameId
+                                ),
+
+                            marketId:
+                                String(
+                                    marketId
+                                ),
+
+                            marketType:
+                                String(
+                                    box.dataset
+                                        .betMarketType
+                                ).toUpperCase(),
+
+                            marketName:
+                                String(
+                                    box.dataset
+                                        .betMarketName ||
+                                    ""
+                                ),
+
+                            selectionId:
+                                String(
+                                    selectionId
+                                ),
+
+                            selectionName:
+                                String(
+                                    box.dataset
+                                        .betSelection ||
+                                    ""
+                                ),
+
+                            side:
+                                String(
+                                    box.dataset
+                                        .betSide
+                                ).toUpperCase(),
+
+                            odds:
+                                odds,
+
+                            stake:
+                                0,
+
+                            eventName:
+                                document
+                                    .getElementById(
+                                        "eventName"
+                                    )
+                                    ?.textContent
+                                    ?.trim() ||
+                                "Cricket Match"
+                        });
+                    }
+                );
+            }
         );
-
-
-    boxes.forEach(
-        function(box) {
-
-            box.addEventListener(
-                "click",
-                function() {
-
-                    const odds =
-                        Number(
-                            box.dataset.betOdds
-                        );
-
-
-                    const selectionId =
-                        box.dataset.betSelectionId;
-
-
-                    if (
-                        !Number.isFinite(
-                            odds
-                        ) ||
-                        odds <= 0
-                    ) {
-                        return;
-                    }
-
-
-                    if (!selectionId) {
-
-                        showBetMessage(
-                            "Selection ID is unavailable. Please refresh the odds."
-                        );
-
-                        return;
-                    }
-
-
-                    selectBet(
-                        box.dataset.betMarket,
-                        box.dataset.betSelection,
-                        box.dataset.betType,
-                        odds,
-                        selectionId
-                    );
-                }
-            );
-        }
-    );
 }
 
 
 /* =========================================================
-   SELECT BET
+   LOCAL STORAGE
 ========================================================= */
 
-function selectBet(
-    market,
-    selection,
-    type,
-    odds,
-    selectionId
+function loadBetSlip() {
+
+    try {
+
+        const raw =
+            localStorage.getItem(
+                BET_SLIP_STORAGE
+            );
+
+        if (!raw) {
+            betSlipItems = [];
+            return;
+        }
+
+        const parsed =
+            JSON.parse(raw);
+
+        betSlipItems =
+            Array.isArray(parsed)
+                ? parsed
+                : [];
+
+    } catch (error) {
+
+        console.error(
+            "[BETSLIP] storage error:",
+            error
+        );
+
+        betSlipItems = [];
+    }
+}
+
+
+function saveBetSlip() {
+
+    try {
+
+        localStorage.setItem(
+            BET_SLIP_STORAGE,
+            JSON.stringify(
+                betSlipItems
+            )
+        );
+
+    } catch (error) {
+
+        console.error(
+            "[BETSLIP] save error:",
+            error
+        );
+    }
+}
+
+
+/* =========================================================
+   ADD BET TO SLIP
+========================================================= */
+
+function addToBetSlip(
+    item
 ) {
 
-    selectedBet = {
-
-        market: market,
-
-        selection: selection,
-
-        type: String(
-            type
-        ).toUpperCase(),
-
-        odds: Number(
-            odds
-        ),
-
-        selectionId: String(
-            selectionId
-        )
-
-    };
+    const key =
+        [
+            item.gameId,
+            item.marketId,
+            item.marketType,
+            item.selectionId,
+            item.side
+        ].join("|");
 
 
-    const slipMarket =
-        document.getElementById(
-            "slipMarket"
-        );
+    /*
+     * Same selection + same side:
+     * update odds instead of duplicating.
+     */
 
-    const slipSelection =
-        document.getElementById(
-            "slipSelection"
-        );
+    const existingIndex =
+        betSlipItems.findIndex(
+            current => {
 
-    const slipType =
-        document.getElementById(
-            "slipType"
-        );
+                const currentKey =
+                    [
+                        current.gameId,
+                        current.marketId,
+                        current.marketType,
+                        current.selectionId,
+                        current.side
+                    ].join("|");
 
-    const slipOdds =
-        document.getElementById(
-            "slipOdds"
-        );
-
-    const betSlip =
-        document.getElementById(
-            "betSlip"
-        );
-
-
-    if (slipMarket) {
-
-        slipMarket.textContent =
-            market;
-    }
-
-
-    if (slipSelection) {
-
-        slipSelection.textContent =
-            selection;
-    }
-
-
-    if (slipType) {
-
-        slipType.textContent =
-            type;
-    }
-
-
-    if (slipOdds) {
-
-        slipOdds.textContent =
-            Number(
-                odds
-            ).toFixed(2);
-    }
-
-
-    if (betSlip) {
-
-        betSlip.classList.add(
-            "show"
-        );
-    }
-
-
-    hideBetMessage();
-}
-
-
-/* =========================================================
-   CLOSE BET SLIP
-========================================================= */
-
-function closeBetSlip() {
-
-    const betSlip =
-        document.getElementById(
-            "betSlip"
-        );
-
-
-    if (betSlip) {
-
-        betSlip.classList.remove(
-            "show"
-        );
-    }
-
-    selectedBet = null;
-}
-
-
-/* =========================================================
-   PLACE BET
-========================================================= */
-
-async function placeBet() {
-
-    hideBetMessage();
-
-
-    if (!selectedBet) {
-
-        showBetMessage(
-            "Please select odds first."
-        );
-
-        return;
-    }
-
-
-    const stakeInput =
-        document.getElementById(
-            "stake"
-        );
-
-
-    const stake =
-        Number(
-            stakeInput
-                ? stakeInput.value
-                : 0
+                return currentKey === key;
+            }
         );
 
 
     if (
-        !Number.isFinite(stake) ||
-        stake <= 0
+        existingIndex >= 0
     ) {
 
-        showBetMessage(
-            "Enter a valid stake."
+        betSlipItems[
+            existingIndex
+        ].odds =
+            item.odds;
+
+    } else {
+
+        /*
+         * Different side of same selection:
+         * remove previous one.
+         */
+
+        betSlipItems =
+            betSlipItems.filter(
+                current => !(
+                    String(
+                        current.gameId
+                    ) === String(
+                        item.gameId
+                    ) &&
+
+                    String(
+                        current.marketId
+                    ) === String(
+                        item.marketId
+                    ) &&
+
+                    String(
+                        current.marketType
+                    ) === String(
+                        item.marketType
+                    ) &&
+
+                    String(
+                        current.selectionId
+                    ) === String(
+                        item.selectionId
+                    )
+                )
+            );
+
+
+        betSlipItems.push(
+            item
         );
+    }
 
 
-        if (stakeInput) {
-            stakeInput.focus();
-        }
+    saveBetSlip();
 
+    renderBetSlip();
+
+    openBetSlip();
+}
+
+
+/* =========================================================
+   REMOVE BET
+========================================================= */
+
+function removeBetFromSlip(
+    index
+) {
+
+    if (
+        index < 0 ||
+        index >= betSlipItems.length
+    ) {
         return;
     }
 
 
-    if (!gameId) {
+    betSlipItems.splice(
+        index,
+        1
+    );
 
-        showBetMessage(
-            "Game ID is missing."
-        );
 
+    saveBetSlip();
+
+    renderBetSlip();
+}
+
+
+/* =========================================================
+   UPDATE STAKE
+========================================================= */
+
+function updateStake(
+    index,
+    value
+) {
+
+    if (
+        index < 0 ||
+        index >= betSlipItems.length
+    ) {
         return;
     }
 
 
-    if (!marketId) {
+    const stake =
+        Number(value);
 
-        showBetMessage(
-            "Market ID is missing."
+
+    betSlipItems[index].stake =
+        Number.isFinite(stake) &&
+        stake > 0
+            ? stake
+            : 0;
+
+
+    saveBetSlip();
+
+    updateSlipSummary();
+}
+
+
+/* =========================================================
+   RENDER BET SLIP
+========================================================= */
+
+function renderBetSlip() {
+
+    const body =
+        document.getElementById(
+            "betSlipBody"
         );
 
-        return;
-    }
-
-
-    if (!selectedBet.selectionId) {
-
-        showBetMessage(
-            "Selection ID is missing. Please refresh the match."
+    const count =
+        document.getElementById(
+            "betSlipCount"
         );
 
-        return;
-    }
-
+    const reopenCount =
+        document.getElementById(
+            "reopenSlipCount"
+        );
 
     const placeButton =
         document.getElementById(
-            "placeBetButton"
+            "placeAllButton"
+        );
+
+
+    if (count) {
+
+        count.textContent =
+            String(
+                betSlipItems.length
+            );
+    }
+
+
+    if (reopenCount) {
+
+        reopenCount.textContent =
+            String(
+                betSlipItems.length
+            );
+    }
+
+
+    if (!body) {
+        return;
+    }
+
+
+    if (!betSlipItems.length) {
+
+        body.innerHTML =
+            '<div class="slip-empty">' +
+            "Select odds from a market to add a bet." +
+            "</div>";
+
+        if (placeButton) {
+            placeButton.disabled = true;
+        }
+
+        updateSlipSummary();
+
+        return;
+    }
+
+
+    /*
+     * Group by event.
+     */
+
+    const groups = new Map();
+
+
+    betSlipItems.forEach(
+        (item, index) => {
+
+            const eventKey =
+                String(
+                    item.gameId ||
+                    item.eventId ||
+                    "event"
+                );
+
+
+            if (!groups.has(
+                eventKey
+            )) {
+
+                groups.set(
+                    eventKey,
+                    []
+                );
+            }
+
+
+            groups.get(
+                eventKey
+            ).push({
+                item,
+                index
+            });
+        }
+    );
+
+
+    let html = "";
+
+
+    groups.forEach(
+        (items) => {
+
+            const eventName =
+                items[0].item.eventName ||
+                "Cricket Match";
+
+
+            html +=
+                '<div class="slip-event">';
+
+
+            html +=
+                '<div class="slip-event-title">' +
+                escapeHtml(
+                    eventName
+                ) +
+                "</div>";
+
+
+            items.forEach(
+                entry => {
+
+                    const item =
+                        entry.item;
+
+                    const index =
+                        entry.index;
+
+
+                    const isFancy =
+                        item.marketType ===
+                            "FANCY" ||
+                        item.marketType ===
+                            "SESSION";
+
+
+                    const displaySide =
+                        isFancy
+                            ? (
+                                item.side ===
+                                    "BACK"
+                                    ? "YES"
+                                    : "NO"
+                            )
+                            : item.side;
+
+
+                    const sideClass =
+                        item.side ===
+                            "BACK"
+                            ? "back"
+                            : "lay";
+
+
+                    const marketLabel =
+                        item.marketType ===
+                            "SESSION"
+                            ? "Session"
+                            : item.marketType ===
+                                "FANCY"
+                                ? "Fancy"
+                                : item.marketType ===
+                                    "BOOKMAKER"
+                                    ? "Bookmaker"
+                                    : "Match Odds";
+
+
+                    html +=
+                        '<div class="slip-selection">';
+
+
+                    html +=
+                        '<div class="slip-selection-top">';
+
+
+                    html +=
+                        '<div class="slip-selection-name">' +
+                        escapeHtml(
+                            item.selectionName
+                        ) +
+                        "</div>";
+
+
+                    html +=
+                        '<button ' +
+                        'type="button" ' +
+                        'class="remove-selection" ' +
+                        'data-remove-index="' +
+                        index +
+                        '">' +
+                        "×" +
+                        "</button>";
+
+
+                    html +=
+                        "</div>";
+
+
+                    html +=
+                        '<div class="slip-market">' +
+                        escapeHtml(
+                            marketLabel
+                        ) +
+                        " • " +
+                        escapeHtml(
+                            item.marketName
+                        ) +
+                        "</div>";
+
+
+                    html +=
+                        '<div class="slip-meta">';
+
+
+                    html +=
+                        '<span class="slip-type">' +
+                        escapeHtml(
+                            marketLabel
+                        ) +
+                        "</span>";
+
+
+                    html +=
+                        '<span class="slip-side ' +
+                        sideClass +
+                        '">' +
+                        escapeHtml(
+                            displaySide
+                        ) +
+                        "</span>";
+
+
+                    html +=
+                        '<span class="slip-odds">' +
+                        numberValue(
+                            item.odds
+                        ).toFixed(2) +
+                        "</span>";
+
+
+                    html +=
+                        "</div>";
+
+
+                    html +=
+                        '<div class="slip-stake-row">';
+
+
+                    html +=
+                        '<span class="slip-stake-label">' +
+                        "Stake" +
+                        "</span>";
+
+
+                    html +=
+                        '<input ' +
+                        'type="number" ' +
+                        'class="stake-input" ' +
+                        'min="1" ' +
+                        'step="0.01" ' +
+                        'value="' +
+                        (
+                            item.stake > 0
+                                ? item.stake
+                                : ""
+                        ) +
+                        '" ' +
+                        'placeholder="Enter stake" ' +
+                        'data-stake-index="' +
+                        index +
+                        '">' ;
+
+
+                    html +=
+                        "</div>";
+
+
+                    html +=
+                        "</div>";
+                }
+            );
+
+
+            html +=
+                "</div>";
+        }
+    );
+
+
+    body.innerHTML =
+        html;
+
+
+    body
+        .querySelectorAll(
+            "[data-remove-index]"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        removeBetFromSlip(
+                            Number(
+                                button.dataset
+                                    .removeIndex
+                            )
+                        );
+                    }
+                );
+            }
+        );
+
+
+    body
+        .querySelectorAll(
+            "[data-stake-index]"
+        )
+        .forEach(
+            input => {
+
+                input.addEventListener(
+                    "input",
+                    () => {
+
+                        updateStake(
+                            Number(
+                                input.dataset
+                                    .stakeIndex
+                            ),
+                            input.value
+                        );
+                    }
+                );
+            }
         );
 
 
     if (placeButton) {
 
         placeButton.disabled =
+            betSlipItems.length === 0;
+    }
+
+
+    updateSlipSummary();
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+function updateSlipSummary() {
+
+    const totalStakeElement =
+        document.getElementById(
+            "totalStake"
+        );
+
+    const returnElement =
+        document.getElementById(
+            "potentialReturn"
+        );
+
+
+    let totalStake = 0;
+    let totalReturn = 0;
+
+
+    betSlipItems.forEach(
+        item => {
+
+            const stake =
+                numberValue(
+                    item.stake
+                );
+
+            const odds =
+                numberValue(
+                    item.odds
+                );
+
+
+            totalStake +=
+                stake;
+
+            totalReturn +=
+                stake * odds;
+        }
+    );
+
+
+    if (totalStakeElement) {
+
+        totalStakeElement.textContent =
+            "₹" +
+            totalStake.toFixed(2);
+    }
+
+
+    if (returnElement) {
+
+        returnElement.textContent =
+            "₹" +
+            totalReturn.toFixed(2);
+    }
+}
+
+
+/* =========================================================
+   OPEN BET SLIP
+========================================================= */
+
+function openBetSlip() {
+
+    const slip =
+        document.getElementById(
+            "betSlip"
+        );
+
+    const reopen =
+        document.getElementById(
+            "reopenSlipButton"
+        );
+
+
+    if (slip) {
+
+        slip.classList.add(
+            "open"
+        );
+    }
+
+
+    if (reopen) {
+
+        reopen.classList.remove(
+            "show"
+        );
+    }
+}
+
+
+/* =========================================================
+   MINIMIZE BET SLIP
+========================================================= */
+
+function minimizeBetSlip() {
+
+    const slip =
+        document.getElementById(
+            "betSlip"
+        );
+
+    const reopen =
+        document.getElementById(
+            "reopenSlipButton"
+        );
+
+
+    if (slip) {
+
+        slip.classList.remove(
+            "open"
+        );
+    }
+
+
+    if (reopen) {
+
+        reopen.classList.toggle(
+            "show",
+            betSlipItems.length > 0
+        );
+    }
+}
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+function showBetMessage(
+    message,
+    type
+) {
+
+    const element =
+        document.getElementById(
+            "betMessage"
+        );
+
+    if (!element) {
+        return;
+    }
+
+
+    element.textContent =
+        message;
+
+
+    element.className =
+        "bet-message show " +
+        (
+            type === "success"
+                ? "success"
+                : "error"
+        );
+}
+
+
+function hideBetMessage() {
+
+    const element =
+        document.getElementById(
+            "betMessage"
+        );
+
+    if (!element) {
+        return;
+    }
+
+
+    element.textContent =
+        "";
+
+    element.className =
+        "bet-message";
+}
+
+
+/* =========================================================
+   PLACE ALL BETS
+========================================================= */
+
+async function placeAllBets() {
+
+    hideBetMessage();
+
+
+    if (!betSlipItems.length) {
+
+        showBetMessage(
+            "Your bet slip is empty.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const invalid =
+        betSlipItems.find(
+            item =>
+                !Number.isFinite(
+                    Number(item.stake)
+                ) ||
+                Number(item.stake) <= 0
+        );
+
+
+    if (invalid) {
+
+        showBetMessage(
+            "Enter a valid stake for every selection.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const button =
+        document.getElementById(
+            "placeAllButton"
+        );
+
+
+    if (button) {
+
+        button.disabled =
             true;
 
-        placeButton.textContent =
+        button.textContent =
             "Placing...";
     }
 
 
+    let placedCount = 0;
+
+
     try {
 
-        const requestBody = {
+        /*
+         * Place sequentially so the balance returned by
+         * the backend remains authoritative.
+         */
 
-            game_id:
-                String(gameId),
+        for (
+            let index = 0;
+            index < betSlipItems.length;
+            index++
+        ) {
 
-            event_id:
-                String(
-                    eventId ||
-                    gameId
-                ),
-
-            market_id:
-                String(marketId),
-
-            market_type:
-                "MATCH_ODDS",
-
-            market_name:
-                String(
-                    selectedBet.market ||
-                    "Match Odds"
-                ),
-
-            selection_id:
-                String(
-                    selectedBet.selectionId
-                ),
-
-            selection_name:
-                String(
-                    selectedBet.selection
-                ),
-
-            side:
-                String(
-                    selectedBet.type
-                ).toUpperCase(),
-
-            odds:
-                Number(
-                    selectedBet.odds
-                ),
-
-            stake:
-                Number(
-                    stake
-                )
-        };
+            const item =
+                betSlipItems[index];
 
 
-        console.log(
-            "[BET] placing:",
-            requestBody
-        );
+            const requestBody = {
+
+                game_id:
+                    String(
+                        item.gameId
+                    ),
+
+                event_id:
+                    String(
+                        item.eventId ||
+                        item.gameId
+                    ),
+
+                market_id:
+                    String(
+                        item.marketId
+                    ),
+
+                market_type:
+                    String(
+                        item.marketType
+                    ).toUpperCase(),
+
+                market_name:
+                    String(
+                        item.marketName ||
+                        ""
+                    ),
+
+                selection_id:
+                    String(
+                        item.selectionId
+                    ),
+
+                selection_name:
+                    String(
+                        item.selectionName
+                    ),
+
+                /*
+                 * Backend converts:
+                 * YES -> BACK
+                 * NO  -> LAY
+                 *
+                 * We already store internal BACK/LAY.
+                 */
+
+                side:
+                    String(
+                        item.side
+                    ).toUpperCase(),
+
+                odds:
+                    Number(
+                        item.odds
+                    ),
+
+                stake:
+                    Number(
+                        item.stake
+                    )
+            };
 
 
-        const response =
-            await fetch(
-                "/bets/place",
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-
-                        "Accept":
-                            "application/json"
-                    },
-
-                    credentials:
-                        "same-origin",
-
-                    body:
-                        JSON.stringify(
-                            requestBody
-                        )
-                }
+            console.log(
+                "[BET] placing:",
+                requestBody
             );
 
 
-        let data = {};
+            const response =
+                await fetch(
+                    "/bets/place",
+                    {
+                        method: "POST",
 
-        try {
+                        headers: {
+                            "Content-Type":
+                                "application/json",
 
-            data =
-                await response.json();
+                            "Accept":
+                                "application/json"
+                        },
 
-        } catch (jsonError) {
+                        credentials:
+                            "same-origin",
 
-            console.error(
-                "[BET] invalid JSON:",
-                jsonError
-            );
+                        body:
+                            JSON.stringify(
+                                requestBody
+                            )
+                    }
+                );
+
+
+            let data = {};
+
+            try {
+
+                data =
+                    await response.json();
+
+            } catch (error) {
+
+                console.error(
+                    "[BET] JSON error:",
+                    error
+                );
+            }
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message ||
+                    data.detail ||
+                    "Bet placement failed."
+                );
+            }
+
+
+            if (!data.success) {
+
+                throw new Error(
+                    data.message ||
+                    "Bet placement failed."
+                );
+            }
+
+
+            placedCount++;
+
+
+            /*
+             * Remove the successfully placed item.
+             */
+
+            betSlipItems =
+                betSlipItems.filter(
+                    (_, itemIndex) =>
+                        itemIndex !==
+                        index
+                );
+
+
+            index--;
+
+
+            saveBetSlip();
+
+            renderBetSlip();
+
+
+            if (
+                data.balance !==
+                undefined
+            ) {
+
+                updateDisplayedBalance(
+                    data.balance
+                );
+            }
         }
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                data.message ||
-                data.detail ||
-                "Bet placement failed. HTTP " +
-                response.status
-            );
-        }
-
-
-        if (!data.success) {
-
-            throw new Error(
-                data.message ||
-                "Bet placement failed."
-            );
-        }
-
-
-        console.log(
-            "[BET] success:",
-            data
-        );
 
 
         showBetMessage(
-            "Bet placed successfully. Bet #" +
-            data.bet_id,
+            placedCount +
+            (
+                placedCount === 1
+                    ? " bet placed successfully."
+                    : " bets placed successfully."
+            ),
             "success"
         );
 
 
-        /* Update displayed balance if present */
-
-        if (
-            data.balance !== undefined &&
-            data.balance !== null
-        ) {
-
-            updateDisplayedBalance(
-                data.balance
-            );
-        }
-
-
-        /* Clear stake */
-
-        if (stakeInput) {
-            stakeInput.value = "";
-        }
-
-
-        /* Keep selected bet cleared */
-
-        selectedBet = null;
-
-
-        /*
-         * Do not close immediately.
-         * Show successful result first.
-         */
-
         setTimeout(
-            function() {
+            () => {
 
-                closeBetSlip();
+                if (
+                    betSlipItems.length === 0
+                ) {
+
+                    const slip =
+                        document.getElementById(
+                            "betSlip"
+                        );
+
+                    if (slip) {
+
+                        slip.classList.remove(
+                            "open"
+                        );
+                    }
+
+
+                    const reopen =
+                        document.getElementById(
+                            "reopenSlipButton"
+                        );
+
+                    if (reopen) {
+
+                        reopen.classList.remove(
+                            "show"
+                        );
+                    }
+                }
 
             },
-            1800
+            1600
         );
 
 
     } catch (error) {
 
         console.error(
-            "[BET] error:",
+            "[BET] placement error:",
             error
         );
 
 
         showBetMessage(
             error.message ||
-            "Unable to place bet."
+            "Unable to place bet.",
+            "error"
         );
 
     } finally {
 
-        if (placeButton) {
+        if (button) {
 
-            placeButton.disabled =
-                false;
+            button.disabled =
+                betSlipItems.length === 0;
 
-            placeButton.textContent =
+            button.textContent =
                 "Place Bet";
         }
     }
@@ -2550,18 +3630,17 @@ function updateDisplayedBalance(
     balance
 ) {
 
-    const number =
+    const value =
         Number(balance);
 
-
-    if (!Number.isFinite(number)) {
+    if (!Number.isFinite(value)) {
         return;
     }
 
 
     const formatted =
         "₹" +
-        number.toFixed(2);
+        value.toFixed(2);
 
 
     document
@@ -2569,7 +3648,7 @@ function updateDisplayedBalance(
             ".balance"
         )
         .forEach(
-            function(element) {
+            element => {
 
                 element.textContent =
                     formatted;
@@ -2592,19 +3671,19 @@ function startOddsPolling() {
     }
 
 
-    loadOdds(false);
+    loadOdds();
 
 
     refreshTimer =
         setInterval(
-            function() {
+            () => {
 
                 if (
                     document.visibilityState ===
                     "visible"
                 ) {
 
-                    loadOdds(false);
+                    loadOdds();
                 }
 
             },
@@ -2636,37 +3715,86 @@ function stopOddsPolling() {
 
 document.addEventListener(
     "DOMContentLoaded",
-    function() {
+    () => {
 
         initializeMatch();
 
+        loadBetSlip();
 
-        const closeButton =
+        renderBetSlip();
+
+
+        const minimize =
             document.getElementById(
-                "closeSlipButton"
+                "minimizeSlipButton"
             );
 
+        if (minimize) {
 
-        if (closeButton) {
-
-            closeButton.addEventListener(
+            minimize.addEventListener(
                 "click",
-                closeBetSlip
+                minimizeBetSlip
             );
         }
 
 
-        const placeButton =
+        const reopen =
             document.getElementById(
-                "placeBetButton"
+                "reopenSlipButton"
             );
 
+        if (reopen) {
 
-        if (placeButton) {
-
-            placeButton.addEventListener(
+            reopen.addEventListener(
                 "click",
-                placeBet
+                openBetSlip
+            );
+        }
+
+
+        const place =
+            document.getElementById(
+                "placeAllButton"
+            );
+
+        if (place) {
+
+            place.addEventListener(
+                "click",
+                placeAllBets
+            );
+        }
+
+
+        /*
+         * Don't automatically cover the dashboard.
+         * Existing selections can still be reopened
+         * through BET SLIP.
+         */
+
+        const slip =
+            document.getElementById(
+                "betSlip"
+            );
+
+        if (slip) {
+
+            slip.classList.remove(
+                "open"
+            );
+        }
+
+
+        const reopenButton =
+            document.getElementById(
+                "reopenSlipButton"
+            );
+
+        if (reopenButton) {
+
+            reopenButton.classList.toggle(
+                "show",
+                betSlipItems.length > 0
             );
         }
 
@@ -2677,12 +3805,12 @@ document.addEventListener(
 
 
 /* =========================================================
-   VISIBILITY
+   TAB VISIBILITY
 ========================================================= */
 
 document.addEventListener(
     "visibilitychange",
-    function() {
+    () => {
 
         if (
             document.visibilityState ===
@@ -2701,4 +3829,5 @@ document.addEventListener(
 </script>
 
 </body>
+
 </html>
