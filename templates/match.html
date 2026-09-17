@@ -1916,33 +1916,50 @@
      * PLACE BET BUTTON
      * =========================================================
      *
-     * We deliberately don't invent the backend payload here.
+     * Sends the selected ProExch market selection to:
      *
-     * Your existing /bets/place route needs to be connected
-     * using its actual schema.
+     * POST /bets/place
+     *
+     * The server validates login, balance, odds and selection,
+     * creates Bet + BetSelection + Transaction, deducts the
+     * stake from User.balance and synchronizes Wallet.balance.
      *
      */
 
-    document
-        .getElementById("placeBetButton")
-        .addEventListener(
+    const placeBetButton =
+        document.getElementById(
+            "placeBetButton"
+        );
+
+
+    if (placeBetButton) {
+
+        placeBetButton.addEventListener(
             "click",
-            function() {
+            async function() {
 
                 if (!selectedBet) {
+
+                    const message =
+                        document.getElementById(
+                            "betslipMessage"
+                        );
+
+                    if (message) {
+
+                        message.textContent =
+                            "Select an odd first.";
+
+                    }
 
                     return;
 
                 }
 
 
-                const stake =
-                    Number(
-                        document
-                            .getElementById(
-                                "stake"
-                            )
-                            .value
+                const stakeInput =
+                    document.getElementById(
+                        "stake"
                     );
 
 
@@ -1952,53 +1969,319 @@
                     );
 
 
+                const stake =
+                    Number(
+                        stakeInput
+                            ? stakeInput.value
+                            : 0
+                    );
+
+
                 if (
                     !Number.isFinite(stake) ||
                     stake <= 0
                 ) {
 
-                    message.textContent =
-                        "Enter a valid stake.";
+                    if (message) {
+
+                        message.textContent =
+                            "Enter a valid stake.";
+
+                    }
 
                     return;
 
                 }
 
 
-                /*
-                 * IMPORTANT:
-                 *
-                 * At this point we have all information
-                 * required for the frontend selection:
-                 *
-                 * game_id
-                 * event_id
-                 * market_id
-                 * market_type
-                 * selection_id
-                 * selection_name
-                 * side
-                 * odds
-                 * stake
-                 *
-                 * Your existing /bets/place endpoint should
-                 * receive these values.
-                 */
+                if (
+                    !Number.isFinite(
+                        Number(
+                            selectedBet.odds
+                        )
+                    ) ||
+                    Number(
+                        selectedBet.odds
+                    ) <= 1
+                ) {
 
-                console.log(
-                    "[BET] Selected bet:",
-                    {
-                        ...selectedBet,
-                        stake: stake
+                    if (message) {
+
+                        message.textContent =
+                            "Invalid odds.";
+
                     }
-                );
+
+                    return;
+
+                }
 
 
-                message.textContent =
-                    "Bet selection is ready. Connect this button to your existing /bets/place endpoint.";
+                placeBetButton.disabled =
+                    true;
+
+
+                const originalText =
+                    placeBetButton.textContent;
+
+
+                placeBetButton.textContent =
+                    "Placing...";
+
+
+                if (message) {
+
+                    message.textContent =
+                        "Placing your bet...";
+
+                }
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            "/bets/place",
+                            {
+                                method: "POST",
+
+                                credentials:
+                                    "same-origin",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json",
+
+                                    "Accept":
+                                        "application/json"
+                                },
+
+                                body:
+                                    JSON.stringify(
+                                        {
+                                            game_id:
+                                                String(
+                                                    selectedBet.game_id ||
+                                                    gameId ||
+                                                    ""
+                                                ),
+
+                                            event_id:
+                                                String(
+                                                    selectedBet.event_id ||
+                                                    eventId ||
+                                                    ""
+                                                ),
+
+                                            market_id:
+                                                String(
+                                                    selectedBet.market_id ||
+                                                    marketId ||
+                                                    ""
+                                                ),
+
+                                            market_type:
+                                                selectedBet.market_type ||
+                                                "match",
+
+                                            market_name:
+                                                selectedBet.market_name ||
+                                                "Match Odds",
+
+                                            selection_id:
+                                                String(
+                                                    selectedBet.selection_id ||
+                                                    ""
+                                                ),
+
+                                            selection_name:
+                                                String(
+                                                    selectedBet.selection_name ||
+                                                    ""
+                                                ),
+
+                                            side:
+                                                String(
+                                                    selectedBet.side ||
+                                                    ""
+                                                ).toUpperCase(),
+
+                                            odds:
+                                                Number(
+                                                    selectedBet.odds
+                                                ),
+
+                                            stake:
+                                                stake
+                                        }
+                                    )
+                            }
+                        );
+
+
+                    let data = null;
+
+
+                    try {
+
+                        data =
+                            await response.json();
+
+                    } catch (jsonError) {
+
+                        throw new Error(
+                            "Server returned an invalid response."
+                        );
+
+                    }
+
+
+                    if (
+                        !response.ok ||
+                        !data.success
+                    ) {
+
+                        throw new Error(
+                            data.message ||
+                            data.detail ||
+                            "Could not place bet."
+                        );
+
+                    }
+
+
+                    if (message) {
+
+                        message.textContent =
+                            data.message ||
+                            "Bet placed successfully.";
+
+                    }
+
+
+                    /*
+                     * Update any balance element that already
+                     * exists on the match page.
+                     */
+
+                    const newBalance =
+                        Number(
+                            data.balance
+                        );
+
+
+                    if (
+                        Number.isFinite(
+                            newBalance
+                        )
+                    ) {
+
+                        document
+                            .querySelectorAll(
+                                "[data-user-balance], #userBalance, #balance, .user-balance"
+                            )
+                            .forEach(
+                                function(element) {
+
+                                    element.textContent =
+                                        "₹" +
+                                        newBalance.toFixed(2);
+
+                                }
+                            );
+
+                    }
+
+
+                    /*
+                     * Clear the current selection after a
+                     * successful server-side bet.
+                     */
+
+                    selectedBet = null;
+
+
+                    document
+                        .querySelectorAll(
+                            ".odd.selected"
+                        )
+                        .forEach(
+                            function(item) {
+
+                                item.classList.remove(
+                                    "selected"
+                                );
+
+                            }
+                        );
+
+
+                    if (stakeInput) {
+
+                        stakeInput.value =
+                            "";
+
+                    }
+
+
+                    /*
+                     * Keep the slip visible long enough for
+                     * the success message to be seen.
+                     */
+
+                    setTimeout(
+                        function() {
+
+                            const slip =
+                                document.getElementById(
+                                    "betslip"
+                                );
+
+                            if (slip) {
+
+                                slip.classList.remove(
+                                    "show"
+                                );
+
+                            }
+
+                        },
+                        1800
+                    );
+
+
+                } catch (error) {
+
+                    console.error(
+                        "[BET] Place bet error:",
+                        error
+                    );
+
+
+                    if (message) {
+
+                        message.textContent =
+                            error.message ||
+                            "Could not place bet.";
+
+                    }
+
+                } finally {
+
+                    placeBetButton.disabled =
+                        false;
+
+
+                    placeBetButton.textContent =
+                        originalText ||
+                        "Place Bet";
+
+                }
 
             }
         );
+
+    }
 
 
     /*

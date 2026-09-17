@@ -55,6 +55,7 @@ from routers.wallet_transactions import (
 
 from routers.proexch import router as proexch_router
 from routers.cricket_api import router as cricket_api_router
+from routers.bets import router as bets_router
 
 
 # ============================================================
