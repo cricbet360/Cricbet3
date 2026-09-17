@@ -10,6 +10,10 @@ from models.bet import Bet
 from services import proexch_api
 
 
+# ==========================================================
+# ROUTER
+# ==========================================================
+
 router = APIRouter()
 
 templates = Jinja2Templates(
@@ -34,7 +38,6 @@ def format_user_bet(
     )
 
     return {
-
         "id": bet.id,
 
         "stake": float(
@@ -96,10 +99,9 @@ async def dashboard(
         )
 
     # ------------------------------------------------------
-    # DO NOT CALL PROEXCH HERE
+    # Dashboard must NOT call ProExch.
     #
-    # Dashboard loads first.
-    # JavaScript loads matches asynchronously.
+    # dashboard.js loads cricket matches asynchronously.
     # ------------------------------------------------------
 
     try:
@@ -119,23 +121,17 @@ async def dashboard(
     except Exception as exc:
 
         print(
-            f"USER BETS ERROR: {exc}"
+            f"[DASHBOARD] user bets error: {exc}"
         )
 
         user_bets = []
 
     return templates.TemplateResponse(
-
         request=request,
-
         name="dashboard.html",
-
         context={
-
             "user": user,
-
             "matches": [],
-
             "bets": [
                 format_user_bet(bet)
                 for bet in user_bets
@@ -150,13 +146,14 @@ async def dashboard(
 
 @router.get("/match/{match_id}")
 async def match_page(
-
     request: Request,
-
     match_id: str,
-
     db: Session = Depends(get_db),
 ):
+
+    # ------------------------------------------------------
+    # AUTH
+    # ------------------------------------------------------
 
     user_id = request.session.get(
         "user_id"
@@ -186,20 +183,36 @@ async def match_page(
             status_code=303,
         )
 
+    # ------------------------------------------------------
+    # CLEAN GAME ID
+    # ------------------------------------------------------
+
     match_id = str(
         match_id
     ).strip()
+
+    if not match_id:
+
+        return templates.TemplateResponse(
+            request=request,
+            name="match.html",
+            context={
+                "user": user,
+                "match": None,
+                "error": "Invalid match ID.",
+            },
+        )
 
     print(
         "\n========================================"
     )
 
     print(
-        "CRICKBET - PROEXCH MATCH"
+        "[CRICKBET] OPEN MATCH PAGE"
     )
 
     print(
-        "GAME ID:",
+        "Game ID:",
         match_id,
     )
 
@@ -209,12 +222,16 @@ async def match_page(
 
     # ------------------------------------------------------
     # FIND MATCH
+    #
+    # IMPORTANT:
+    # The service function is find_match(),
+    # NOT get_match().
     # ------------------------------------------------------
 
     try:
 
         selected_match = (
-            proexch_api.get_match(
+            proexch_api.find_match(
                 match_id
             )
         )
@@ -222,22 +239,16 @@ async def match_page(
     except Exception as exc:
 
         print(
-            "PROEXCH MATCH ERROR:",
+            "[CRICKET] PROEXCH MATCH ERROR:",
             exc,
         )
 
         return templates.TemplateResponse(
-
             request=request,
-
             name="match.html",
-
             context={
-
                 "user": user,
-
                 "match": None,
-
                 "error": (
                     f"Unable to load match: {exc}"
                 ),
@@ -248,25 +259,19 @@ async def match_page(
     # MATCH NOT FOUND
     # ------------------------------------------------------
 
-    if selected_match is None:
+    if not selected_match:
 
         print(
-            "PROEXCH MATCH NOT FOUND:",
+            "[CRICKET] MATCH NOT FOUND:",
             match_id,
         )
 
         return templates.TemplateResponse(
-
             request=request,
-
             name="match.html",
-
             context={
-
                 "user": user,
-
                 "match": None,
-
                 "error": (
                     "This match is no longer available."
                 ),
@@ -274,184 +279,251 @@ async def match_page(
         )
 
     # ------------------------------------------------------
-    # BASIC MATCH DATA
+    # SELECTED MATCH IS ALREADY NORMALIZED BY
+    # proexch_api.get_matches()
+    #
+    # Therefore use snake_case fields.
     # ------------------------------------------------------
 
     game_id = str(
         selected_match.get(
-            "gameId",
-            match_id,
+            "game_id"
         )
+        or match_id
     )
 
     market_id = str(
         selected_match.get(
-            "marketId",
-            "",
+            "market_id"
         )
+        or ""
     )
 
     event_id = str(
         selected_match.get(
-            "eventId",
-            "",
+            "event_id"
         )
+        or game_id
     )
 
     event_name = (
         selected_match.get(
-            "eventName"
+            "event_name"
         )
         or "Cricket Match"
     )
 
     event_time = (
         selected_match.get(
-            "eventTime"
+            "event_time"
         )
         or ""
     )
 
     in_play = bool(
         selected_match.get(
-            "inPlay",
+            "in_play",
             False,
         )
     )
 
     team1 = (
         selected_match.get(
-            "runnerName1"
+            "team1"
         )
         or "Team 1"
     )
 
     team2 = (
         selected_match.get(
-            "runnerName2"
+            "team2"
         )
         or "Team 2"
     )
 
     team3 = (
         selected_match.get(
-            "runnerName3"
+            "team3"
         )
-        or "The Draw"
+        or ""
     )
 
     # ------------------------------------------------------
     # LOAD ODDS
     # ------------------------------------------------------
 
-    odds_data = {}
+    odds_data = {
+        "match_odds": [],
+        "bookmaker_odds": [],
+        "fancy_odds": [],
+        "other_market_odds": [],
+        "counts": {},
+    }
 
     odds_error = None
 
-    try:
+    if market_id:
 
-        if not market_id:
+        try:
 
-            raise ValueError(
-                "ProExch did not provide marketId"
+            odds_data = (
+                proexch_api.get_odds(
+                    game_id=game_id,
+                    event_id=event_id,
+                    market_id=market_id,
+                )
             )
 
-        odds_data = (
-            proexch_api.get_odds(
-                game_id=game_id,
-                market_id=market_id,
+        except Exception as exc:
+
+            odds_error = str(exc)
+
+            print(
+                "[CRICKET] PROEXCH ODDS ERROR:",
+                odds_error,
             )
+
+    else:
+
+        odds_error = (
+            "ProExch did not provide a market ID."
         )
-
-    except Exception as exc:
-
-        odds_error = str(exc)
 
         print(
-            "PROEXCH ODDS ERROR:",
-            odds_error,
+            "[CRICKET] Missing market ID:",
+            game_id,
         )
 
     # ------------------------------------------------------
-    # RAW ODDS
+    # NORMALIZED ODDS
+    #
+    # get_odds() already calls normalize_odds().
+    #
+    # Therefore:
+    #
+    # match_odds
+    # bookmaker_odds
+    # fancy_odds
+    # other_market_odds
+    #
+    # are already parsed.
     # ------------------------------------------------------
 
-    match_odds_raw = (
+    match_odds = (
         odds_data.get(
-            "matchOdds",
+            "match_odds",
             []
         )
+        if isinstance(
+            odds_data,
+            dict
+        )
+        else []
     )
 
-    bookmaker_odds_raw = (
+    bookmaker_odds = (
         odds_data.get(
-            "bookMakerOdds",
+            "bookmaker_odds",
             []
         )
+        if isinstance(
+            odds_data,
+            dict
+        )
+        else []
     )
 
-    fancy_odds_raw = (
+    fancy_odds = (
         odds_data.get(
-            "fancyOdds",
+            "fancy_odds",
             []
         )
+        if isinstance(
+            odds_data,
+            dict
+        )
+        else []
     )
 
     other_market_odds = (
         odds_data.get(
-            "otherMarketOdds",
+            "other_market_odds",
             []
         )
+        if isinstance(
+            odds_data,
+            dict
+        )
+        else []
     )
 
-    # Safety checks
-
-    if not isinstance(
-        match_odds_raw,
-        list,
-    ):
-        match_odds_raw = []
-
-    if not isinstance(
-        bookmaker_odds_raw,
-        list,
-    ):
-        bookmaker_odds_raw = []
-
-    if not isinstance(
-        fancy_odds_raw,
-        list,
-    ):
-        fancy_odds_raw = []
-
-    if not isinstance(
-        other_market_odds,
-        list,
-    ):
-        other_market_odds = []
+    counts = (
+        odds_data.get(
+            "counts",
+            {}
+        )
+        if isinstance(
+            odds_data,
+            dict
+        )
+        else {}
+    )
 
     # ------------------------------------------------------
-    # PARSED ODDS
+    # FANCY MARKET IDS
+    #
+    # Do NOT call get_fancy_market_ids().
+    # That function does not exist in the current service.
+    #
+    # Build the IDs directly from normalized fancy markets.
     # ------------------------------------------------------
 
-    match_odds = (
-        proexch_api.parse_match_odds(
-            match_odds_raw
-        )
-    )
+    fancy_market_ids = []
 
-    fancy_odds = (
-        proexch_api.parse_fancy_odds(
-            fancy_odds_raw
-        )
-    )
+    if isinstance(
+        fancy_odds,
+        list
+    ):
 
-    fancy_market_ids = (
-        proexch_api.get_fancy_market_ids(
-            game_id,
-            fancy_odds_raw,
+        for market in fancy_odds:
+
+            if not isinstance(
+                market,
+                dict
+            ):
+                continue
+
+            fancy_id = (
+                market.get("id")
+                or market.get("market_id")
+                or market.get("marketId")
+            )
+
+            if fancy_id:
+
+                fancy_market_ids.append(
+                    str(fancy_id)
+                )
+
+    # ------------------------------------------------------
+    # RAW DATA
+    #
+    # normalize_odds() keeps raw ProExch data under "raw".
+    # ------------------------------------------------------
+
+    raw_odds = {}
+
+    if isinstance(
+        odds_data,
+        dict
+    ):
+
+        raw_odds = (
+            odds_data.get(
+                "raw",
+                {}
+            )
         )
-    )
 
     # ------------------------------------------------------
     # FINAL MATCH OBJECT
@@ -485,23 +557,19 @@ async def match_page(
 
         "start_time": event_time,
 
+        "event_time": event_time,
+
         "league": "Cricket",
+
+        # --------------------------------------------------
+        # NORMALIZED ODDS
+        # --------------------------------------------------
 
         "match_odds": match_odds,
 
+        "bookmaker_odds": bookmaker_odds,
+
         "fancy_odds": fancy_odds,
-
-        "match_odds_raw": (
-            match_odds_raw
-        ),
-
-        "bookmaker_odds": (
-            bookmaker_odds_raw
-        ),
-
-        "fancy_odds_raw": (
-            fancy_odds_raw
-        ),
 
         "other_market_odds": (
             other_market_odds
@@ -509,6 +577,61 @@ async def match_page(
 
         "fancy_market_ids": (
             fancy_market_ids
+        ),
+
+        "counts": counts,
+
+        # --------------------------------------------------
+        # RAW DATA
+        # --------------------------------------------------
+
+        "raw_match": (
+            selected_match.get(
+                "raw",
+                {}
+            )
+        ),
+
+        "raw_odds": raw_odds,
+
+        # --------------------------------------------------
+        # COMPATIBILITY FIELDS
+        # --------------------------------------------------
+
+        "match_odds_raw": (
+            raw_odds.get(
+                "matchOdds",
+                []
+            )
+            if isinstance(
+                raw_odds,
+                dict
+            )
+            else []
+        ),
+
+        "bookmaker_odds_raw": (
+            raw_odds.get(
+                "bookMakerOdds",
+                []
+            )
+            if isinstance(
+                raw_odds,
+                dict
+            )
+            else []
+        ),
+
+        "fancy_odds_raw": (
+            raw_odds.get(
+                "fancyOdds",
+                []
+            )
+            if isinstance(
+                raw_odds,
+                dict
+            )
+            else []
         ),
 
         "bookmaker": "",
@@ -521,7 +644,7 @@ async def match_page(
     # ------------------------------------------------------
 
     print(
-        "\n========== PROEXCH MATCH =========="
+        "\n========== CRICKBET MATCH =========="
     )
 
     print(
@@ -550,18 +673,23 @@ async def match_page(
     )
 
     print(
-        "Match runners:",
+        "Match markets:",
         len(match_odds),
     )
 
     print(
         "Bookmaker markets:",
-        len(bookmaker_odds_raw),
+        len(bookmaker_odds),
     )
 
     print(
         "Fancy markets:",
         len(fancy_odds),
+    )
+
+    print(
+        "Fancy market IDs:",
+        fancy_market_ids,
     )
 
     print(
@@ -578,17 +706,11 @@ async def match_page(
     # ------------------------------------------------------
 
     return templates.TemplateResponse(
-
         request=request,
-
         name="match.html",
-
         context={
-
             "user": user,
-
             "match": match,
-
             "error": odds_error,
         },
     )

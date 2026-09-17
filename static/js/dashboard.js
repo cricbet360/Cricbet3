@@ -1,5 +1,6 @@
 "use strict";
 
+
 /* =========================================================
    CONFIG
 ========================================================= */
@@ -21,7 +22,11 @@ const oddsLoading = new Set();
 ========================================================= */
 
 function escapeHtml(value) {
-    if (value === null || value === undefined) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
         return "";
     }
 
@@ -35,7 +40,12 @@ function escapeHtml(value) {
 
 
 function toNumber(value) {
-    if (value === null || value === undefined || value === "") {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
         return null;
     }
 
@@ -48,6 +58,7 @@ function toNumber(value) {
 
 
 function getGameId(match) {
+
     return String(
         match?.game_id ??
         match?.gameId ??
@@ -57,15 +68,17 @@ function getGameId(match) {
 
 
 function getEventId(match) {
+
     return String(
         match?.event_id ??
         match?.eventId ??
-        ""
+        getGameId(match)
     ).trim();
 }
 
 
 function getMarketId(match) {
+
     return String(
         match?.market_id ??
         match?.marketId ??
@@ -75,6 +88,7 @@ function getMarketId(match) {
 
 
 function getSelectionId(match, index) {
+
     return String(
         match?.[`selection_id${index}`] ??
         match?.[`selectionId${index}`] ??
@@ -84,6 +98,7 @@ function getSelectionId(match, index) {
 
 
 function isLive(match) {
+
     const value =
         match?.in_play ??
         match?.inPlay;
@@ -99,23 +114,31 @@ function isLive(match) {
 
 
 function formatDate(value) {
+
     if (!value) {
         return "";
     }
 
     const date = new Date(value);
 
-    if (Number.isNaN(date.getTime())) {
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
         return String(value);
     }
 
-    return date.toLocaleString("en-IN", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
-    });
+    return date.toLocaleString(
+        "en-IN",
+        {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
 }
 
 
@@ -124,6 +147,7 @@ function formatDate(value) {
 ========================================================= */
 
 function openWhatsApp(message) {
+
     if (!WHATSAPP_NUMBER) {
         return;
     }
@@ -140,6 +164,7 @@ function openWhatsApp(message) {
 
 
 function openDepositWhatsApp() {
+
     openWhatsApp(
         "Hello, I want to make a deposit in CricBet."
     );
@@ -147,6 +172,7 @@ function openDepositWhatsApp() {
 
 
 function openWithdrawWhatsApp() {
+
     openWhatsApp(
         "Hello, I want to make a withdrawal from CricBet."
     );
@@ -158,6 +184,7 @@ function openWithdrawWhatsApp() {
 ========================================================= */
 
 function getOddsRoot(payload) {
+
     if (!payload) {
         return null;
     }
@@ -173,6 +200,7 @@ function getOddsRoot(payload) {
         payload.data &&
         typeof payload.data === "object"
     ) {
+
         if (
             payload.data.data &&
             typeof payload.data.data === "object"
@@ -188,36 +216,58 @@ function getOddsRoot(payload) {
 
 
 function getMatchOddsMarkets(payload) {
-    const root = getOddsRoot(payload);
 
-    if (!root || typeof root !== "object") {
+    const root =
+        getOddsRoot(payload);
+
+    if (
+        !root ||
+        typeof root !== "object"
+    ) {
         return [];
     }
 
-    /* Raw ProExch */
-
-    if (Array.isArray(root.matchOdds)) {
-        return root.matchOdds;
-    }
-
-    /* Normalized backend */
-
-    if (Array.isArray(root.match_odds)) {
+    if (
+        Array.isArray(
+            root.match_odds
+        )
+    ) {
         return root.match_odds;
     }
 
-    if (Array.isArray(root.MATCH_ODDS)) {
+    if (
+        Array.isArray(
+            root.matchOdds
+        )
+    ) {
+        return root.matchOdds;
+    }
+
+    if (
+        Array.isArray(
+            root.MATCH_ODDS
+        )
+    ) {
         return root.MATCH_ODDS;
     }
 
-    /* Case-insensitive fallback */
+    for (
+        const key of Object.keys(root)
+    ) {
 
-    for (const key of Object.keys(root)) {
+        const lower =
+            key.toLowerCase();
+
         if (
-            key.toLowerCase() === "matchodds" ||
-            key.toLowerCase() === "match_odds"
+            lower === "matchodds" ||
+            lower === "match_odds"
         ) {
-            if (Array.isArray(root[key])) {
+
+            if (
+                Array.isArray(
+                    root[key]
+                )
+            ) {
                 return root[key];
             }
         }
@@ -232,7 +282,11 @@ function getMatchOddsMarkets(payload) {
 ========================================================= */
 
 function isProExchRunner(item) {
-    if (!item || typeof item !== "object") {
+
+    if (
+        !item ||
+        typeof item !== "object"
+    ) {
         return false;
     }
 
@@ -253,28 +307,22 @@ function isProExchRunner(item) {
 
 
 function findRunners(value) {
+
     if (!value) {
         return [];
     }
 
-    /* Direct array */
-
-    if (Array.isArray(value)) {
-
-        /*
-         * IMPORTANT:
-         * ProExch uses:
-         *
-         * sid
-         * rname
-         * b1
-         * l1
-         */
+    if (
+        Array.isArray(value)
+    ) {
 
         if (
             value.length &&
-            value.some(isProExchRunner)
+            value.some(
+                isProExchRunner
+            )
         ) {
+
             return value.filter(
                 item =>
                     item &&
@@ -282,11 +330,16 @@ function findRunners(value) {
             );
         }
 
-        for (const item of value) {
+        for (
+            const item of value
+        ) {
+
             const result =
                 findRunners(item);
 
-            if (result.length) {
+            if (
+                result.length
+            ) {
                 return result;
             }
         }
@@ -294,25 +347,29 @@ function findRunners(value) {
         return [];
     }
 
-    if (typeof value !== "object") {
+    if (
+        typeof value !== "object"
+    ) {
         return [];
     }
 
-
-    /* Direct ProExch oddDatas */
-
-    if (Array.isArray(value.oddDatas)) {
+    if (
+        Array.isArray(
+            value.oddDatas
+        )
+    ) {
 
         const runners =
             value.oddDatas.filter(
                 isProExchRunner
             );
 
-        if (runners.length) {
+        if (
+            runners.length
+        ) {
             return runners;
         }
     }
-
 
     const keys = [
         "runners",
@@ -326,7 +383,9 @@ function findRunners(value) {
         "match_odds"
     ];
 
-    for (const key of keys) {
+    for (
+        const key of keys
+    ) {
 
         if (
             value[key] === undefined ||
@@ -336,9 +395,13 @@ function findRunners(value) {
         }
 
         const result =
-            findRunners(value[key]);
+            findRunners(
+                value[key]
+            );
 
-        if (result.length) {
+        if (
+            result.length
+        ) {
             return result;
         }
     }
@@ -352,6 +415,7 @@ function findRunners(value) {
 ========================================================= */
 
 function getRunnerSelectionId(item) {
+
     return (
         item?.selectionId ??
         item?.selection_id ??
@@ -365,6 +429,7 @@ function getRunnerSelectionId(item) {
 
 
 function getRunnerName(item) {
+
     return (
         item?.runnerName ??
         item?.runner_name ??
@@ -380,6 +445,7 @@ function getRunnerName(item) {
 
 
 function extractPrice(value) {
+
     if (
         value === null ||
         value === undefined ||
@@ -388,17 +454,26 @@ function extractPrice(value) {
         return null;
     }
 
-    if (typeof value === "number") {
+    if (
+        typeof value === "number"
+    ) {
+
         return Number.isFinite(value)
             ? value
             : null;
     }
 
-    if (typeof value === "string") {
+    if (
+        typeof value === "string"
+    ) {
+
         return toNumber(value);
     }
 
-    if (typeof value === "object") {
+    if (
+        typeof value === "object"
+    ) {
+
         return (
             toNumber(value.price) ??
             toNumber(value.odds) ??
@@ -414,6 +489,7 @@ function extractPrice(value) {
 function getBackPrice(item) {
 
     const values = [
+
         item?.back,
         item?.Back,
         item?.backPrice,
@@ -425,21 +501,23 @@ function getBackPrice(item) {
         item?.backOdd,
         item?.back_odd,
 
-        /* ProExch */
         item?.b1,
-
         item?.b2,
         item?.b3,
 
         item?.back1
     ];
 
-    for (const value of values) {
+    for (
+        const value of values
+    ) {
 
         const price =
             extractPrice(value);
 
-        if (price !== null) {
+        if (
+            price !== null
+        ) {
             return price;
         }
     }
@@ -451,6 +529,7 @@ function getBackPrice(item) {
 function getLayPrice(item) {
 
     const values = [
+
         item?.lay,
         item?.Lay,
         item?.layPrice,
@@ -462,21 +541,23 @@ function getLayPrice(item) {
         item?.layOdd,
         item?.lay_odd,
 
-        /* ProExch */
         item?.l1,
-
         item?.l2,
         item?.l3,
 
         item?.lay1
     ];
 
-    for (const value of values) {
+    for (
+        const value of values
+    ) {
 
         const price =
             extractPrice(value);
 
-        if (price !== null) {
+        if (
+            price !== null
+        ) {
             return price;
         }
     }
@@ -517,7 +598,9 @@ function getLaySize(item) {
 
 function normalizeRunners(runners) {
 
-    if (!Array.isArray(runners)) {
+    if (
+        !Array.isArray(runners)
+    ) {
         return [];
     }
 
@@ -532,6 +615,7 @@ function normalizeRunners(runners) {
             }
 
             return {
+
                 selectionId:
                     getRunnerSelectionId(item),
 
@@ -562,6 +646,7 @@ function normalizeRunners(runners) {
 function emptyOdds() {
 
     return {
+
         team1: {
             back: null,
             lay: null,
@@ -590,76 +675,80 @@ function emptyOdds() {
    NORMALIZE MATCH ODDS
 ========================================================= */
 
-function normalizeMatchOdds(match, payload) {
+function normalizeMatchOdds(
+    match,
+    payload
+) {
 
     const markets =
-        getMatchOddsMarkets(payload);
-
-    if (!markets.length) {
-
-        console.warn(
-            "[CricBet] No matchOdds markets found:",
+        getMatchOddsMarkets(
             payload
         );
+
+    if (
+        !markets.length
+    ) {
 
         return emptyOdds();
     }
 
-
-    /*
-     * Usually first market is Match Odds.
-     */
-
     let runners = [];
 
-    for (const market of markets) {
+    for (
+        const market of markets
+    ) {
 
         const found =
             findRunners(market);
 
-        if (found.length) {
+        if (
+            found.length
+        ) {
+
             runners = found;
+
             break;
         }
     }
 
-
-    if (!runners.length) {
-
-        console.warn(
-            "[CricBet] No runners found in matchOdds:",
-            markets
-        );
+    if (
+        !runners.length
+    ) {
 
         return emptyOdds();
     }
 
-
     const normalized =
-        normalizeRunners(runners);
-
+        normalizeRunners(
+            runners
+        );
 
     const selectionIds = [
-        getSelectionId(match, 1),
-        getSelectionId(match, 2),
-        getSelectionId(match, 3)
-    ];
 
+        getSelectionId(
+            match,
+            1
+        ),
+
+        getSelectionId(
+            match,
+            2
+        ),
+
+        getSelectionId(
+            match,
+            3
+        )
+    ];
 
     const result =
         emptyOdds();
-
 
     const slots = [
         "team1",
         "team2",
         "team3"
     ];
-
-
-    /*
-     * First match by selection ID.
-     */
 
     normalized.forEach(
         runner => {
@@ -672,22 +761,28 @@ function normalizeMatchOdds(match, payload) {
                         runner.selectionId
                     );
 
-
             const index =
                 selectionIds.indexOf(
                     runnerId
                 );
 
-
-            if (index >= 0) {
+            if (
+                index >= 0
+            ) {
 
                 result[
                     slots[index]
                 ] = {
-                    back: runner.back,
-                    lay: runner.lay,
+
+                    back:
+                        runner.back,
+
+                    lay:
+                        runner.lay,
+
                     backSize:
                         runner.backSize,
+
                     laySize:
                         runner.laySize
                 };
@@ -695,17 +790,13 @@ function normalizeMatchOdds(match, payload) {
         }
     );
 
-
-    /*
-     * Fallback:
-     * If selection IDs were not present
-     * in /matches, use runner order.
-     */
-
     normalized
         .slice(0, 3)
         .forEach(
-            (runner, index) => {
+            (
+                runner,
+                index
+            ) => {
 
                 const slot =
                     slots[index];
@@ -716,24 +807,22 @@ function normalizeMatchOdds(match, payload) {
                 ) {
 
                     result[slot] = {
-                        back: runner.back,
-                        lay: runner.lay,
+
+                        back:
+                            runner.back,
+
+                        lay:
+                            runner.lay,
+
                         backSize:
                             runner.backSize,
+
                         laySize:
                             runner.laySize
                     };
                 }
             }
         );
-
-
-    console.log(
-        "[CricBet] Normalized odds:",
-        getGameId(match),
-        result
-    );
-
 
     return result;
 }
@@ -759,7 +848,6 @@ function createOddsButton({
 
     const disabled =
         numericPrice === null;
-
 
     return `
         <button
@@ -801,36 +889,30 @@ function createMatchRow(match) {
     const marketId =
         getMarketId(match);
 
-
     const eventName =
         match.event_name ??
         match.eventName ??
         "Cricket Match";
-
 
     const eventTime =
         match.event_time ??
         match.eventTime ??
         "";
 
-
     const team1 =
         match.team1 ??
         match.runnerName1 ??
         "Team 1";
-
 
     const team2 =
         match.team2 ??
         match.runnerName2 ??
         "Team 2";
 
-
     const team3 =
         match.team3 ??
         match.runnerName3 ??
         "";
-
 
     const odds =
         oddsCache.has(gameId)
@@ -839,7 +921,6 @@ function createMatchRow(match) {
                 oddsCache.get(gameId)
             )
             : emptyOdds();
-
 
     return `
         <div
@@ -860,12 +941,12 @@ function createMatchRow(match) {
                                 <span class="match-status live-status">
                                     LIVE
                                 </span>
-                              `
+                            `
                             : `
                                 <span class="match-status upcoming-status">
                                     UPCOMING
                                 </span>
-                              `
+                            `
                     }
 
                     <span class="match-time">
@@ -896,7 +977,7 @@ function createMatchRow(match) {
                                 <div class="team-name">
                                     ${escapeHtml(team3)}
                                 </div>
-                              `
+                            `
                             : ""
                     }
 
@@ -908,32 +989,37 @@ function createMatchRow(match) {
 
             </div>
 
-
             ${createOddsButton({
                 gameId,
                 eventId,
                 marketId,
                 selectionId:
-                    getSelectionId(match, 1),
+                    getSelectionId(
+                        match,
+                        1
+                    ),
                 team: team1,
                 side: "back",
                 price: odds.team1.back,
-                className: "odds-team-1"
+                className:
+                    "odds-team-1"
             })}
-
 
             ${createOddsButton({
                 gameId,
                 eventId,
                 marketId,
                 selectionId:
-                    getSelectionId(match, 2),
+                    getSelectionId(
+                        match,
+                        2
+                    ),
                 team: team2,
                 side: "back",
                 price: odds.team2.back,
-                className: "odds-team-2"
+                className:
+                    "odds-team-2"
             })}
-
 
             ${
                 team3
@@ -955,7 +1041,6 @@ function createMatchRow(match) {
                     })
                     : ""
             }
-
 
             <div class="match-action">
 
@@ -989,7 +1074,6 @@ async function loadMatches() {
         return;
     }
 
-
     if (!allMatches.length) {
 
         container.innerHTML = `
@@ -1011,7 +1095,6 @@ async function loadMatches() {
         `;
     }
 
-
     try {
 
         const response =
@@ -1019,10 +1102,13 @@ async function loadMatches() {
                 "/api/cricket/matches",
                 {
                     method: "GET",
+
                     credentials:
                         "same-origin",
+
                     cache:
                         "no-store",
+
                     headers: {
                         Accept:
                             "application/json"
@@ -1030,67 +1116,91 @@ async function loadMatches() {
                 }
             );
 
-
         const payload =
             await response.json();
-
 
         if (!response.ok) {
 
             throw new Error(
-                payload?.error ||
                 payload?.detail ||
-                "Unable to load cricket matches."
+                payload?.error ||
+                `HTTP ${response.status}`
             );
         }
-
 
         if (
             payload.success !== true
         ) {
 
             throw new Error(
+                payload?.detail ||
                 payload?.error ||
                 "Cricket API request failed."
             );
         }
 
+        /*
+         * IMPORTANT:
+         *
+         * Backend returns:
+         *
+         * {
+         *   success: true,
+         *   data: [...]
+         * }
+         *
+         * NOT:
+         *
+         * {
+         *   matches: [...]
+         * }
+         */
+
+        let matches =
+            payload.data;
 
         if (
-            !Array.isArray(
-                payload.matches
-            )
+            !Array.isArray(matches)
         ) {
 
-            throw new Error(
-                "Invalid matches response."
-            );
+            /*
+             * Compatibility with any future
+             * backend response.
+             */
+
+            if (
+                Array.isArray(
+                    payload.matches
+                )
+            ) {
+
+                matches =
+                    payload.matches;
+
+            } else {
+
+                matches = [];
+            }
         }
 
-
         allMatches =
-            payload.matches;
-
+            matches;
 
         console.log(
             "[CricBet] Matches:",
             allMatches
         );
 
-
         renderMatches();
 
-
-        loadAllOdds();
-
+        await loadAllOdds();
 
     } catch (error) {
 
         console.error(
-            "CRICKET MATCH ERROR:",
+            "[CricBet] MATCH ERROR:",
             error
         );
-
 
         if (!allMatches.length) {
 
@@ -1141,21 +1251,15 @@ async function loadOddsForMatch(match) {
     const marketId =
         getMarketId(match);
 
-
-    if (!gameId || !eventId) {
+    if (!gameId) {
 
         console.warn(
-            "[CricBet] Missing IDs:",
-            {
-                gameId,
-                eventId,
-                marketId
-            }
+            "[CricBet] Missing game ID:",
+            match
         );
 
         return;
     }
-
 
     if (
         oddsLoading.has(gameId)
@@ -1163,9 +1267,7 @@ async function loadOddsForMatch(match) {
         return;
     }
 
-
     oddsLoading.add(gameId);
-
 
     try {
 
@@ -1177,11 +1279,13 @@ async function loadOddsForMatch(match) {
             gameId
         );
 
-        params.set(
-            "eventId",
-            eventId
-        );
+        if (eventId) {
 
+            params.set(
+                "eventId",
+                eventId
+            );
+        }
 
         if (marketId) {
 
@@ -1191,26 +1295,26 @@ async function loadOddsForMatch(match) {
             );
         }
 
-
         const url =
             `/api/cricket/odds?${params.toString()}`;
-
 
         console.log(
             "[CricBet] Loading odds:",
             url
         );
 
-
         const response =
             await fetch(
                 url,
                 {
                     method: "GET",
+
                     credentials:
                         "same-origin",
+
                     cache:
                         "no-store",
+
                     headers: {
                         Accept:
                             "application/json"
@@ -1218,53 +1322,37 @@ async function loadOddsForMatch(match) {
                 }
             );
 
-
         const payload =
             await response.json();
-
 
         if (!response.ok) {
 
             throw new Error(
-                payload?.error ||
                 payload?.detail ||
+                payload?.error ||
                 `Odds HTTP ${response.status}`
             );
         }
-
 
         if (
             payload.success !== true
         ) {
 
             throw new Error(
+                payload?.detail ||
                 payload?.error ||
                 "Odds request failed."
             );
         }
-
-
-        /*
-         * Store the COMPLETE response.
-         *
-         * Do NOT strip payload.odds here.
-         */
 
         oddsCache.set(
             gameId,
             payload
         );
 
-
-        console.log(
-            "[CricBet] Raw odds:",
-            gameId,
-            payload
+        updateMatchOdds(
+            match
         );
-
-
-        updateMatchOdds(match);
-
 
     } catch (error) {
 
@@ -1289,13 +1377,13 @@ async function loadOddsForMatch(match) {
 
 async function loadAllOdds() {
 
-    if (!allMatches.length) {
+    if (
+        !allMatches.length
+    ) {
         return;
     }
 
-
     const batchSize = 5;
-
 
     for (
         let i = 0;
@@ -1308,7 +1396,6 @@ async function loadAllOdds() {
                 i,
                 i + batchSize
             );
-
 
         await Promise.all(
             batch.map(
@@ -1331,7 +1418,6 @@ function updateMatchOdds(match) {
     const gameId =
         getGameId(match);
 
-
     if (
         !gameId ||
         !oddsCache.has(gameId)
@@ -1339,24 +1425,20 @@ function updateMatchOdds(match) {
         return;
     }
 
-
     const row =
         document.querySelector(
             `.sportsbook-match-row[data-game-id="${CSS.escape(gameId)}"]`
         );
 
-
     if (!row) {
         return;
     }
-
 
     const odds =
         normalizeMatchOdds(
             match,
             oddsCache.get(gameId)
         );
-
 
     updateOddsButton(
         row.querySelector(
@@ -1365,14 +1447,12 @@ function updateMatchOdds(match) {
         odds.team1.back
     );
 
-
     updateOddsButton(
         row.querySelector(
             ".odds-team-2"
         ),
         odds.team2.back
     );
-
 
     updateOddsButton(
         row.querySelector(
@@ -1396,16 +1476,13 @@ function updateOddsButton(
         return;
     }
 
-
     const numericPrice =
         toNumber(price);
-
 
     const span =
         button.querySelector(
             ".odds-price"
         );
-
 
     if (
         numericPrice === null
@@ -1415,23 +1492,18 @@ function updateOddsButton(
 
         button.dataset.price = "";
 
-
         if (span) {
 
             span.textContent = "-";
         }
 
-
         return;
     }
 
-
     button.disabled = false;
-
 
     button.dataset.price =
         String(numericPrice);
-
 
     if (span) {
 
@@ -1450,7 +1522,6 @@ function setFilter(filter) {
     currentFilter =
         filter;
 
-
     document
         .querySelectorAll(
             ".sport-filter"
@@ -1466,7 +1537,6 @@ function setFilter(filter) {
             }
         );
 
-
     renderMatches();
 }
 
@@ -1478,15 +1548,12 @@ function renderMatches() {
             "matches"
         );
 
-
     if (!container) {
         return;
     }
 
-
     let matches =
         [...allMatches];
-
 
     if (
         currentFilter === "live"
@@ -1498,17 +1565,16 @@ function renderMatches() {
             );
     }
 
-
     if (
         currentFilter === "upcoming"
     ) {
 
         matches =
             matches.filter(
-                match => !isLive(match)
+                match =>
+                    !isLive(match)
             );
     }
-
 
     if (!matches.length) {
 
@@ -1533,14 +1599,12 @@ function renderMatches() {
         return;
     }
 
-
     container.innerHTML =
         matches
             .map(
                 createMatchRow
             )
             .join("");
-
 
     matches.forEach(
         updateMatchOdds
@@ -1561,10 +1625,13 @@ async function loadBalance() {
                 "/api/user/balance",
                 {
                     method: "GET",
+
                     credentials:
                         "same-origin",
+
                     cache:
                         "no-store",
+
                     headers: {
                         Accept:
                             "application/json"
@@ -1572,15 +1639,12 @@ async function loadBalance() {
                 }
             );
 
-
         if (!response.ok) {
             return;
         }
 
-
         const data =
             await response.json();
-
 
         if (
             data.balance === undefined
@@ -1588,10 +1652,10 @@ async function loadBalance() {
             return;
         }
 
-
         const balance =
-            Number(data.balance);
-
+            Number(
+                data.balance
+            );
 
         const formatted =
             Number.isFinite(balance)
@@ -1600,43 +1664,43 @@ async function loadBalance() {
                     {
                         minimumFractionDigits:
                             2,
+
                         maximumFractionDigits:
                             2
                     }
                 )
                 : "0.00";
 
-
         const balanceElement =
             document.getElementById(
                 "balance"
             );
-
 
         const betslipBalance =
             document.getElementById(
                 "betslipBalance"
             );
 
-
-        if (balanceElement) {
+        if (
+            balanceElement
+        ) {
 
             balanceElement.textContent =
                 `₹${formatted}`;
         }
 
-
-        if (betslipBalance) {
+        if (
+            betslipBalance
+        ) {
 
             betslipBalance.textContent =
                 `₹${formatted}`;
         }
 
-
     } catch (error) {
 
         console.warn(
-            "Balance loading failed:",
+            "[CricBet] Balance loading failed:",
             error
         );
     }
@@ -1654,18 +1718,15 @@ function setupBetslip() {
             "betslip"
         );
 
-
     const closeButton =
         document.getElementById(
             "betslipClose"
         );
 
-
     const mobileButton =
         document.getElementById(
             "mobileBetslipButton"
         );
-
 
     if (
         closeButton &&
@@ -1682,7 +1743,6 @@ function setupBetslip() {
             }
         );
     }
-
 
     if (
         mobileButton &&
@@ -1715,7 +1775,6 @@ document.addEventListener(
                 ".odds-cell"
             );
 
-
         if (
             !button ||
             button.disabled
@@ -1723,19 +1782,16 @@ document.addEventListener(
             return;
         }
 
-
         const price =
             Number(
                 button.dataset.price
             );
-
 
         if (
             !Number.isFinite(price)
         ) {
             return;
         }
-
 
         const selection = {
 
@@ -1760,12 +1816,10 @@ document.addEventListener(
             price
         };
 
-
         console.log(
-            "CRICBET ODDS SELECTED:",
+            "[CricBet] Odds selected:",
             selection
         );
-
 
         document.dispatchEvent(
             new CustomEvent(
@@ -1807,14 +1861,14 @@ document.addEventListener(
                 }
             );
 
-
         const depositButton =
             document.getElementById(
                 "depositBtn"
             );
 
-
-        if (depositButton) {
+        if (
+            depositButton
+        ) {
 
             depositButton.addEventListener(
                 "click",
@@ -1822,14 +1876,14 @@ document.addEventListener(
             );
         }
 
-
         const withdrawButton =
             document.getElementById(
                 "withdrawBtn"
             );
 
-
-        if (withdrawButton) {
+        if (
+            withdrawButton
+        ) {
 
             withdrawButton.addEventListener(
                 "click",
@@ -1837,21 +1891,16 @@ document.addEventListener(
             );
         }
 
-
         setupBetslip();
-
 
         loadBalance();
 
-
         loadMatches();
-
 
         setInterval(
             loadMatches,
             MATCH_REFRESH_MS
         );
-
 
         setInterval(
             () => {
@@ -1868,7 +1917,6 @@ document.addEventListener(
             },
             ODDS_REFRESH_MS
         );
-
 
         setInterval(
             loadBalance,
