@@ -9,22 +9,16 @@ from fastapi.templating import Jinja2Templates
 from services import proexch_api
 
 
-# ============================================================
-# ROUTER
-# ============================================================
-
-router = APIRouter(
-    tags=["Cricket"],
-)
+router = APIRouter(tags=["Cricket"])
 
 templates = Jinja2Templates(
     directory="templates"
 )
 
 
-# ============================================================
+# =========================================================
 # AUTH
-# ============================================================
+# =========================================================
 
 def is_logged_in(request: Request) -> bool:
     return request.session.get("user_id") is not None
@@ -40,12 +34,11 @@ def unauthorized():
     )
 
 
-# ============================================================
-# GENERIC HELPERS
-# ============================================================
+# =========================================================
+# HELPERS
+# =========================================================
 
 def clean(value: Any) -> str | None:
-
     if value is None:
         return None
 
@@ -64,14 +57,48 @@ def first_value(
 
     for key in keys:
 
-        if key in data:
+        if key not in data:
+            continue
 
-            value = data.get(key)
+        value = data.get(key)
 
-            if value is not None:
-                return value
+        if value is not None:
+            return value
 
     return default
+
+
+def ensure_list(value) -> list:
+
+    if value is None:
+        return []
+
+    if isinstance(value, list):
+        return value
+
+    if isinstance(value, tuple):
+        return list(value)
+
+    if isinstance(value, dict):
+
+        for key in (
+            "data",
+            "items",
+            "markets",
+            "oddDatas",
+            "odds",
+            "rows",
+            "list",
+        ):
+
+            nested = value.get(key)
+
+            if isinstance(nested, list):
+                return nested
+
+        return [value]
+
+    return []
 
 
 def to_number(value):
@@ -104,124 +131,9 @@ def to_number(value):
         return None
 
 
-def ensure_list(value) -> list:
-
-    """
-    ProExch can return a section as:
-
-        []
-        {}
-        [ {}, {} ]
-
-    Normalize all of them to a list.
-    """
-
-    if value is None:
-        return []
-
-    if isinstance(value, list):
-        return value
-
-    if isinstance(value, tuple):
-        return list(value)
-
-    if isinstance(value, dict):
-
-        # Sometimes an object contains its own list.
-        for key in (
-            "data",
-            "items",
-            "markets",
-            "oddDatas",
-            "odds",
-            "rows",
-            "list",
-        ):
-
-            nested = value.get(key)
-
-            if isinstance(nested, list):
-                return nested
-
-        # Otherwise the dictionary itself is one object.
-        return [value]
-
-    return []
-
-
-def unwrap_response(data: Any) -> Any:
-    """
-    Safely unwrap common ProExch response wrappers.
-
-    Examples supported:
-
-        {
-            "matchOdds": [...]
-        }
-
-        {
-            "data": {
-                "matchOdds": [...]
-            }
-        }
-
-        {
-            "statusCode": 200,
-            "data": {
-                "data": {
-                    "matchOdds": [...]
-                }
-            }
-        }
-    """
-
-    current = data
-
-    for _ in range(6):
-
-        if not isinstance(current, dict):
-            break
-
-        # If the current object already contains actual odds
-        # sections, stop here.
-        if any(
-            key in current
-            for key in (
-                "matchOdds",
-                "bookMakerOdds",
-                "bookmakerOdds",
-                "fancyOdds",
-                "otherMarketOdds",
-            )
-        ):
-            break
-
-        nested = None
-
-        for key in (
-            "data",
-            "result",
-            "response",
-            "body",
-        ):
-
-            value = current.get(key)
-
-            if isinstance(value, (dict, list)):
-                nested = value
-                break
-
-        if nested is None:
-            break
-
-        current = nested
-
-    return current
-
-
-# ============================================================
-# FIND MATCH
-# ============================================================
+# =========================================================
+# MATCH
+# =========================================================
 
 def find_match(
     matches: list[dict],
@@ -252,14 +164,9 @@ def find_match(
     return None
 
 
-# ============================================================
-# GET PROEXCH IDS
-# ============================================================
-
 def get_match_ids(
     match: dict,
-) -> tuple[str | None, str | None]:
-
+):
     event_id = first_value(
         match,
         "eventId",
@@ -281,10 +188,6 @@ def get_match_ids(
         clean(market_id),
     )
 
-
-# ============================================================
-# NORMALIZE MATCH
-# ============================================================
 
 def normalize_match(
     match: dict,
@@ -360,20 +263,28 @@ def normalize_match(
         default=False,
     )
 
-    # Handle string versions such as "true", "false", "1", "0".
     if isinstance(in_play, str):
 
-        in_play = in_play.strip().lower() in (
-            "true",
-            "1",
-            "yes",
-            "y",
-            "live",
+        in_play = (
+            in_play.strip().lower()
+            in (
+                "true",
+                "1",
+                "yes",
+                "y",
+                "live",
+            )
         )
 
     else:
 
         in_play = bool(in_play)
+
+    tv = first_value(
+        match,
+        "tv",
+        default=False,
+    )
 
     return {
         "game_id": clean(game_id),
@@ -397,614 +308,87 @@ def normalize_match(
         "in_play": in_play,
         "inPlay": in_play,
 
-        "tv": first_value(
-            match,
-            "tv",
-            default=False,
-        ),
+        "tv": tv,
 
         "raw": match,
     }
 
 
-# ============================================================
-# EXTRACT ODD DATAS
-# ============================================================
-
-def get_odd_datas(
-    market: dict,
-) -> list[dict]:
-
-    if not isinstance(market, dict):
-        return []
-
-    value = first_value(
-        market,
-        "oddDatas",
-        "oddData",
-        "oddsData",
-        "runners",
-        "selections",
-        "outcomes",
-        default=[],
-    )
-
-    return [
-        item
-        for item in ensure_list(value)
-        if isinstance(item, dict)
-    ]
-
-
-# ============================================================
-# MATCH ODDS
-# ============================================================
-
-def parse_match_odds(
-    raw_match_odds,
-) -> list[dict]:
-
-    markets = []
-
-    for market in ensure_list(raw_match_odds):
-
-        if not isinstance(market, dict):
-            continue
-
-        market_id = first_value(
-            market,
-            "mid",
-            "marketId",
-            "market_id",
-            "marketID",
-        )
-
-        market_name = first_value(
-            market,
-            "market",
-            "mname",
-            "marketName",
-            "name",
-            default="Match Odds",
-        )
-
-        market_status = first_value(
-            market,
-            "mstatus",
-            "status",
-            "marketStatus",
-            default="",
-        )
-
-        runners = []
-
-        for item in get_odd_datas(market):
-
-            selection_id = first_value(
-                item,
-                "sid",
-                "selectionId",
-                "selection_id",
-                "runnerId",
-                "runner_id",
-            )
-
-            runner_name = first_value(
-                item,
-                "rname",
-                "runnerName",
-                "selectionName",
-                "name",
-                default="Unknown",
-            )
-
-            back = to_number(
-                first_value(
-                    item,
-                    "b1",
-                    "back",
-                    "backPrice",
-                    "backOdds",
-                    "backOdd",
-                )
-            )
-
-            back_size = to_number(
-                first_value(
-                    item,
-                    "bs1",
-                    "backSize",
-                    "backVolume",
-                    "backAmount",
-                )
-            )
-
-            lay = to_number(
-                first_value(
-                    item,
-                    "l1",
-                    "lay",
-                    "layPrice",
-                    "layOdds",
-                    "layOdd",
-                )
-            )
-
-            lay_size = to_number(
-                first_value(
-                    item,
-                    "ls1",
-                    "laySize",
-                    "layVolume",
-                    "layAmount",
-                )
-            )
-
-            runners.append(
-                {
-                    "id": (
-                        str(selection_id)
-                        if selection_id is not None
-                        else None
-                    ),
-
-                    "selection_id": (
-                        str(selection_id)
-                        if selection_id is not None
-                        else None
-                    ),
-
-                    "name": str(runner_name),
-
-                    "back": back,
-                    "back_size": back_size,
-
-                    "lay": lay,
-                    "lay_size": lay_size,
-
-                    # Extra aliases for templates.
-                    "back_price": back,
-                    "lay_price": lay,
-
-                    "odds": back,
-
-                    "status": first_value(
-                        item,
-                        "status",
-                        "runnerStatus",
-                        default="",
-                    ),
-                }
-            )
-
-        if runners:
-
-            markets.append(
-                {
-                    "id": clean(market_id),
-                    "name": str(market_name),
-                    "status": market_status,
-                    "type": "match_odds",
-                    "runners": runners,
-                    "outcomes": runners,
-                }
-            )
-
-    return markets
-
-
-# ============================================================
-# BOOKMAKER
-# ============================================================
-
-def parse_bookmaker_odds(
-    raw_bookmaker,
-) -> list[dict]:
-
-    markets = []
-
-    for market in ensure_list(raw_bookmaker):
-
-        if not isinstance(market, dict):
-            continue
-
-        runners = []
-
-        for item in get_odd_datas(market):
-
-            selection_id = first_value(
-                item,
-                "sid",
-                "selectionId",
-                "selection_id",
-                "runnerId",
-            )
-
-            name = first_value(
-                item,
-                "rname",
-                "runnerName",
-                "selectionName",
-                "name",
-                default="Unknown",
-            )
-
-            back = to_number(
-                first_value(
-                    item,
-                    "b1",
-                    "back",
-                    "backPrice",
-                    "backOdds",
-                )
-            )
-
-            back_size = to_number(
-                first_value(
-                    item,
-                    "bs1",
-                    "backSize",
-                    "backVolume",
-                )
-            )
-
-            lay = to_number(
-                first_value(
-                    item,
-                    "l1",
-                    "lay",
-                    "layPrice",
-                    "layOdds",
-                )
-            )
-
-            lay_size = to_number(
-                first_value(
-                    item,
-                    "ls1",
-                    "laySize",
-                    "layVolume",
-                )
-            )
-
-            runners.append(
-                {
-                    "id": (
-                        str(selection_id)
-                        if selection_id is not None
-                        else None
-                    ),
-
-                    "selection_id": (
-                        str(selection_id)
-                        if selection_id is not None
-                        else None
-                    ),
-
-                    "name": str(name),
-
-                    "back": back,
-                    "back_size": back_size,
-
-                    "lay": lay,
-                    "lay_size": lay_size,
-
-                    "back_price": back,
-                    "lay_price": lay,
-
-                    "odds": back,
-
-                    "status": first_value(
-                        item,
-                        "status",
-                        "runnerStatus",
-                        default="",
-                    ),
-                }
-            )
-
-        if runners:
-
-            market_id = first_value(
-                market,
-                "mid",
-                "marketId",
-                "market_id",
-                "marketID",
-            )
-
-            market_name = first_value(
-                market,
-                "market",
-                "mname",
-                "marketName",
-                "name",
-                default="Bookmaker",
-            )
-
-            markets.append(
-                {
-                    "id": clean(market_id),
-                    "name": str(market_name),
-                    "status": first_value(
-                        market,
-                        "mstatus",
-                        "status",
-                        default="",
-                    ),
-                    "type": "bookmaker",
-                    "runners": runners,
-                    "outcomes": runners,
-                }
-            )
-
-    return markets
-
-
-# ============================================================
-# FANCY / SESSION
-# ============================================================
-
-def parse_fancy_odds(
-    raw_fancy,
-) -> list[dict]:
-
-    markets = []
-
-    for market in ensure_list(raw_fancy):
-
-        if not isinstance(market, dict):
-            continue
-
-        market_id = first_value(
-            market,
-            "mid",
-            "marketId",
-            "market_id",
-            "marketID",
-        )
-
-        market_name = first_value(
-            market,
-            "market",
-            "mname",
-            "marketName",
-            "name",
-            default="Fancy / Session",
-        )
-
-        market_status = first_value(
-            market,
-            "mstatus",
-            "status",
-            "marketStatus",
-            default="",
-        )
-
-        runners = []
-
-        for item in get_odd_datas(market):
-
-            sid = first_value(
-                item,
-                "sid",
-                "selectionId",
-                "selection_id",
-                "runnerId",
-            )
-
-            name = first_value(
-                item,
-                "rname",
-                "runnerName",
-                "selectionName",
-                "name",
-                default="Session",
-            )
-
-            yes = to_number(
-                first_value(
-                    item,
-                    "b1",
-                    "yes",
-                    "yesPrice",
-                    "back",
-                    "backPrice",
-                )
-            )
-
-            yes_size = to_number(
-                first_value(
-                    item,
-                    "bs1",
-                    "yesSize",
-                    "backSize",
-                    "backVolume",
-                )
-            )
-
-            no = to_number(
-                first_value(
-                    item,
-                    "l1",
-                    "no",
-                    "noPrice",
-                    "lay",
-                    "layPrice",
-                )
-            )
-
-            no_size = to_number(
-                first_value(
-                    item,
-                    "ls1",
-                    "noSize",
-                    "laySize",
-                    "layVolume",
-                )
-            )
-
-            runners.append(
-                {
-                    "id": (
-                        str(sid)
-                        if sid is not None
-                        else None
-                    ),
-
-                    "selection_id": (
-                        str(sid)
-                        if sid is not None
-                        else None
-                    ),
-
-                    "name": str(name),
-
-                    "yes": yes,
-                    "yes_size": yes_size,
-
-                    "no": no,
-                    "no_size": no_size,
-
-                    # Back/Lay aliases.
-                    "back": yes,
-                    "back_size": yes_size,
-
-                    "lay": no,
-                    "lay_size": no_size,
-
-                    "odds": yes,
-
-                    "status": first_value(
-                        item,
-                        "status",
-                        "runnerStatus",
-                        default="",
-                    ),
-                }
-            )
-
-        if runners:
-
-            markets.append(
-                {
-                    "id": clean(market_id),
-
-                    "name": str(market_name),
-
-                    "status": market_status,
-
-                    "type": "fancy",
-
-                    "runners": runners,
-
-                    "outcomes": runners,
-                }
-            )
-
-    return markets
-
-
-# ============================================================
-# NORMALIZE ODDS
-# ============================================================
-
-def normalize_odds(
-    raw_odds: dict,
-) -> dict:
-
-    raw_odds = unwrap_response(raw_odds)
+# =========================================================
+# ODDS NORMALIZATION
+# =========================================================
+
+def normalize_odds(raw_odds: dict) -> dict:
+    """
+    Uses the exact structure returned by ProExch:
+
+    data
+      ├── matchOdds
+      ├── bookMakerOdds
+      ├── fancyOdds
+      └── otherMarketOdds
+    """
 
     if not isinstance(raw_odds, dict):
         raw_odds = {}
 
-    # --------------------------------------------------------
-    # Match Odds
-    # --------------------------------------------------------
+    data = raw_odds.get("data")
 
-    raw_match_odds = first_value(
-        raw_odds,
-        "matchOdds",
-        "match_odds",
-        "matchOddsData",
-        default=[],
+    if isinstance(data, dict):
+        raw = data
+    else:
+        raw = raw_odds
+
+    match_odds = (
+        proexch_api.parse_match_odds(
+            raw.get("matchOdds", [])
+        )
     )
 
-    # --------------------------------------------------------
-    # Bookmaker
-    # --------------------------------------------------------
-
-    raw_bookmaker = first_value(
-        raw_odds,
-        "bookMakerOdds",
-        "bookmakerOdds",
-        "bookmaker_odds",
-        "bookMaker",
-        default=[],
+    bookmaker_odds = (
+        proexch_api.parse_bookmaker_odds(
+            raw.get("bookMakerOdds", [])
+        )
     )
 
-    # --------------------------------------------------------
-    # Fancy
-    # --------------------------------------------------------
-
-    raw_fancy = first_value(
-        raw_odds,
-        "fancyOdds",
-        "fancy_odds",
-        "sessionOdds",
-        "fancy",
-        default=[],
+    fancy_odds = (
+        proexch_api.parse_fancy_odds(
+            raw.get("fancyOdds", [])
+        )
     )
 
-    # --------------------------------------------------------
-    # Other
-    # --------------------------------------------------------
-
-    raw_other = first_value(
-        raw_odds,
+    other_market_odds = raw.get(
         "otherMarketOdds",
-        "other_market_odds",
-        "otherOdds",
-        default=[],
+        [],
     )
 
-    match_markets = parse_match_odds(
-        raw_match_odds
-    )
-
-    bookmaker_markets = parse_bookmaker_odds(
-        raw_bookmaker
-    )
-
-    fancy_markets = parse_fancy_odds(
-        raw_fancy
-    )
+    if not isinstance(
+        other_market_odds,
+        list,
+    ):
+        other_market_odds = []
 
     return {
-        "match_odds": match_markets,
-
-        "bookmaker_odds": bookmaker_markets,
-
-        "fancy_odds": fancy_markets,
-
-        "other_market_odds": ensure_list(
-            raw_other
-        ),
-
-        "raw": raw_odds,
+        "match_odds": match_odds,
+        "bookmaker_odds": bookmaker_odds,
+        "fancy_odds": fancy_odds,
+        "other_market_odds": other_market_odds,
+        "raw": raw,
     }
 
 
-# ============================================================
-# BUILD PAGE DATA
-# ============================================================
+# =========================================================
+# BUILD MATCH PAGE
+# =========================================================
 
 def build_match_page_data(
     match: dict,
     odds: dict,
 ) -> dict:
 
-    normalized = normalize_match(match)
+    normalized = normalize_match(
+        match
+    )
 
     normalized["status"] = (
         "LIVE"
@@ -1023,10 +407,6 @@ def build_match_page_data(
 
     normalized["bookmaker"] = "ProExch"
 
-    # --------------------------------------------------------
-    # Keep individual sections directly on match
-    # --------------------------------------------------------
-
     normalized["match_odds"] = (
         odds.get("match_odds", [])
     )
@@ -1040,102 +420,94 @@ def build_match_page_data(
     )
 
     normalized["other_market_odds"] = (
-        odds.get("other_market_odds", [])
+        odds.get(
+            "other_market_odds",
+            [],
+        )
     )
-
-    # --------------------------------------------------------
-    # Combined markets
-    # --------------------------------------------------------
 
     markets = []
 
     for market in normalized["match_odds"]:
 
-        markets.append(
-            {
-                "id": market.get("id"),
-                "name": market.get(
-                    "name",
-                    "Match Odds",
-                ),
-                "status": market.get(
-                    "status",
-                    "",
-                ),
-                "type": "match_odds",
-                "runners": market.get(
+        markets.append({
+            "id": market.get("id"),
+            "name": market.get(
+                "name",
+                "Match Odds",
+            ),
+            "status": market.get(
+                "status",
+                "",
+            ),
+            "type": "match_odds",
+            "runners": market.get(
+                "runners",
+                [],
+            ),
+            "outcomes": market.get(
+                "outcomes",
+                market.get(
                     "runners",
                     [],
                 ),
-                "outcomes": market.get(
-                    "outcomes",
-                    market.get(
-                        "runners",
-                        [],
-                    ),
-                ),
-            }
-        )
+            ),
+        })
 
     for market in normalized["bookmaker_odds"]:
 
-        markets.append(
-            {
-                "id": market.get("id"),
-                "name": market.get(
-                    "name",
-                    "Bookmaker",
-                ),
-                "status": market.get(
-                    "status",
-                    "",
-                ),
-                "type": "bookmaker",
-                "runners": market.get(
+        markets.append({
+            "id": market.get("id"),
+            "name": market.get(
+                "name",
+                "Bookmaker",
+            ),
+            "status": market.get(
+                "status",
+                "",
+            ),
+            "type": "bookmaker",
+            "runners": market.get(
+                "runners",
+                [],
+            ),
+            "outcomes": market.get(
+                "outcomes",
+                market.get(
                     "runners",
                     [],
                 ),
-                "outcomes": market.get(
-                    "outcomes",
-                    market.get(
-                        "runners",
-                        [],
-                    ),
-                ),
-            }
-        )
+            ),
+        })
 
     for market in normalized["fancy_odds"]:
 
-        markets.append(
-            {
-                "id": market.get("id"),
-                "name": market.get(
-                    "name",
-                    "Fancy / Session",
-                ),
-                "status": market.get(
-                    "status",
-                    "",
-                ),
-                "type": "fancy",
-                "runners": market.get(
+        markets.append({
+            "id": market.get("id"),
+            "name": market.get(
+                "name",
+                "Fancy / Session",
+            ),
+            "status": market.get(
+                "status",
+                "",
+            ),
+            "type": "fancy",
+            "runners": market.get(
+                "runners",
+                [],
+            ),
+            "outcomes": market.get(
+                "outcomes",
+                market.get(
                     "runners",
                     [],
                 ),
-                "outcomes": market.get(
-                    "outcomes",
-                    market.get(
-                        "runners",
-                        [],
-                    ),
-                ),
-            }
-        )
+            ),
+        })
 
     normalized["markets"] = markets
 
-    # Useful debugging counters for template/JS.
     normalized["match_odds_count"] = sum(
         len(m.get("runners", []))
         for m in normalized["match_odds"]
@@ -1154,18 +526,13 @@ def build_match_page_data(
     return normalized
 
 
-# ============================================================
+# =========================================================
 # RESOLVE MATCH
-# ============================================================
+# =========================================================
 
 def resolve_match(
     game_id: str,
-) -> tuple[
-    dict | None,
-    str | None,
-    str | None,
-]:
-
+):
     matches = proexch_api.get_matches()
 
     if not isinstance(matches, list):
@@ -1179,8 +546,8 @@ def resolve_match(
     if not match:
         return None, None, None
 
-    event_id, market_id = get_match_ids(
-        match
+    event_id, market_id = (
+        get_match_ids(match)
     )
 
     return (
@@ -1190,11 +557,13 @@ def resolve_match(
     )
 
 
-# ============================================================
-# API - MATCHES
-# ============================================================
+# =========================================================
+# MATCHES API
+# =========================================================
 
-@router.get("/api/cricket/matches")
+@router.get(
+    "/api/cricket/matches"
+)
 async def cricket_matches(
     request: Request,
 ):
@@ -1204,9 +573,14 @@ async def cricket_matches(
 
     try:
 
-        matches = proexch_api.get_matches()
+        matches = (
+            proexch_api.get_matches()
+        )
 
-        if not isinstance(matches, list):
+        if not isinstance(
+            matches,
+            list,
+        ):
             matches = []
 
         result = [
@@ -1232,26 +606,31 @@ async def cricket_matches(
             status_code=500,
             content={
                 "success": False,
-                "error": "Unable to load cricket matches",
+                "error": (
+                    "Unable to load cricket matches"
+                ),
             },
         )
 
 
-# ============================================================
-# API - ODDS
-# ============================================================
+# =========================================================
+# ODDS API
+# =========================================================
 
-@router.get("/api/cricket/odds")
+@router.get(
+    "/api/cricket/odds"
+)
 async def cricket_odds(
     request: Request,
 
     gameId: str | None = None,
-    eventId: str | None = None,
     marketId: str | None = None,
 
     game_id: str | None = None,
-    event_id: str | None = None,
     market_id: str | None = None,
+
+    eventId: str | None = None,
+    event_id: str | None = None,
 ):
 
     if not is_logged_in(request):
@@ -1261,12 +640,14 @@ async def cricket_odds(
         gameId or game_id
     )
 
-    event_id = clean(
-        eventId or event_id
-    )
-
     market_id = clean(
         marketId or market_id
+    )
+
+    # Event ID is accepted for frontend
+    # compatibility but NOT sent to ProExch.
+    event_id = clean(
+        eventId or event_id
     )
 
     print(
@@ -1288,15 +669,20 @@ async def cricket_odds(
 
     try:
 
-        # ----------------------------------------------------
-        # Resolve IDs when required
-        # ----------------------------------------------------
+        # -------------------------------------------------
+        # Resolve market ID if frontend didn't provide it
+        # -------------------------------------------------
 
-        if not event_id or not market_id:
+        if not market_id:
 
-            matches = proexch_api.get_matches()
+            matches = (
+                proexch_api.get_matches()
+            )
 
-            if not isinstance(matches, list):
+            if not isinstance(
+                matches,
+                list,
+            ):
                 matches = []
 
             match = find_match(
@@ -1314,44 +700,40 @@ async def cricket_odds(
                     },
                 )
 
-            discovered_event_id, discovered_market_id = (
+            _, discovered_market_id = (
                 get_match_ids(match)
             )
 
-            if not event_id:
-                event_id = discovered_event_id
+            market_id = discovered_market_id
 
-            if not market_id:
-                market_id = discovered_market_id
-
-        if not event_id:
+        if not market_id:
 
             return JSONResponse(
                 status_code=400,
                 content={
                     "success": False,
                     "error": (
-                        "event_id could not be determined "
-                        "from ProExch match data"
+                        "marketId could not be "
+                        "determined from ProExch"
                     ),
                 },
             )
 
+        # -------------------------------------------------
+        # CALL PROEXCH
+        # -------------------------------------------------
+
         print(
             "[CRICKET] calling ProExch:",
             "gameId=", game_id,
-            "eventId=", event_id,
             "marketId=", market_id,
         )
 
-        # ----------------------------------------------------
-        # Get odds
-        # ----------------------------------------------------
-
-        raw_odds = proexch_api.get_odds(
-            game_id=game_id,
-            event_id=event_id,
-            market_id=market_id,
+        raw_odds = (
+            proexch_api.get_odds(
+                game_id=game_id,
+                market_id=market_id,
+            )
         )
 
         normalized = normalize_odds(
@@ -1361,53 +743,86 @@ async def cricket_odds(
         print(
             "[CRICKET] odds received:",
             "match_markets=",
-            len(normalized["match_odds"]),
+            len(
+                normalized["match_odds"]
+            ),
             "match_runners=",
             sum(
-                len(m.get("runners", []))
-                for m in normalized["match_odds"]
+                len(
+                    m.get(
+                        "runners",
+                        [],
+                    )
+                )
+                for m in normalized[
+                    "match_odds"
+                ]
             ),
             "bookmaker_markets=",
-            len(normalized["bookmaker_odds"]),
+            len(
+                normalized[
+                    "bookmaker_odds"
+                ]
+            ),
             "fancy_markets=",
-            len(normalized["fancy_odds"]),
+            len(
+                normalized[
+                    "fancy_odds"
+                ]
+            ),
         )
 
         return {
             "success": True,
 
             "game_id": game_id,
+
             "event_id": event_id,
+
             "market_id": market_id,
 
-            "match_odds": normalized[
-                "match_odds"
-            ],
+            "match_odds": (
+                normalized[
+                    "match_odds"
+                ]
+            ),
 
-            "bookmaker_odds": normalized[
-                "bookmaker_odds"
-            ],
+            "bookmaker_odds": (
+                normalized[
+                    "bookmaker_odds"
+                ]
+            ),
 
-            "fancy_odds": normalized[
-                "fancy_odds"
-            ],
+            "fancy_odds": (
+                normalized[
+                    "fancy_odds"
+                ]
+            ),
 
-            "other_market_odds": normalized[
-                "other_market_odds"
-            ],
+            "other_market_odds": (
+                normalized[
+                    "other_market_odds"
+                ]
+            ),
 
-            # Compatibility aliases.
-            "matchOdds": normalized[
-                "match_odds"
-            ],
+            # Compatibility names
+            "matchOdds": (
+                normalized[
+                    "match_odds"
+                ]
+            ),
 
-            "bookMakerOdds": normalized[
-                "bookmaker_odds"
-            ],
+            "bookMakerOdds": (
+                normalized[
+                    "bookmaker_odds"
+                ]
+            ),
 
-            "fancyOdds": normalized[
-                "fancy_odds"
-            ],
+            "fancyOdds": (
+                normalized[
+                    "fancy_odds"
+                ]
+            ),
 
             "odds": normalized["raw"],
         }
@@ -1428,11 +843,13 @@ async def cricket_odds(
         )
 
 
-# ============================================================
-# API - SINGLE MATCH
-# ============================================================
+# =========================================================
+# MATCH JSON
+# =========================================================
 
-@router.get("/api/cricket/match/{game_id}")
+@router.get(
+    "/api/cricket/match/{game_id}"
+)
 async def cricket_match(
     request: Request,
     game_id: str,
@@ -1455,8 +872,8 @@ async def cricket_match(
 
     try:
 
-        match, event_id, market_id = resolve_match(
-            game_id
+        match, event_id, market_id = (
+            resolve_match(game_id)
         )
 
         if not match:
@@ -1469,29 +886,22 @@ async def cricket_match(
                 },
             )
 
-        if not event_id:
-
-            return JSONResponse(
-                status_code=400,
-                content={
-                    "success": False,
-                    "error": "eventId not available from ProExch",
-                },
+        raw_odds = (
+            proexch_api.get_odds(
+                game_id=game_id,
+                market_id=market_id,
             )
-
-        raw_odds = proexch_api.get_odds(
-            game_id=game_id,
-            event_id=event_id,
-            market_id=market_id,
         )
 
-        normalized_odds = normalize_odds(
-            raw_odds
+        normalized_odds = (
+            normalize_odds(raw_odds)
         )
 
-        page_match = build_match_page_data(
-            match,
-            normalized_odds,
+        page_match = (
+            build_match_page_data(
+                match,
+                normalized_odds,
+            )
         )
 
         return {
@@ -1503,23 +913,33 @@ async def cricket_match(
 
             "match": page_match,
 
-            "match_odds": normalized_odds[
-                "match_odds"
-            ],
+            "match_odds": (
+                normalized_odds[
+                    "match_odds"
+                ]
+            ),
 
-            "bookmaker_odds": normalized_odds[
-                "bookmaker_odds"
-            ],
+            "bookmaker_odds": (
+                normalized_odds[
+                    "bookmaker_odds"
+                ]
+            ),
 
-            "fancy_odds": normalized_odds[
-                "fancy_odds"
-            ],
+            "fancy_odds": (
+                normalized_odds[
+                    "fancy_odds"
+                ]
+            ),
 
-            "other_market_odds": normalized_odds[
-                "other_market_odds"
-            ],
+            "other_market_odds": (
+                normalized_odds[
+                    "other_market_odds"
+                ]
+            ),
 
-            "odds": normalized_odds["raw"],
+            "odds": normalized_odds[
+                "raw"
+            ],
         }
 
     except Exception as exc:
@@ -1538,11 +958,13 @@ async def cricket_match(
         )
 
 
-# ============================================================
-# HTML - MATCH PAGE
-# ============================================================
+# =========================================================
+# MATCH PAGE
+# =========================================================
 
-@router.get("/match/{game_id}")
+@router.get(
+    "/match/{game_id}"
+)
 async def match_page(
     request: Request,
     game_id: str,
@@ -1575,12 +997,8 @@ async def match_page(
             game_id,
         )
 
-        # ----------------------------------------------------
-        # Resolve match
-        # ----------------------------------------------------
-
-        match, event_id, market_id = resolve_match(
-            game_id
+        match, event_id, market_id = (
+            resolve_match(game_id)
         )
 
         print(
@@ -1598,76 +1016,69 @@ async def match_page(
                     "request": request,
                     "match": None,
                     "error": (
-                        "The requested cricket match "
-                        "could not be found."
+                        "The requested cricket "
+                        "match could not be found."
                     ),
                 },
             )
-
-        if not event_id:
-
-            return templates.TemplateResponse(
-                "match.html",
-                {
-                    "request": request,
-                    "match": None,
-                    "error": (
-                        "ProExch did not return an "
-                        "event ID for this match."
-                    ),
-                },
-            )
-
-        # ----------------------------------------------------
-        # Initial odds
-        # ----------------------------------------------------
 
         print(
             "[CRICKET] requesting initial odds:",
             game_id,
-            event_id,
             market_id,
         )
 
-        raw_odds = proexch_api.get_odds(
-            game_id=game_id,
-            event_id=event_id,
-            market_id=market_id,
+        raw_odds = (
+            proexch_api.get_odds(
+                game_id=game_id,
+                market_id=market_id,
+            )
         )
 
-        normalized_odds = normalize_odds(
-            raw_odds
+        normalized_odds = (
+            normalize_odds(raw_odds)
         )
 
         print(
             "[CRICKET] initial odds:",
             "match_markets=",
-            len(normalized_odds["match_odds"]),
+            len(
+                normalized_odds[
+                    "match_odds"
+                ]
+            ),
             "match_runners=",
             sum(
-                len(m.get("runners", []))
-                for m in normalized_odds["match_odds"]
+                len(
+                    m.get(
+                        "runners",
+                        [],
+                    )
+                )
+                for m in normalized_odds[
+                    "match_odds"
+                ]
             ),
             "bookmaker_markets=",
-            len(normalized_odds["bookmaker_odds"]),
+            len(
+                normalized_odds[
+                    "bookmaker_odds"
+                ]
+            ),
             "fancy_markets=",
-            len(normalized_odds["fancy_odds"]),
-            "raw_type=",
-            type(raw_odds).__name__,
+            len(
+                normalized_odds[
+                    "fancy_odds"
+                ]
+            ),
         )
 
-        # ----------------------------------------------------
-        # Build page structure
-        # ----------------------------------------------------
-
-        page_match = build_match_page_data(
-            match,
-            normalized_odds,
+        page_match = (
+            build_match_page_data(
+                match,
+                normalized_odds,
+            )
         )
-
-        # ----------------------------------------------------
-        # Send BOTH structures to template
-        # ----------------------------------------------------
 
         return templates.TemplateResponse(
             "match.html",
@@ -1677,27 +1088,36 @@ async def match_page(
                 "match": page_match,
 
                 "game_id": game_id,
+
                 "event_id": event_id,
+
                 "market_id": market_id,
 
                 "odds": normalized_odds,
 
-                # Direct aliases useful to Jinja templates.
-                "match_odds": normalized_odds[
-                    "match_odds"
-                ],
+                "match_odds": (
+                    normalized_odds[
+                        "match_odds"
+                    ]
+                ),
 
-                "bookmaker_odds": normalized_odds[
-                    "bookmaker_odds"
-                ],
+                "bookmaker_odds": (
+                    normalized_odds[
+                        "bookmaker_odds"
+                    ]
+                ),
 
-                "fancy_odds": normalized_odds[
-                    "fancy_odds"
-                ],
+                "fancy_odds": (
+                    normalized_odds[
+                        "fancy_odds"
+                    ]
+                ),
 
-                "other_market_odds": normalized_odds[
-                    "other_market_odds"
-                ],
+                "other_market_odds": (
+                    normalized_odds[
+                        "other_market_odds"
+                    ]
+                ),
 
                 "odds_error": None,
 
@@ -1722,7 +1142,8 @@ async def match_page(
                 "game_id": game_id,
 
                 "error": (
-                    "Unable to load this cricket match: "
+                    "Unable to load this "
+                    "cricket match: "
                     + str(exc)
                 ),
 
