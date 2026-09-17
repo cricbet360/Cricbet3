@@ -9,12 +9,15 @@ const WHATSAPP_NUMBER = "918895898319";
 
 const MATCH_REFRESH_MS = 30000;
 const ODDS_REFRESH_MS = 5000;
+const BET_REFRESH_MS = 10000;
 
 let allMatches = [];
 let currentFilter = "all";
 
 const oddsCache = new Map();
 const oddsLoading = new Set();
+
+let userBets = [];
 
 
 /* =========================================================
@@ -54,6 +57,24 @@ function toNumber(value) {
     return Number.isFinite(number)
         ? number
         : null;
+}
+
+
+function money(value) {
+
+    const number = Number(value);
+
+    if (!Number.isFinite(number)) {
+        return "₹0.00";
+    }
+
+    return `₹${number.toLocaleString(
+        "en-IN",
+        {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }
+    )}`;
 }
 
 
@@ -1102,13 +1123,8 @@ async function loadMatches() {
                 "/api/cricket/matches",
                 {
                     method: "GET",
-
-                    credentials:
-                        "same-origin",
-
-                    cache:
-                        "no-store",
-
+                    credentials: "same-origin",
+                    cache: "no-store",
                     headers: {
                         Accept:
                             "application/json"
@@ -1139,34 +1155,12 @@ async function loadMatches() {
             );
         }
 
-        /*
-         * IMPORTANT:
-         *
-         * Backend returns:
-         *
-         * {
-         *   success: true,
-         *   data: [...]
-         * }
-         *
-         * NOT:
-         *
-         * {
-         *   matches: [...]
-         * }
-         */
-
         let matches =
             payload.data;
 
         if (
             !Array.isArray(matches)
         ) {
-
-            /*
-             * Compatibility with any future
-             * backend response.
-             */
 
             if (
                 Array.isArray(
@@ -1237,7 +1231,7 @@ async function loadMatches() {
 
 
 /* =========================================================
-   LOAD ODDS FOR MATCH
+   LOAD ODDS
 ========================================================= */
 
 async function loadOddsForMatch(match) {
@@ -1252,12 +1246,6 @@ async function loadOddsForMatch(match) {
         getMarketId(match);
 
     if (!gameId) {
-
-        console.warn(
-            "[CricBet] Missing game ID:",
-            match
-        );
-
         return;
     }
 
@@ -1280,7 +1268,6 @@ async function loadOddsForMatch(match) {
         );
 
         if (eventId) {
-
             params.set(
                 "eventId",
                 eventId
@@ -1288,33 +1275,19 @@ async function loadOddsForMatch(match) {
         }
 
         if (marketId) {
-
             params.set(
                 "marketId",
                 marketId
             );
         }
 
-        const url =
-            `/api/cricket/odds?${params.toString()}`;
-
-        console.log(
-            "[CricBet] Loading odds:",
-            url
-        );
-
         const response =
             await fetch(
-                url,
+                `/api/cricket/odds?${params.toString()}`,
                 {
                     method: "GET",
-
-                    credentials:
-                        "same-origin",
-
-                    cache:
-                        "no-store",
-
+                    credentials: "same-origin",
+                    cache: "no-store",
                     headers: {
                         Accept:
                             "application/json"
@@ -1399,10 +1372,7 @@ async function loadAllOdds() {
 
         await Promise.all(
             batch.map(
-                match =>
-                    loadOddsForMatch(
-                        match
-                    )
+                loadOddsForMatch
             )
         );
     }
@@ -1463,10 +1433,6 @@ function updateMatchOdds(match) {
 }
 
 
-/* =========================================================
-   UPDATE ODDS BUTTON
-========================================================= */
-
 function updateOddsButton(
     button,
     price
@@ -1493,7 +1459,6 @@ function updateOddsButton(
         button.dataset.price = "";
 
         if (span) {
-
             span.textContent = "-";
         }
 
@@ -1601,9 +1566,7 @@ function renderMatches() {
 
     container.innerHTML =
         matches
-            .map(
-                createMatchRow
-            )
+            .map(createMatchRow)
             .join("");
 
     matches.forEach(
@@ -1625,13 +1588,8 @@ async function loadBalance() {
                 "/api/user/balance",
                 {
                     method: "GET",
-
-                    credentials:
-                        "same-origin",
-
-                    cache:
-                        "no-store",
-
+                    credentials: "same-origin",
+                    cache: "no-store",
                     headers: {
                         Accept:
                             "application/json"
@@ -1662,11 +1620,8 @@ async function loadBalance() {
                 ? balance.toLocaleString(
                     "en-IN",
                     {
-                        minimumFractionDigits:
-                            2,
-
-                        maximumFractionDigits:
-                            2
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
                     }
                 )
                 : "0.00";
@@ -1681,17 +1636,13 @@ async function loadBalance() {
                 "betslipBalance"
             );
 
-        if (
-            balanceElement
-        ) {
+        if (balanceElement) {
 
             balanceElement.textContent =
                 `₹${formatted}`;
         }
 
-        if (
-            betslipBalance
-        ) {
+        if (betslipBalance) {
 
             betslipBalance.textContent =
                 `₹${formatted}`;
@@ -1708,8 +1659,377 @@ async function loadBalance() {
 
 
 /* =========================================================
-   BETSLIP
+   BETS
 ========================================================= */
+
+async function loadMyBets() {
+
+    try {
+
+        const response =
+            await fetch(
+                "/bets/my-bets",
+                {
+                    method: "GET",
+                    credentials: "same-origin",
+                    cache: "no-store",
+                    headers: {
+                        Accept:
+                            "application/json"
+                    }
+                }
+            );
+
+        const payload =
+            await response.json();
+
+        if (!response.ok) {
+
+            throw new Error(
+                payload?.message ||
+                payload?.detail ||
+                `HTTP ${response.status}`
+            );
+        }
+
+        if (
+            payload.success !== true
+        ) {
+
+            throw new Error(
+                payload?.message ||
+                "Unable to load bets."
+            );
+        }
+
+        userBets =
+            Array.isArray(payload.bets)
+                ? payload.bets
+                : [];
+
+        console.log(
+            "[CricBet] My Bets:",
+            userBets
+        );
+
+        renderBetslip();
+
+    } catch (error) {
+
+        console.warn(
+            "[CricBet] MY BETS ERROR:",
+            error
+        );
+
+        renderBetslipError(
+            error.message
+        );
+    }
+}
+
+
+/* =========================================================
+   BETSLIP RENDER
+========================================================= */
+
+function renderBetslip() {
+
+    const content =
+        document.getElementById(
+            "betslipContent"
+        );
+
+    const count =
+        document.getElementById(
+            "betslipCount"
+        );
+
+    const placeButton =
+        document.getElementById(
+            "placeBetButton"
+        );
+
+    if (!content) {
+        return;
+    }
+
+    if (count) {
+
+        count.textContent =
+            String(userBets.length);
+    }
+
+    /*
+     * Bets already placed in the database
+     * are displayed here.
+     */
+
+    if (!userBets.length) {
+
+        content.innerHTML = `
+            <div class="betslip-empty">
+
+                <h3>
+                    Your bet slip is empty
+                </h3>
+
+                <p>
+                    Select odds from a match to add a bet.
+                </p>
+
+            </div>
+        `;
+
+        if (placeButton) {
+            placeButton.disabled = true;
+        }
+
+        return;
+    }
+
+    if (placeButton) {
+        placeButton.disabled = true;
+    }
+
+    content.innerHTML =
+        userBets
+            .slice(0, 10)
+            .map(
+                renderPlacedBet
+            )
+            .join("");
+}
+
+
+function renderPlacedBet(bet) {
+
+    const selection =
+        Array.isArray(
+            bet.selections
+        ) &&
+        bet.selections.length
+            ? bet.selections[0]
+            : null;
+
+    const side =
+        String(
+            selection?.side ||
+            ""
+        ).toUpperCase();
+
+    const status =
+        String(
+            bet.status ||
+            "pending"
+        );
+
+    const statusText =
+        status.charAt(0).toUpperCase() +
+        status.slice(1);
+
+    const statusClass =
+        status.toLowerCase();
+
+    return `
+        <div class="betslip-bet-card">
+
+            <div class="betslip-bet-top">
+
+                <strong>
+                    ${
+                        escapeHtml(
+                            selection?.runner_name ||
+                            "Selection"
+                        )
+                    }
+                </strong>
+
+                <span
+                    class="betslip-status ${escapeHtml(statusClass)}"
+                >
+                    ${escapeHtml(statusText)}
+                </span>
+
+            </div>
+
+
+            <div class="betslip-bet-match">
+
+                ${
+                    escapeHtml(
+                        selection?.event_name ||
+                        "Cricket Match"
+                    )
+                }
+
+            </div>
+
+
+            <div class="betslip-bet-row">
+
+                <span>
+                    Type
+                </span>
+
+                <strong>
+                    ${escapeHtml(side || "-")}
+                </strong>
+
+            </div>
+
+
+            <div class="betslip-bet-row">
+
+                <span>
+                    Odds
+                </span>
+
+                <strong>
+                    ${
+                        Number.isFinite(
+                            Number(bet.total_odds)
+                        )
+                            ? Number(
+                                bet.total_odds
+                            ).toFixed(2)
+                            : "-"
+                    }
+                </strong>
+
+            </div>
+
+
+            <div class="betslip-bet-row">
+
+                <span>
+                    Stake
+                </span>
+
+                <strong>
+                    ${money(bet.stake)}
+                </strong>
+
+            </div>
+
+
+            <div class="betslip-bet-row">
+
+                <span>
+                    Potential Win
+                </span>
+
+                <strong>
+                    ${money(bet.potential_win)}
+                </strong>
+
+            </div>
+
+
+            <div class="betslip-bet-time">
+
+                ${
+                    formatDate(
+                        bet.created_at
+                    )
+                }
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+function renderBetslipError(message) {
+
+    const content =
+        document.getElementById(
+            "betslipContent"
+        );
+
+    if (!content) {
+        return;
+    }
+
+    content.innerHTML = `
+        <div class="betslip-empty">
+
+            <h3>
+                Unable to load bets
+            </h3>
+
+            <p>
+                ${escapeHtml(
+                    message ||
+                    "Please refresh the page."
+                )}
+            </p>
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   BETSLIP OPEN / CLOSE
+========================================================= */
+
+function openBetslip() {
+
+    const betslip =
+        document.getElementById(
+            "betslip"
+        );
+
+    if (!betslip) {
+        return;
+    }
+
+    /*
+     * hidden is used instead of relying only
+     * on the CSS "open" class.
+     */
+
+    betslip.hidden = false;
+
+    betslip.classList.add(
+        "open"
+    );
+
+    betslip.classList.remove(
+        "minimized"
+    );
+}
+
+
+function minimizeBetslip() {
+
+    const betslip =
+        document.getElementById(
+            "betslip"
+        );
+
+    if (!betslip) {
+        return;
+    }
+
+    /*
+     * This guarantees the panel actually
+     * disappears even if the existing CSS
+     * does not have a minimized class.
+     */
+
+    betslip.classList.remove(
+        "open"
+    );
+
+    betslip.classList.add(
+        "minimized"
+    );
+
+    betslip.hidden = true;
+}
+
 
 function setupBetslip() {
 
@@ -1728,34 +2048,42 @@ function setupBetslip() {
             "mobileBetslipButton"
         );
 
+    if (betslip) {
+
+        /*
+         * Start minimized.
+         */
+
+        betslip.hidden = true;
+    }
+
     if (
-        closeButton &&
-        betslip
+        closeButton
     ) {
 
         closeButton.addEventListener(
             "click",
-            () => {
+            event => {
 
-                betslip.classList.remove(
-                    "open"
-                );
+                event.preventDefault();
+                event.stopPropagation();
+
+                minimizeBetslip();
             }
         );
     }
 
     if (
-        mobileButton &&
-        betslip
+        mobileButton
     ) {
 
         mobileButton.addEventListener(
             "click",
-            () => {
+            event => {
 
-                betslip.classList.toggle(
-                    "open"
-                );
+                event.preventDefault();
+
+                openBetslip();
             }
         );
     }
@@ -1861,14 +2189,13 @@ document.addEventListener(
                 }
             );
 
+
         const depositButton =
             document.getElementById(
                 "depositBtn"
             );
 
-        if (
-            depositButton
-        ) {
+        if (depositButton) {
 
             depositButton.addEventListener(
                 "click",
@@ -1876,14 +2203,13 @@ document.addEventListener(
             );
         }
 
+
         const withdrawButton =
             document.getElementById(
                 "withdrawBtn"
             );
 
-        if (
-            withdrawButton
-        ) {
+        if (withdrawButton) {
 
             withdrawButton.addEventListener(
                 "click",
@@ -1891,16 +2217,24 @@ document.addEventListener(
             );
         }
 
+
         setupBetslip();
+
 
         loadBalance();
 
+
+        loadMyBets();
+
+
         loadMatches();
+
 
         setInterval(
             loadMatches,
             MATCH_REFRESH_MS
         );
+
 
         setInterval(
             () => {
@@ -1918,9 +2252,17 @@ document.addEventListener(
             ODDS_REFRESH_MS
         );
 
+
         setInterval(
             loadBalance,
             15000
         );
+
+
+        setInterval(
+            loadMyBets,
+            BET_REFRESH_MS
+        );
+
     }
 );
