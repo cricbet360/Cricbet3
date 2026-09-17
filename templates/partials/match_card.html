@@ -1,0 +1,69 @@
+<div class="match-card">
+
+    <div class="match-top">
+
+        <span class="live-tag">LIVE</span>
+
+        <span class="league">
+
+            {{ match.league }}
+
+        </span>
+
+    </div>
+
+    <div class="teams">
+
+        <div class="team">
+
+            {{ match.team1 }}
+
+        </div>
+
+        <div class="vs">
+
+            VS
+
+        </div>
+
+        <div class="team">
+
+            {{ match.team2 }}
+
+        </div>
+
+    </div>
+
+    <div class="score">
+
+        {{ match.score }}
+
+    </div>
+
+    <div class="odds">
+
+        <button
+            class="back-btn"
+            data-team="{{ match.team1 }}"
+            data-odds="{{ match.back_odds }}">
+
+            Back
+
+            <strong>{{ match.back_odds }}</strong>
+
+        </button>
+
+        <button
+            class="lay-btn"
+            data-team="{{ match.team2 }}"
+            data-odds="{{ match.lay_odds }}">
+
+            Lay
+
+            <strong>{{ match.lay_odds }}</strong>
+
+        </button>
+
+    </div>
+
+</div>

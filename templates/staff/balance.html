@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Balance Management</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+
+            font-family:
+                Inter,
+                Arial,
+                sans-serif;
+
+            background: #f3f5f8;
+            color: #111827;
+        }
+
+        .header {
+            min-height: 64px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 22px;
+
+            background: #101827;
+            color: white;
+        }
+
+        .header strong {
+            font-size: 20px;
+        }
+
+        .page {
+            width: min(700px, 100%);
+            margin: 35px auto;
+            padding: 15px;
+        }
+
+        .card {
+            background: white;
+
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+
+            padding: 24px;
+
+            box-shadow:
+                0 5px 20px
+                rgba(15, 23, 42, .06);
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        label {
+            display: block;
+
+            margin-top: 16px;
+            margin-bottom: 6px;
+
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+
+            padding: 12px;
+
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+
+            outline: none;
+
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .search {
+            display: flex;
+            gap: 8px;
+        }
+
+        .search input {
+            flex: 1;
+        }
+
+        button {
+            border: 0;
+            border-radius: 8px;
+
+            padding: 12px 15px;
+
+            font-weight: 800;
+
+            cursor: pointer;
+        }
+
+        .search button {
+            background: #111827;
+            color: white;
+        }
+
+        .user-card {
+            margin-top: 20px;
+
+            padding: 17px;
+
+            border-radius: 10px;
+
+            background: #f8fafc;
+
+            display: none;
+        }
+
+        .user-card.visible {
+            display: block;
+        }
+
+        .username {
+            font-size: 18px;
+            font-weight: 900;
+        }
+
+        .current-balance {
+            margin-top: 7px;
+
+            font-size: 25px;
+            font-weight: 900;
+
+            color: #15803d;
+        }
+
+        .actions {
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 10px;
+
+            margin-top: 18px;
+        }
+
+        .credit {
+            background: #16a34a;
+            color: white;
+        }
+
+        .debit {
+            background: #dc2626;
+            color: white;
+        }
+
+        .message {
+            margin-top: 15px;
+
+            padding: 12px;
+
+            border-radius: 8px;
+
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        @media(max-width:600px) {
+
+            .actions {
+                grid-template-columns: 1fr;
+            }
+
+            .search {
+                flex-direction: column;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<header class="header">
+
+    <strong>
+        CrickBet Balance Management
+    </strong>
+
+    <span>
+        Staff
+    </span>
+
+</header>
+
+<main class="page">
+
+<section class="card">
+
+<h1>
+    Update User Balance
+</h1>
+
+<p>
+    This panel is only for balance adjustments.
+</p>
+
+<label>
+    Username
+</label>
+
+<div class="search">
+
+    <input
+        id="username"
+        type="text"
+        placeholder="Enter username"
+        autocomplete="off"
+    >
+
+    <button
+        id="searchButton"
+        type="button"
+    >
+        Search
+    </button>
+
+</div>
+
+<div
+    id="userCard"
+    class="user-card"
+>
+
+    <div
+        id="displayUsername"
+        class="username"
+    ></div>
+
+    <div
+        id="displayBalance"
+        class="current-balance"
+    >
+        ₹0.00
+    </div>
+
+    <label>
+        Amount
+    </label>
+
+    <input
+        id="amount"
+        type="number"
+        min="0.01"
+        step="0.01"
+        placeholder="Enter amount"
+    >
+
+    <label>
+        Reason
+    </label>
+
+    <textarea
+        id="reason"
+        placeholder="Deposit, withdrawal, correction..."
+    ></textarea>
+
+    <div class="actions">
+
+        <button
+            id="creditButton"
+            class="credit"
+            type="button"
+        >
+            + Add Balance
+        </button>
+
+        <button
+            id="debitButton"
+            class="debit"
+            type="button"
+        >
+            − Deduct Balance
+        </button>
+
+    </div>
+
+</div>
+
+<div
+    id="message"
+    class="message"
+></div>
+
+</section>
+
+</main>
+
+<script>
+
+"use strict";
+
+let selectedUsername = "";
+
+const usernameInput =
+    document.getElementById(
+        "username"
+    );
+
+const searchButton =
+    document.getElementById(
+        "searchButton"
+    );
+
+const userCard =
+    document.getElementById(
+        "userCard"
+    );
+
+const displayUsername =
+    document.getElementById(
+        "displayUsername"
+    );
+
+const displayBalance =
+    document.getElementById(
+        "displayBalance"
+    );
+
+const amountInput =
+    document.getElementById(
+        "amount"
+    );
+
+const reasonInput =
+    document.getElementById(
+        "reason"
+    );
+
+const message =
+    document.getElementById(
+        "message"
+    );
+
+
+function showMessage(
+    text,
+    success = true
+) {
+
+    message.textContent = text;
+
+    message.className =
+        "message show " +
+        (
+            success
+                ? "success"
+                : "error"
+        );
+
+}
+
+
+function money(value) {
+
+    return (
+        "₹" +
+        Number(value || 0)
+            .toFixed(2)
+    );
+
+}
+
+
+async function searchUser() {
+
+    const username =
+        usernameInput.value.trim();
+
+    if (!username) {
+
+        showMessage(
+            "Enter username.",
+            false
+        );
+
+        return;
+    }
+
+    searchButton.disabled = true;
+
+    try {
+
+        const response =
+            await fetch(
+                "/staff/balance/search?username=" +
+                encodeURIComponent(username),
+                {
+                    credentials: "same-origin",
+                    cache: "no-store"
+                }
+            );
+
+        const result =
+            await response.json();
+
+        if (!result.success) {
+
+            userCard.classList.remove(
+                "visible"
+            );
+
+            showMessage(
+                result.message ||
+                "User not found.",
+                false
+            );
+
+            return;
+        }
+
+        selectedUsername =
+            result.user.username;
+
+        displayUsername.textContent =
+            result.user.username;
+
+        displayBalance.textContent =
+            money(
+                result.user.balance
+            );
+
+        amountInput.value = "";
+        reasonInput.value = "";
+
+        userCard.classList.add(
+            "visible"
+        );
+
+        showMessage(
+            "User found.",
+            true
+        );
+
+    } catch (error) {
+
+        showMessage(
+            "Could not search user.",
+            false
+        );
+
+    } finally {
+
+        searchButton.disabled = false;
+
+    }
+
+}
+
+
+async function updateBalance(
+    action
+) {
+
+    if (!selectedUsername) {
+
+        showMessage(
+            "Search for a user first.",
+            false
+        );
+
+        return;
+    }
+
+    const amount =
+        amountInput.value.trim();
+
+    const reason =
+        reasonInput.value.trim();
+
+    if (!amount || Number(amount) <= 0) {
+
+        showMessage(
+            "Enter a valid amount.",
+            false
+        );
+
+        return;
+    }
+
+    const body =
+        new URLSearchParams();
+
+    body.append(
+        "username",
+        selectedUsername
+    );
+
+    body.append(
+        "amount",
+        amount
+    );
+
+    body.append(
+        "action",
+        action
+    );
+
+    body.append(
+        "reason",
+        reason
+    );
+
+    try {
+
+        const response =
+            await fetch(
+                "/staff/balance/update",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/x-www-form-urlencoded"
+                    },
+
+                    body,
+
+                    credentials:
+                        "same-origin"
+                }
+            );
+
+        const result =
+            await response.json();
+
+        if (!result.success) {
+
+            showMessage(
+                result.message ||
+                "Balance update failed.",
+                false
+            );
+
+            return;
+        }
+
+        displayBalance.textContent =
+            money(
+                result.balance
+            );
+
+        amountInput.value = "";
+        reasonInput.value = "";
+
+        showMessage(
+            result.message ||
+            "Balance updated successfully.",
+            true
+        );
+
+    } catch (error) {
+
+        showMessage(
+            "Balance update failed.",
+            false
+        );
+
+    }
+
+}
+
+
+searchButton.addEventListener(
+    "click",
+    searchUser
+);
+
+
+usernameInput.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.key === "Enter"
+        ) {
+
+            searchUser();
+
+        }
+
+    }
+);
+
+
+document.getElementById(
+    "creditButton"
+).addEventListener(
+    "click",
+    function() {
+
+        updateBalance(
+            "CREDIT"
+        );
+
+    }
+);
+
+
+document.getElementById(
+    "debitButton"
+).addEventListener(
+    "click",
+    function() {
+
+        updateBalance(
+            "DEBIT"
+        );
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>

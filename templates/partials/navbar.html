@@ -1,0 +1,48 @@
+
+<header class="topbar">
+
+    <div class="logo">
+        🏏 CRIC<span style="color: #20c77a;">BET</span>
+    </div>
+
+
+    <nav class="nav-links">
+
+        <a href="/">
+            Home
+        </a>
+
+        <a href="/dashboard">
+            Live
+        </a>
+
+        <a href="/dashboard">
+            Cricket
+        </a>
+
+    </nav>
+
+
+    <div class="user-menu">
+
+        <div class="wallet">
+            ₹ {{ "%.2f"|format(user.balance or 0) }}
+        </div>
+
+
+        <div class="profile">
+            👤 {{ user.username }}
+        </div>
+
+
+        <a
+            href="/logout"
+            class="logout"
+        >
+            Logout
+        </a>
+
+    </div>
+
+</header>
+

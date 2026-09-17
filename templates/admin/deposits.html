@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Admin - Deposits</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        .header {
+            background: #111827;
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h2 {
+            margin: 0;
+        }
+
+        .container {
+            padding: 30px;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #2563eb;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        th,
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        th {
+            background: #f9fafb;
+            font-size: 13px;
+        }
+
+        .pending {
+            color: #d97706;
+            font-weight: bold;
+        }
+
+        .completed {
+            color: #16a34a;
+            font-weight: bold;
+        }
+
+        .screenshot {
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+    <h2>CrickBet Admin — Deposits</h2>
+
+    <span>
+        Admin Panel
+    </span>
+
+</div>
+
+
+<div class="container">
+
+    <a
+        href="/admin/dashboard"
+        class="back"
+    >
+        ← Back to Dashboard
+    </a>
+
+
+    <div class="card">
+
+        {% if deposits %}
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>User</th>
+
+                    <th>Email</th>
+
+                    <th>Amount</th>
+
+                    <th>UTR</th>
+
+                    <th>Screenshot</th>
+
+                    <th>Date</th>
+
+                    <th>Status</th>
+
+                    <th>Processed By</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for deposit in deposits %}
+
+                <tr>
+
+                    <td>
+                        {{ deposit.user.username }}
+                    </td>
+
+                    <td>
+                        {{ deposit.user.email }}
+                    </td>
+
+                    <td>
+                        ₹{{ "%.2f"|format(deposit.amount) }}
+                    </td>
+
+                    <td>
+                        {{ deposit.utr_number }}
+                    </td>
+
+                    <td>
+
+                        <a
+                            href="/{{ deposit.payment_screenshot }}"
+                            target="_blank"
+                            class="screenshot"
+                        >
+                            View Screenshot
+                        </a>
+
+                    </td>
+
+                    <td>
+
+                        {% if deposit.created_at %}
+
+                            {{ deposit.created_at.strftime("%d %b %Y, %I:%M %p") }}
+
+                        {% else %}
+
+                            —
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        {% if deposit.status == "Pending" %}
+
+                            <span class="pending">
+                                Pending
+                            </span>
+
+                        {% else %}
+
+                            <span class="completed">
+                                Completed
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        {% if deposit.employee %}
+
+                            {{ deposit.employee.employee_id }}
+
+                        {% else %}
+
+                            —
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% else %}
+
+        <div class="empty">
+
+            No deposit requests found.
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

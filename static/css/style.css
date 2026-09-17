@@ -1,0 +1,1154 @@
+/* =====================================
+   CRICKBET - GLOBAL STYLES
+===================================== */
+
+:root {
+    --bg-main: #111827;
+    --bg-dark: #0f172a;
+    --bg-card: #1e293b;
+    --bg-card-light: #263448;
+
+    --primary: #00d26a;
+    --primary-hover: #00b85c;
+
+    --danger: #ff5b5b;
+    --danger-hover: #e53935;
+
+    --text-main: #ffffff;
+    --text-muted: #9ca3af;
+
+    --border: #1f2937;
+}
+
+
+/* =====================================
+   RESET
+===================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+html {
+    scroll-behavior: smooth;
+}
+
+
+body {
+    min-height: 100vh;
+
+    background: var(--bg-main);
+    color: var(--text-main);
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    padding-top: 70px;
+}
+
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+
+button,
+input {
+    font-family: inherit;
+}
+
+
+/* =====================================
+   CONTAINER
+===================================== */
+
+.container {
+    width: min(1400px, 100%);
+    margin: auto;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+
+/* =====================================
+   NAVBAR
+===================================== */
+
+.topbar {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    min-height: 70px;
+
+    background: var(--bg-dark);
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 0 35px;
+
+    border-bottom: 1px solid var(--border);
+
+    z-index: 999;
+}
+
+
+.logo {
+    font-size: 28px;
+    font-weight: bold;
+
+    color: var(--primary);
+}
+
+
+.topbar nav {
+    display: flex;
+    gap: 35px;
+}
+
+
+.topbar nav a {
+    color: var(--text-main);
+
+    font-weight: 600;
+
+    transition: color 0.3s ease;
+}
+
+
+.topbar nav a:hover {
+    color: var(--primary);
+}
+
+
+.user-menu {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+
+.wallet {
+    color: var(--primary);
+    font-weight: bold;
+}
+
+
+.logout {
+    color: var(--danger);
+}
+
+
+/* =====================================
+   HERO
+===================================== */
+
+.hero {
+    text-align: center;
+
+    padding: 140px 20px 120px;
+}
+
+
+.hero h1 {
+    font-size: clamp(40px, 7vw, 64px);
+
+    margin-bottom: 20px;
+}
+
+
+.hero p {
+    max-width: 750px;
+
+    margin: auto;
+
+    color: #b6b6b6;
+
+    font-size: clamp(17px, 3vw, 24px);
+
+    line-height: 1.6;
+}
+
+
+.hero-buttons {
+    margin-top: 45px;
+}
+
+
+/* =====================================
+   BUTTONS
+===================================== */
+
+.btn {
+    display: inline-block;
+
+    background: var(--primary);
+    color: #111827;
+
+    font-weight: bold;
+
+    padding: 16px 38px;
+
+    border: none;
+    border-radius: 10px;
+
+    margin: 10px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.3s ease,
+        transform 0.3s ease;
+}
+
+
+.btn:hover {
+    background: var(--primary-hover);
+
+    transform: translateY(-3px);
+}
+
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+
+.btn-danger:hover {
+    background: var(--danger-hover);
+}
+
+
+/* =====================================
+   GENERAL SECTION
+===================================== */
+
+.section {
+    padding: 70px 20px;
+}
+
+
+.section h2 {
+    font-size: 34px;
+    margin-bottom: 35px;
+}
+
+
+/* =====================================
+   MATCH GRID
+===================================== */
+
+.match-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(320px, 1fr)
+        );
+
+    gap: 25px;
+}
+
+
+.match-card {
+    background: var(--bg-card);
+
+    border-radius: 15px;
+
+    padding: 25px;
+
+    border: 1px solid transparent;
+
+    transition:
+        transform 0.3s ease,
+        border-color 0.3s ease;
+}
+
+
+.match-card:hover {
+    transform: translateY(-4px);
+
+    border-color: #334155;
+}
+
+
+.match-card small {
+    color: var(--text-muted);
+
+    display: block;
+
+    margin-bottom: 10px;
+}
+
+
+.match-card h3 {
+    margin-bottom: 20px;
+
+    line-height: 1.5;
+}
+
+
+/* =====================================
+   BETTING ODDS
+===================================== */
+
+.odds {
+    display: flex;
+    gap: 12px;
+}
+
+
+.back,
+.lay {
+    flex: 1;
+
+    border: none;
+
+    padding: 14px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    color: white;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    transition:
+        transform 0.2s ease,
+        opacity 0.2s ease;
+}
+
+
+.back:hover,
+.lay:hover {
+    transform: translateY(-2px);
+}
+
+
+.back {
+    background: var(--primary);
+}
+
+
+.back:hover {
+    background: var(--primary-hover);
+}
+
+
+.lay {
+    background: var(--danger);
+}
+
+
+.lay:hover {
+    background: var(--danger-hover);
+}
+
+
+/* =====================================
+   FEATURES
+===================================== */
+
+.feature-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(250px, 1fr)
+        );
+
+    gap: 25px;
+}
+
+
+.feature-card {
+    background: var(--bg-card);
+
+    padding: 30px;
+
+    border-radius: 12px;
+
+    text-align: center;
+
+    transition: transform 0.3s ease;
+}
+
+
+.feature-card:hover {
+    transform: translateY(-4px);
+}
+
+
+.feature-card h3 {
+    margin-bottom: 15px;
+
+    color: var(--primary);
+}
+
+
+.feature-card p {
+    color: #bdbdbd;
+
+    line-height: 1.6;
+}
+
+
+/* =====================================
+   SPORTS
+===================================== */
+
+.sports-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(180px, 1fr)
+        );
+
+    gap: 20px;
+}
+
+
+.sport-card {
+    background: var(--bg-card);
+
+    border-radius: 10px;
+
+    padding: 25px;
+
+    text-align: center;
+
+    font-size: 20px;
+
+    transition:
+        background 0.3s ease,
+        transform 0.3s ease;
+}
+
+
+.sport-card:hover {
+    background: var(--bg-card-light);
+
+    transform: translateY(-3px);
+}
+
+
+/* =====================================
+   AUTHENTICATION CARDS
+   Login / Register / OTP / Reset Password
+===================================== */
+
+.card {
+    width: min(430px, calc(100% - 30px));
+
+    margin: 60px auto;
+
+    background: #1b2234;
+
+    padding: 35px;
+
+    border-radius: 15px;
+
+    box-shadow:
+        0 15px 40px
+        rgba(0, 0, 0, 0.35);
+
+    border: 1px solid #263244;
+}
+
+
+.card h2 {
+    text-align: center;
+
+    margin-bottom: 10px;
+
+    color: var(--text-main);
+}
+
+
+.card-subtitle {
+    text-align: center;
+
+    color: var(--text-muted);
+
+    margin-bottom: 30px;
+
+    font-size: 15px;
+
+    line-height: 1.5;
+}
+
+
+/* =====================================
+   FORM INPUTS
+===================================== */
+
+.card input,
+.form-input {
+    width: 100%;
+
+    padding: 15px;
+
+    margin-bottom: 18px;
+
+    border: 1px solid transparent;
+
+    border-radius: 10px;
+
+    background: var(--bg-main);
+
+    color: white;
+
+    font-size: 15px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.card input::placeholder,
+.form-input::placeholder {
+    color: #6b7280;
+}
+
+
+.card input:focus,
+.form-input:focus {
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(0, 210, 106, 0.1);
+}
+
+
+
+/* =====================================
+   PASSWORD REQUIREMENTS 
+===================================== */
+
+.card .password-requirements {
+    width: 100%;
+    margin: 0 0 20px 0;
+    padding: 15px;
+
+    background: #111827 !important;
+    color: #ffffff !important;
+
+    border: 1px solid #263448;
+    border-left: 3px solid #00d26a;
+    border-radius: 8px;
+}
+
+.card .password-requirements strong {
+    display: block;
+    color: #ffffff !important;
+    margin-bottom: 10px;
+}
+
+.card .password-requirements ul {
+    margin: 0;
+    padding-left: 20px;
+
+    color: #cbd5e1 !important;
+}
+
+.card .password-requirements li {
+    color: #cbd5e1 !important;
+    margin-bottom: 5px;
+}
+
+/* =====================================
+   CHECKBOX
+   Terms and Disclaimer
+===================================== */
+
+.checkbox-group {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 10px;
+
+    margin: 15px 0 20px;
+
+    color: var(--text-muted);
+
+    font-size: 14px;
+
+    line-height: 1.5;
+}
+
+
+.checkbox-group input[type="checkbox"] {
+    width: auto;
+
+    margin: 3px 0 0;
+
+    accent-color: var(--primary);
+}
+
+
+.checkbox-group label {
+    cursor: pointer;
+}
+
+
+/* =====================================
+   SUBMIT BUTTONS
+===================================== */
+
+.card button[type="submit"],
+.card .submit-btn {
+    width: 100%;
+
+    padding: 15px;
+
+    background: var(--primary);
+
+    color: #111827;
+
+    border: none;
+
+    border-radius: 10px;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition:
+        background 0.3s ease,
+        transform 0.2s ease;
+}
+
+
+.card button[type="submit"]:hover,
+.card .submit-btn:hover {
+    background: var(--primary-hover);
+
+    transform: translateY(-2px);
+}
+
+
+.card button[type="submit"]:disabled,
+.card .submit-btn:disabled {
+    background: #4b5563;
+
+    color: #9ca3af;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+
+/* =====================================
+   FORM FOOTER
+===================================== */
+
+.form-footer,
+.login-footer {
+    margin-top: 25px;
+
+    text-align: center;
+
+    color: var(--text-muted);
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+
+.form-footer a,
+.login-footer a {
+    color: var(--primary);
+
+    font-weight: bold;
+}
+
+
+.form-footer a:hover,
+.login-footer a:hover {
+    text-decoration: underline;
+}
+
+
+/* =====================================
+   FORGOT PASSWORD
+===================================== */
+
+.forgot-password {
+    margin-top: -5px;
+
+    margin-bottom: 20px;
+
+    text-align: right;
+}
+
+
+.forgot-password a {
+    color: var(--primary);
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+.forgot-password a:hover {
+    text-decoration: underline;
+}
+
+
+/* =====================================
+   ALERTS
+===================================== */
+
+.alert {
+    padding: 12px;
+
+    border-radius: 8px;
+
+    text-align: center;
+
+    margin-bottom: 20px;
+
+    background:
+        rgba(255, 82, 82, 0.15);
+
+    border:
+        1px solid
+        rgba(255, 82, 82, 0.35);
+
+    color: #ff8585;
+
+    font-size: 14px;
+}
+
+
+.alert-success {
+    padding: 12px;
+
+    border-radius: 8px;
+
+    text-align: center;
+
+    margin-bottom: 20px;
+
+    background:
+        rgba(0, 210, 106, 0.12);
+
+    border:
+        1px solid
+        rgba(0, 210, 106, 0.3);
+
+    color: var(--primary);
+
+    font-size: 14px;
+}
+
+
+/* =====================================
+   OTP INPUT
+===================================== */
+
+.otp-input {
+    text-align: center;
+
+    font-size: 24px !important;
+
+    letter-spacing: 10px;
+
+    font-weight: bold;
+}
+
+
+/* =====================================
+   PROFILE
+===================================== */
+
+.profile-card {
+    width: min(900px, calc(100% - 30px));
+
+    margin: 40px auto;
+
+    padding: 30px;
+
+    background: var(--bg-card);
+
+    border-radius: 15px;
+
+    border: 1px solid #334155;
+}
+
+
+.profile-card h1 {
+    margin-bottom: 10px;
+}
+
+
+.profile-info {
+    color: var(--text-muted);
+
+    line-height: 1.8;
+}
+
+
+/* =====================================
+   TABLES
+   Bets / Profit & Loss / Statements
+===================================== */
+
+.table-container {
+    width: 100%;
+
+    overflow-x: auto;
+
+    background: var(--bg-card);
+
+    border-radius: 12px;
+
+    padding: 10px;
+}
+
+
+table {
+    width: 100%;
+
+    border-collapse: collapse;
+}
+
+
+th,
+td {
+    padding: 14px;
+
+    text-align: left;
+
+    border-bottom: 1px solid #334155;
+}
+
+
+th {
+    color: var(--primary);
+
+    font-size: 14px;
+}
+
+
+td {
+    color: #d1d5db;
+}
+
+
+/* =====================================
+   STATUS COLORS
+===================================== */
+
+.status-won,
+.profit {
+    color: var(--primary);
+    font-weight: bold;
+}
+
+
+.status-lost,
+.loss {
+    color: var(--danger);
+    font-weight: bold;
+}
+
+
+.status-pending {
+    color: #facc15;
+    font-weight: bold;
+}
+
+
+/* =====================================
+   EMPTY STATES
+===================================== */
+
+.empty-state {
+    padding: 50px 20px;
+
+    text-align: center;
+
+    color: var(--text-muted);
+
+    background: var(--bg-card);
+
+    border-radius: 12px;
+}
+
+
+.empty-state h3 {
+    color: white;
+
+    margin-bottom: 10px;
+}
+
+
+/* =====================================
+   FOOTER
+===================================== */
+
+footer {
+    margin-top: 70px;
+
+    padding: 25px;
+
+    text-align: center;
+
+    border-top:
+        1px solid var(--border);
+
+    color: #999;
+}
+
+
+/* =====================================
+   RESPONSIVE
+===================================== */
+
+@media (max-width: 768px) {
+
+    body {
+        padding-top: 130px;
+    }
+
+
+    .topbar {
+        flex-direction: column;
+
+        height: auto;
+
+        padding: 15px;
+
+        gap: 12px;
+    }
+
+
+    .topbar nav {
+        margin: 0;
+
+        gap: 18px;
+
+        flex-wrap: wrap;
+
+        justify-content: center;
+    }
+
+
+    .user-menu {
+        gap: 12px;
+
+        flex-wrap: wrap;
+
+        justify-content: center;
+    }
+
+
+    .hero {
+        padding: 70px 20px 60px;
+    }
+
+
+    .section {
+        padding: 50px 15px;
+    }
+
+
+    .card {
+        margin: 30px auto;
+
+        padding: 25px 20px;
+    }
+
+
+    .profile-card {
+        padding: 20px;
+    }
+
+
+    .odds {
+        flex-direction: column;
+    }
+
+}
+
+
+@media (max-width: 480px) {
+
+    .logo {
+        font-size: 24px;
+    }
+
+
+    .topbar nav {
+        gap: 12px;
+
+        font-size: 14px;
+    }
+
+
+    .card h2 {
+        font-size: 24px;
+    }
+
+
+    .hero-buttons .btn {
+        width: 100%;
+
+        margin: 8px 0;
+    }
+
+}
+
+
+/* =====================================
+   FORM BUTTONS
+===================================== */
+
+.card .submit-button {
+    width: 100%;
+    margin-top: 8px;
+
+    background: #00d26a;
+    color: #111827;
+
+    border: none;
+
+    padding: 15px;
+
+    border-radius: 10px;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.card .submit-button:hover {
+    background: #00b85c;
+}
+
+
+/* =====================================
+   FORGOT PASSWORD LINK
+===================================== */
+
+.forgot-password {
+    display: block;
+
+    width: fit-content;
+
+    margin: 0 0 20px auto;
+
+    color: #00d26a;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+/* =====================================
+   PASSWORD INPUT WITH EYE ICON
+===================================== */
+
+.password-wrapper {
+    position: relative !important;
+    width: 100% !important;
+    display: block !important;
+    margin-bottom: 18px !important;
+}
+
+.password-wrapper input {
+    width: 100% !important;
+    height: 50px !important;
+    margin: 0 !important;
+    padding: 15px 55px 15px 15px !important;
+    display: block !important;
+}
+
+/* Eye button inside the password field */
+
+.password-wrapper .password-toggle {
+    position: absolute !important;
+
+    top: 50% !important;
+    right: 8px !important;
+
+    transform: translateY(-50%) !important;
+
+    width: 38px !important;
+    height: 38px !important;
+
+    min-width: 38px !important;
+    min-height: 38px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    border: none !important;
+    border-radius: 50% !important;
+
+    background: transparent !important;
+
+    color: #9ca3af !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    cursor: pointer !important;
+
+    z-index: 10 !important;
+
+    box-shadow: none !important;
+}
+
+/* Prevent normal button hover styles */
+
+.password-wrapper .password-toggle:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important;
+
+    transform: translateY(-50%) !important;
+}
+
+/* SVG eye size */
+
+.password-wrapper .password-toggle svg {
+    width: 20px !important;
+    height: 20px !important;
+
+    display: block !important;
+
+    pointer-events: none !important;
+}
+

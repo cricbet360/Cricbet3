@@ -1,0 +1,89 @@
+.betslip{
+
+    width:320px;
+
+    background:#1b2234;
+
+    padding:25px;
+
+    border-left:1px solid #293448;
+
+}
+
+.betslip h3{
+
+    color:#00e676;
+
+    margin-bottom:20px;
+
+}
+
+#bets-container{
+
+    min-height:250px;
+
+}
+
+.stake-box{
+
+    margin-top:25px;
+
+}
+
+.stake-box input{
+
+    width:100%;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:#111827;
+
+    color:white;
+
+    margin-bottom:15px;
+
+}
+
+.stake-box button{
+
+    width:100%;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:#00d26a;
+
+    color:#111827;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+}
+
+.rupee-input {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.rupee-input span {
+    padding: 10px 12px;
+    font-weight: bold;
+}
+
+.rupee-input input {
+    flex: 1;
+    border: none;
+    padding: 10px;
+    outline: none;
+}

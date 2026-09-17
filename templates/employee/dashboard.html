@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Employee Dashboard - CrickBet</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/employee.css"
+    >
+
+</head>
+
+<body class="employee-body">
+
+<div class="employee-dashboard-page">
+
+    <main class="employee-dashboard-container">
+
+
+        <!-- HEADER -->
+
+        <header class="employee-dashboard-header">
+
+            <div class="employee-dashboard-title">
+
+                <div class="employee-dashboard-brand">
+                    <span class="employee-dashboard-brand-icon">
+                        🏏
+                    </span>
+
+                    CrickBet Employee Portal
+                </div>
+
+                <h1>
+                    Employee Dashboard
+                </h1>
+
+                <p>
+                    Manage customer deposits and withdrawals
+                </p>
+
+            </div>
+
+
+            <!-- EMPLOYEE PROFILE -->
+
+            <div class="employee-profile">
+
+                <div class="employee-profile-icon">
+                    👤
+                </div>
+
+                <div class="employee-profile-info">
+
+                    <span>
+                        EMPLOYEE ID
+                    </span>
+
+                    <strong>
+                        {{ employee.employee_id }}
+                    </strong>
+
+                </div>
+
+                <a
+                    href="/employee/logout"
+                    class="employee-dashboard-logout"
+                >
+                    Logout
+                </a>
+
+            </div>
+
+        </header>
+
+
+        <!-- STAT CARDS -->
+
+        <div class="employee-stats">
+
+            <div class="employee-stat">
+
+                <div class="employee-stat-icon deposit">
+                    +
+                </div>
+
+                <div class="employee-stat-text">
+
+                    <span>
+                        Deposits
+                    </span>
+
+                    <strong>
+                        Manage Deposits
+                    </strong>
+
+                    <small>
+                        Verify customer payments
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="employee-stat">
+
+                <!-- DEPOSITS -->
+
+                <div class="employee-stat">
+
+                    <div class="employee-stat-icon deposit">
+                        +
+                    </div>
+
+                    <div class="employee-stat-text">
+
+                        <span>
+                            Pending Deposits
+                        </span>
+
+                        <strong>
+                            {{ pending_deposits }}
+                        </strong>
+
+                        <small>
+                            Waiting for verification
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <!-- WITHDRAWALS -->
+
+                <div class="employee-stat">
+
+                    <div class="employee-stat-icon withdrawal">
+                        -
+                    </div>
+                     
+                    <div class="employee-stat-text">
+
+                        <span>
+                            Pending Withdrawals
+                        </span>
+
+                        <strong>
+                            {{ pending_withdrawals }}
+                        </strong>
+
+                        <small>
+                            Waiting to be processed
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+   
+
+        <!-- DEPOSITS -->
+
+        <section class="employee-dashboard-section">
+
+            <div class="employee-section-title">
+
+                <h2>
+                    💰 Deposits
+                </h2>
+
+                <p>
+                    Review customer deposit requests and verify payments.
+                </p>
+
+            </div>
+
+
+            <div class="employee-action-grid">
+
+                <a
+                    href="/employee/deposits"
+                    class="employee-action deposit"
+                >
+
+                    <div class="employee-action-icon">
+                        📥
+                    </div>
+
+                    <div class="employee-action-content">
+
+                        <h3>
+                            Pending Deposits
+                            <span class="employee-count-badge">
+                                {{ pending_deposits }}
+                            </span>
+                        </h3>
+
+                        <p>
+                            View and process deposits waiting
+                            for verification.
+                        </p>
+
+                    </div>
+
+                    <div class="employee-action-arrow">
+                        →
+                    </div>
+
+                </a>
+
+
+                <a
+                    href="/employee/deposits/done"
+                    class="employee-action completed"
+                >
+
+                    <div class="employee-action-icon">
+                        ✅
+                    </div>
+
+                    <div class="employee-action-content">
+
+                        <h3>
+                            Completed Deposits
+                            <span class="employee-count-badge completed">
+                                {{ completed_deposits }}
+                            </span>
+                        </h3>
+
+                        <p>
+                            View all successfully completed
+                            deposit requests.
+                        </p>
+
+                    </div>
+
+                    <div class="employee-action-arrow">
+                        →
+                    </div>
+
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- WITHDRAWALS -->
+
+        <section class="employee-dashboard-section">
+
+            <div class="employee-section-title">
+
+                <h2>
+                    🏦 Withdrawals
+                </h2>
+
+                <p>
+                    Review customer bank details and process withdrawals.
+                </p>
+
+            </div>
+
+
+            <div class="employee-action-grid">
+
+                <a
+                    href="/employee/withdrawals"
+                    class="employee-action withdrawal"
+                >
+
+                    <div class="employee-action-icon">
+                        📤
+                    </div>
+
+                    <div class="employee-action-content">
+
+                        <h3>
+                            Pending Withdrawals
+                            <span class="employee-count-badge withdrawal">
+                                {{ pending_withdrawals }}
+                            </span>
+                        </h3>
+
+                        <p>
+                            View withdrawal requests waiting
+                            to be processed.
+                        </p>
+
+                    </div>
+
+                    <div class="employee-action-arrow">
+                        →
+                    </div>
+
+                </a>
+
+
+                <a
+                    href="/employee/withdrawals/done"
+                    class="employee-action completed"
+                >
+
+                    <div class="employee-action-icon">
+                        ✅
+                    </div>
+
+                    <div class="employee-action-content">
+
+                        <h3>
+                            Completed Withdrawals
+                            <span class="employee-count-badge completed">
+                                {{ completed_withdrawals }}
+                            </span>
+                        </h3>
+
+                        <p>
+                            View all successfully completed
+                            withdrawals.
+                        </p>
+
+                    </div>
+
+                    <div class="employee-action-arrow">
+                        →
+                    </div>
+
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- SECURITY -->
+
+        <div class="employee-security">
+
+            <div class="employee-security-icon">
+                🔐
+            </div>
+
+            <div>
+
+                <h3>
+                    Employee Access
+                </h3>
+
+                <p>
+                    This portal is restricted to authorized CrickBet
+                    employees. Employee accounts can only process
+                    customer deposit and withdrawal requests.
+                </p>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

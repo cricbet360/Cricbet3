@@ -1,0 +1,437 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+    <!-- =================================================
+         ADMIN HEADER
+    ================================================== -->
+
+    <div style="
+        text-align: center;
+        margin-bottom: 30px;
+    ">
+
+        <h1 style="
+            margin-bottom: 8px;
+        ">
+            🏏 CrickBet Admin Panel
+        </h1>
+
+    </div>
+
+    <hr>
+
+
+    <!-- =================================================
+         ADMIN FEATURES
+    ================================================== -->
+
+    <div class="feature-grid">
+
+        <div class="feature-card">
+            <h3>👥 Users</h3>
+            <p>Manage Users</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>🏏 Sports</h3>
+            <p>Manage Sports</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>🏆 Matches</h3>
+            <p>Manage Matches</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>🎯 Markets</h3>
+            <p>Manage Markets</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>💰 Wallets</h3>
+            <p>Manage Wallets</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>📊 Reports</h3>
+            <p>Reports & Statistics</p>
+        </div>
+
+
+        <!-- DEPOSITS -->
+
+        <a
+            href="/admin/deposits"
+            class="feature-card"
+            style="
+                text-decoration: none;
+                color: inherit;
+                display: block;
+                cursor: pointer;
+            "
+        >
+
+            <h3>💰 Deposits</h3>
+
+            <p>
+                View all customer deposits
+            </p>
+
+            <p>
+                <strong>
+                    Pending: {{ pending_deposits }}
+                </strong>
+            </p>
+
+            <p>
+                Completed: {{ completed_deposits }}
+            </p>
+
+            <p>
+                <strong>
+                    View All Deposits →
+                </strong>
+            </p>
+
+        </a>
+
+
+        <!-- WITHDRAWALS -->
+
+        <a
+            href="/admin/withdrawals"
+            class="feature-card"
+            style="
+                text-decoration: none;
+                color: inherit;
+                display: block;
+                cursor: pointer;
+            "
+        >
+
+            <h3>🏦 Withdrawals</h3>
+
+            <p>
+                View all customer withdrawals
+            </p>
+
+            <p>
+                <strong>
+                    Pending: {{ pending_withdrawals }}
+                </strong>
+            </p>
+
+            <p>
+                Completed: {{ completed_withdrawals }}
+            </p>
+
+            <p>
+                <strong>
+                    View All Withdrawals →
+                </strong>
+            </p>
+
+        </a>
+
+    </div>
+
+
+    <hr>
+
+
+    <!-- =================================================
+         EMPLOYEE MANAGEMENT
+    ================================================== -->
+
+    <div class="employee-management">
+
+        <div style="
+            text-align: center;
+            margin-bottom: 25px;
+        ">
+
+            <h2>
+                👨‍💼 Employee Management
+            </h2>
+
+            <p>
+                Create and manage employees who will process
+                deposits and withdrawals.
+            </p>
+
+        </div>
+
+
+        <!-- CREATE EMPLOYEE -->
+
+        <div class="feature-card">
+
+            <h3>➕ Create Employee</h3>
+
+            <form
+                method="POST"
+                action="/admin/employees/create"
+            >
+
+                <div style="margin-bottom: 15px;">
+
+                    <label for="employee_id">
+                        Employee ID
+                    </label>
+
+                    <br>
+
+                    <input
+                        type="text"
+                        id="employee_id"
+                        name="employee_id"
+                        placeholder="EMP001"
+                        maxlength="50"
+                        required
+                        style="
+                            padding: 10px;
+                            width: 250px;
+                            margin-top: 5px;
+                        "
+                    >
+
+                </div>
+
+
+                <div style="margin-bottom: 15px;">
+
+                    <label for="employee_password">
+                        Password
+                    </label>
+
+                    <br>
+
+                    <input
+                        type="password"
+                        id="employee_password"
+                        name="password"
+                        placeholder="Enter password"
+                        minlength="6"
+                        required
+                        style="
+                            padding: 10px;
+                            width: 250px;
+                            margin-top: 5px;
+                        "
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    style="
+                        padding: 10px 18px;
+                        cursor: pointer;
+                    "
+                >
+                    Create Employee
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- EXISTING EMPLOYEES -->
+
+        <div
+            class="feature-card"
+            style="margin-top: 20px;"
+        >
+
+            <h3>📋 Existing Employees</h3>
+
+            {% if employees %}
+
+            <div style="overflow-x: auto;">
+
+                <table
+                    style="
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-top: 15px;
+                    "
+                >
+
+                    <thead>
+
+                        <tr>
+
+                            <th style="
+                                text-align: left;
+                                padding: 10px;
+                                border-bottom: 1px solid #ddd;
+                            ">
+                                ID
+                            </th>
+
+                            <th style="
+                                text-align: left;
+                                padding: 10px;
+                                border-bottom: 1px solid #ddd;
+                            ">
+                                Employee ID
+                            </th>
+
+                            <th style="
+                                text-align: left;
+                                padding: 10px;
+                                border-bottom: 1px solid #ddd;
+                            ">
+                                Status
+                            </th>
+
+                            <th style="
+                                text-align: left;
+                                padding: 10px;
+                                border-bottom: 1px solid #ddd;
+                            ">
+                                Created
+                            </th>
+
+                            <th style="
+                                text-align: left;
+                                padding: 10px;
+                                border-bottom: 1px solid #ddd;
+                            ">
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for employee in employees %}
+
+                        <tr>
+
+                            <td style="
+                                padding: 10px;
+                                border-bottom: 1px solid #eee;
+                            ">
+                                {{ employee.id }}
+                            </td>
+
+
+                            <td style="
+                                padding: 10px;
+                                border-bottom: 1px solid #eee;
+                            ">
+                                <strong>
+                                    {{ employee.employee_id }}
+                                </strong>
+                            </td>
+
+
+                            <td style="
+                                padding: 10px;
+                                border-bottom: 1px solid #eee;
+                            ">
+
+                                {% if employee.status == "Active" %}
+
+                                    🟢 Active
+
+                                {% else %}
+
+                                    🔴 Inactive
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td style="
+                                padding: 10px;
+                                border-bottom: 1px solid #eee;
+                            ">
+                                {{ employee.created_at or "-" }}
+                            </td>
+
+
+                            <td style="
+                                padding: 10px;
+                                border-bottom: 1px solid #eee;
+                            ">
+
+                                {% if employee.status == "Active" %}
+
+                                <form
+                                    method="POST"
+                                    action="/admin/employees/{{ employee.id }}/deactivate"
+                                    style="display: inline;"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        style="
+                                            padding: 7px 12px;
+                                            cursor: pointer;
+                                        "
+                                    >
+                                        Deactivate
+                                    </button>
+
+                                </form>
+
+                                {% else %}
+
+                                <form
+                                    method="POST"
+                                    action="/admin/employees/{{ employee.id }}/activate"
+                                    style="display: inline;"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        style="
+                                            padding: 7px 12px;
+                                            cursor: pointer;
+                                        "
+                                    >
+                                        Activate
+                                    </button>
+
+                                </form>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+                <p>
+                    No employees created yet.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,376 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>CricBet - Cricket</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/dashboard.css?v=32"
+    >
+
+    <script
+        src="/static/js/dashboard.js?v=32"
+        defer
+    ></script>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     TOP BAR
+===================================================== -->
+
+<header class="topbar">
+
+    <div class="brand">
+
+        <span class="brand-icon">🏏</span>
+
+        <span class="brand-text">
+            CRIC<span class="brand-accent">BET</span>
+        </span>
+
+    </div>
+
+
+    <div class="topbar-right">
+
+
+        <!-- BALANCE -->
+
+        <div class="balance">
+
+            <span class="balance-label">
+                Balance
+            </span>
+
+            <span
+                id="balance"
+                class="balance-value"
+            >
+                ₹0.00
+            </span>
+
+        </div>
+
+
+        <!-- DEPOSIT -->
+
+        <button
+            type="button"
+            id="depositBtn"
+            class="topbar-action deposit-action"
+        >
+            Deposit
+        </button>
+
+
+        <!-- WITHDRAW -->
+
+        <button
+            type="button"
+            id="withdrawBtn"
+            class="topbar-action withdraw-action"
+        >
+            Withdraw
+        </button>
+
+
+        <!-- PROFILE -->
+
+        <a
+            href="/profile"
+            class="profile-link"
+        >
+            Profile
+        </a>
+
+
+        <!-- LOGOUT -->
+
+        <a
+            href="/logout"
+            class="logout"
+        >
+            Logout
+        </a>
+
+    </div>
+
+</header>
+
+
+<!-- =====================================================
+     MAIN NAVIGATION
+===================================================== -->
+
+<nav class="main-mode-nav">
+
+    <button
+        type="button"
+        class="mode-tab"
+        onclick="window.location.href='/dashboard'"
+    >
+        HOME
+    </button>
+
+
+    <button
+        type="button"
+        class="mode-tab active"
+    >
+        CRICKET
+    </button>
+
+</nav>
+
+
+<!-- =====================================================
+     MAIN CONTENT
+===================================================== -->
+
+<main class="sportsbook-container">
+
+
+    <!-- CRICKET HEADER -->
+
+    <section class="sportsbook-header">
+
+        <div class="sport-title">
+
+            <div class="sport-icon">
+                🏏
+            </div>
+
+
+            <div>
+
+                <h2>
+                    Cricket
+                </h2>
+
+                <p>
+                    Live &amp; upcoming cricket matches
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="sport-filters">
+
+            <button
+                type="button"
+                class="sport-filter active"
+                data-filter="all"
+            >
+                All
+            </button>
+
+
+            <button
+                type="button"
+                class="sport-filter"
+                data-filter="live"
+            >
+                Live
+            </button>
+
+
+            <button
+                type="button"
+                class="sport-filter"
+                data-filter="upcoming"
+            >
+                Upcoming
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- MATCHES -->
+
+    <section class="matches-wrapper">
+
+        <div class="odds-header">
+
+            <div class="match-column">
+                Match
+            </div>
+
+
+            <div class="odds-column-header back-header">
+                BACK
+            </div>
+
+
+            <div class="odds-column-header lay-header">
+                LAY
+            </div>
+
+
+            <div class="odds-column-header draw-header">
+                DRAW
+            </div>
+
+        </div>
+
+
+        <div id="matches">
+
+            <div class="empty-state">
+
+                <div class="empty-state-icon">
+                    🏏
+                </div>
+
+
+                <div class="empty-state-title">
+                    Loading cricket matches...
+                </div>
+
+
+                <div class="empty-state-text">
+                    Fetching live cricket data.
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- =====================================================
+     BET SLIP
+===================================================== -->
+
+<div
+    id="betslip"
+    class="betslip"
+>
+
+    <div class="betslip-header">
+
+        <div>
+
+            <h2>
+                Bet Slip
+            </h2>
+
+            <span>
+                Cricket
+            </span>
+
+        </div>
+
+
+        <button
+            type="button"
+            id="betslipClose"
+            class="betslip-close"
+        >
+            ×
+        </button>
+
+    </div>
+
+
+    <div
+        id="betslipContent"
+        class="betslip-content"
+    >
+
+        <div class="betslip-empty">
+
+            <h3>
+                Your bet slip is empty
+            </h3>
+
+            <p>
+                Select odds from a match to add a bet.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="betslip-footer">
+
+        <div class="betslip-balance">
+
+            <span>
+                Balance
+            </span>
+
+            <strong
+                id="betslipBalance"
+                class="balance-value"
+            >
+                ₹0.00
+            </strong>
+
+        </div>
+
+
+        <button
+            type="button"
+            id="placeBetButton"
+            class="place-bet-button"
+            disabled
+        >
+            PLACE BET
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MOBILE BET SLIP
+===================================================== -->
+
+<button
+    type="button"
+    id="mobileBetslipButton"
+    class="mobile-betslip-button"
+>
+
+    <span>
+        BET SLIP
+    </span>
+
+
+    <span
+        id="betslipCount"
+        class="betslip-count"
+    >
+        0
+    </span>
+
+</button>
+
+
+</body>
+</html>
+

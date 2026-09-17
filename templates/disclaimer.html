@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card disclaimer-card">
+
+    <h2>Terms & Disclaimer</h2>
+
+    <p class="card-subtitle">
+        Please read and accept the following terms before continuing.
+    </p>
+
+    {% if message %}
+    <div class="alert">
+        {{ message }}
+    </div>
+    {% endif %}
+
+    <div class="disclaimer-content">
+
+        <h3>Responsible Use Notice</h3>
+
+        <p>
+            CrickBet may involve financial risk and is intended only for
+            users who are legally permitted to participate according to
+            applicable laws and regulations.
+        </p>
+
+        <p>
+            You acknowledge that participation may result in financial loss.
+            You should only use funds that you can afford to lose.
+        </p>
+
+        <p>
+            You are responsible for ensuring that your use of this platform
+            complies with the laws applicable in your location.
+        </p>
+
+        <p>
+            CrickBet reserves the right to modify its rules, policies,
+            account requirements and platform functionality.
+        </p>
+
+        <p>
+            Do not use this platform if participation is restricted or
+            prohibited in your jurisdiction.
+        </p>
+
+        <p>
+            This is a temporary disclaimer and will be replaced with the
+            final CrickBet Terms and Conditions and responsible gaming policy.
+        </p>
+
+    </div>
+
+    <form
+        method="POST"
+        action="/register/disclaimer"
+    >
+
+        <label class="checkbox-label">
+
+            <input
+                type="checkbox"
+                name="accept_terms"
+                value="yes"
+                required
+            >
+
+            <span>
+                I confirm that I have read and understood the above
+                disclaimer and agree to the Terms and Conditions.
+            </span>
+
+        </label>
+
+        <button type="submit">
+            Accept and Continue
+        </button>
+
+    </form>
+
+    <div class="form-footer">
+        <a href="/register">
+            Cancel Registration
+        </a>
+    </div>
+
+</div>
+
+<style>
+
+.disclaimer-card {
+    max-width: 650px;
+}
+
+.disclaimer-content {
+    margin: 20px 0;
+    padding: 18px;
+
+    background: #f8fafc;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 10px;
+
+    max-height: 350px;
+
+    overflow-y: auto;
+}
+
+.disclaimer-content h3 {
+    margin-top: 0;
+}
+
+.disclaimer-content p {
+    line-height: 1.6;
+    color: #475569;
+}
+
+.checkbox-label {
+    display: flex;
+
+    gap: 12px;
+
+    align-items: flex-start;
+
+    margin: 20px 0;
+
+    line-height: 1.5;
+
+    cursor: pointer;
+}
+
+.checkbox-label input {
+    width: auto;
+
+    margin-top: 4px;
+
+    transform: scale(1.2);
+}
+
+</style>
+
+{% endblock %}

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Profit & Loss - CrickBet</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f5f8;
+            color: #111827;
+        }
+
+        .topbar {
+            min-height: 64px;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #101827;
+            color: white;
+        }
+
+        .brand {
+            font-weight: 900;
+            font-size: 21px;
+        }
+
+        .topbar a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+
+        .page {
+            width: min(900px, 100%);
+            margin: auto;
+            padding: 25px 15px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 14px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 15px;
+        }
+
+        .value {
+            font-size: 30px;
+            font-weight: 900;
+        }
+
+        .profit {
+            color: #16a34a;
+        }
+
+        .loss {
+            color: #dc2626;
+        }
+
+        .muted {
+            color: #6b7280;
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="topbar">
+
+    <div class="brand">
+        🏏 CrickBet
+    </div>
+
+    <div>
+        <a href="/profile">Profile</a>
+        <a href="/dashboard">Dashboard</a>
+    </div>
+
+</header>
+
+
+<main class="page">
+
+    <div class="card">
+
+        <h1>Profit & Loss</h1>
+
+        <p class="muted">
+            Your betting performance
+        </p>
+
+        <div
+            class="value {% if profit_loss >= 0 %}profit{% else %}loss{% endif %}"
+        >
+            ₹{{ "%.2f"|format(profit_loss or 0) }}
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <p>
+            Total Bets:
+            <strong>{{ total_bets }}</strong>
+        </p>
+
+        <p>
+            Total Stake:
+            <strong>
+                ₹{{ "%.2f"|format(total_stake or 0) }}
+            </strong>
+        </p>
+
+        <p>
+            Total Returns:
+            <strong>
+                ₹{{ "%.2f"|format(total_returns or 0) }}
+            </strong>
+        </p>
+
+    </div>
+
+</main>
+
+</body>
+</html>

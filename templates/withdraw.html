@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Withdraw - CrickBet</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f5f8;
+            color: #111827;
+        }
+
+        .top {
+            background: #101827;
+            color: white;
+
+            padding: 18px 22px;
+
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .page {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 15px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 14px;
+
+            border: 1px solid #e5e7eb;
+        }
+
+        .balance {
+            margin: 18px 0;
+
+            padding: 15px;
+
+            border-radius: 10px;
+
+            background: #f0fdf4;
+            color: #166534;
+
+            font-size: 22px;
+            font-weight: 900;
+        }
+
+        .notice {
+            padding: 16px;
+
+            background: #fff7ed;
+            color: #9a3412;
+
+            border-radius: 10px;
+
+            line-height: 1.6;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 18px;
+
+            text-decoration: none;
+            color: #15803d;
+            font-weight: 800;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="top">
+
+    <strong>
+        🏏 CrickBet
+    </strong>
+
+    <span>
+        Withdraw
+    </span>
+
+</div>
+
+<main class="page">
+
+    <div class="card">
+
+        <h1>
+            Withdraw
+        </h1>
+
+        <div class="balance">
+
+            Available Balance:
+            ₹{{ "%.2f"|format(user.balance or 0) }}
+
+        </div>
+
+        <div class="notice">
+
+            Withdrawal requests are handled
+            manually by our authorized team.
+
+            <br><br>
+
+            Contact support with your withdrawal
+            details.
+
+            <br><br>
+
+            After verification, the balance team
+            will process the withdrawal.
+
+        </div>
+
+        <a
+            class="back"
+            href="/dashboard"
+        >
+            ← Back to Dashboard
+        </a>
+
+    </div>
+
+</main>
+
+</body>
+
+</html>

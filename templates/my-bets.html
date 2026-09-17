@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Bets - CrickBet</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f5f8;
+            color: #111827;
+        }
+
+        .topbar {
+            min-height: 64px;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #101827;
+            color: white;
+        }
+
+        .brand {
+            font-size: 21px;
+            font-weight: 900;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .top-actions a {
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .balance {
+            color: #22c55e;
+            font-weight: 900;
+        }
+
+        .page {
+            width: min(1050px, 100%);
+            margin: auto;
+            padding: 25px 18px 60px;
+        }
+
+        .header {
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .header p {
+            margin-top: 6px;
+            color: #6b7280;
+        }
+
+        .bet-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 14px;
+            box-shadow: 0 3px 12px rgba(15, 23, 42, .05);
+        }
+
+        .bet-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .bet-id {
+            font-weight: 900;
+            font-size: 18px;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            background: #fef3c7;
+            color: #92400e;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .bet-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .label {
+            color: #6b7280;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .value {
+            font-size: 17px;
+            font-weight: 800;
+        }
+
+        .empty {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 40px 20px;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        @media (max-width: 650px) {
+            .topbar {
+                padding: 0 12px;
+            }
+
+            .top-actions {
+                gap: 8px;
+            }
+
+            .bet-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="topbar">
+
+    <div class="brand">
+        🏏 CrickBet
+    </div>
+
+    <div class="top-actions">
+
+        <span class="balance">
+            ₹{{ "%.2f"|format(user.balance or 0) }}
+        </span>
+
+        <a href="/dashboard">
+            Dashboard
+        </a>
+
+        <a href="/logout">
+            Logout
+        </a>
+
+    </div>
+
+</header>
+
+
+<main class="page">
+
+    <a href="/profile" class="back">
+        ← Back to Profile
+    </a>
+
+    <div class="header">
+
+        <h1>My Bets</h1>
+
+        <p>
+            View your complete betting history.
+        </p>
+
+    </div>
+
+
+    {% if bets %}
+
+        {% for bet in bets %}
+
+        <div class="bet-card">
+
+            <div class="bet-top">
+
+                <div class="bet-id">
+                    Bet #{{ bet.id }}
+                </div>
+
+                <div class="status">
+                    {{ bet.status }}
+                </div>
+
+            </div>
+
+
+            <div class="bet-grid">
+
+                <div>
+                    <div class="label">
+                        Stake
+                    </div>
+
+                    <div class="value">
+                        ₹{{ "%.2f"|format(bet.stake or 0) }}
+                    </div>
+                </div>
+
+
+                <div>
+                    <div class="label">
+                        Total Odds
+                    </div>
+
+                    <div class="value">
+                        {{ "%.2f"|format(bet.total_odds or 0) }}
+                    </div>
+                </div>
+
+
+                <div>
+                    <div class="label">
+                        Potential Win
+                    </div>
+
+                    <div class="value">
+                        ₹{{ "%.2f"|format(bet.potential_win or 0) }}
+                    </div>
+                </div>
+
+
+                <div>
+                    <div class="label">
+                        Date
+                    </div>
+
+                    <div class="value">
+                        {{ bet.created_at.strftime("%d %b %Y %H:%M") if bet.created_at else "-" }}
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="empty">
+
+            <h3>No bets found</h3>
+
+            <p>
+                Your betting history will appear here.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Employee Login - CrickBet</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/employee.css"
+    >
+
+</head>
+
+<body class="employee-body">
+
+<div class="employee-login-page">
+
+    <div class="employee-login-wrapper">
+
+        <div class="employee-brand">
+            <span class="employee-brand-icon">🏏</span>
+            Crick<span>Bet</span>
+        </div>
+
+
+        <div class="employee-login-card">
+
+            <div class="employee-login-icon">
+                👤
+            </div>
+
+
+            <div class="employee-login-header">
+
+                <h1>Employee Portal</h1>
+
+                <p>
+                    Sign in to manage customer deposits
+                    and withdrawals.
+                </p>
+
+            </div>
+
+
+            {% if message %}
+
+                <div class="employee-login-error">
+                    {{ message }}
+                </div>
+
+            {% endif %}
+
+
+            <form
+                method="POST"
+                action="/employee/login"
+            >
+
+                <div class="employee-field">
+
+                    <label for="employee_id">
+                        Employee ID
+                    </label>
+
+                    <input
+                        type="text"
+                        id="employee_id"
+                        name="employee_id"
+                        placeholder="Enter your employee ID"
+                        autocomplete="username"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="employee-field">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="employee-login-submit"
+                >
+                    Sign In
+                </button>
+
+            </form>
+
+
+            <div class="employee-login-footer">
+
+                Authorized CrickBet employees only
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

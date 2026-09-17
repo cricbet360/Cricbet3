@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>CricBet</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/style.css?v=3"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/css/navbar.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/css/sidebar.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/css/cards.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/css/betslip.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/css/footer.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/css/responsive.css"
+    >
+
+</head>
+
+
+<body>
+
+
+{% if admin %}
+
+    {% include "partials/admin_navbar.html" %}
+
+{% elif user %}
+
+    {% include "partials/navbar.html" %}
+
+{% else %}
+
+    {% include "partials/guest_navbar.html" %}
+
+{% endif %}
+
+
+<div class="container">
+
+    {% block content %}
+    {% endblock %}
+
+</div>
+
+
+{% include "partials/footer.html" %}
+
+
+<script
+    src="{{ url_for('static', path='js/main.js') }}"
+></script>
+
+
+</body>
+
+</html>
+

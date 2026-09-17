@@ -1,0 +1,101 @@
+.match-card{
+
+    background:#1e293b;
+
+    padding:22px;
+
+    border-radius:12px;
+
+    margin-bottom:20px;
+
+}
+
+.match-top{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-bottom:18px;
+
+}
+
+.live-tag{
+
+    background:#ff3b3b;
+
+    color:white;
+
+    padding:4px 10px;
+
+    border-radius:20px;
+
+    font-size:12px;
+
+}
+
+.league{
+
+    color:#999;
+
+}
+
+.teams{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    font-size:22px;
+
+    margin:20px 0;
+
+}
+
+.score{
+
+    color:#00e676;
+
+    margin-bottom:20px;
+
+}
+
+.odds{
+
+    display:flex;
+
+    gap:15px;
+
+}
+
+.back-btn{
+
+    flex:1;
+
+    background:#7fd3ff;
+
+    border:none;
+
+    padding:15px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+}
+
+.lay-btn{
+
+    flex:1;
+
+    background:#ffb7cb;
+
+    border:none;
+
+    padding:15px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+}

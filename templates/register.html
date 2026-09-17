@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card register-card">
+
+    <h2>Create Your Account</h2>
+
+    <p class="card-subtitle">
+        Join CrickBet by verifying your email and mobile number.
+    </p>
+
+
+    {% if message %}
+
+    <div class="alert">
+        {{ message }}
+    </div>
+
+    {% endif %}
+
+
+    <form
+        method="POST"
+        action="/register/send-otp"
+    >
+
+        <label>
+            Username
+        </label>
+
+        <input
+            type="text"
+            name="username"
+            placeholder="Choose a username"
+            minlength="3"
+            required
+        >
+
+
+        <label>
+            Email Address
+        </label>
+
+        <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+        >
+
+
+        <label>
+            Mobile Number
+        </label>
+
+        <input
+            type="tel"
+            name="phone"
+            placeholder="10-digit mobile number"
+            pattern="[6-9][0-9]{9}"
+            maxlength="10"
+            required
+        >
+
+
+        <button type="submit">
+
+            Send Verification OTP
+
+        </button>
+
+    </form>
+
+
+    <div class="form-footer">
+
+        Already have an account?
+
+        <a href="/login">
+            Login
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

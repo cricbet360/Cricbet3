@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Account Statement - CrickBet</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f5f8;
+            color: #111827;
+        }
+
+        .topbar {
+            min-height: 64px;
+            padding: 0 24px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            background: #101827;
+            color: white;
+        }
+
+        .brand {
+            font-size: 21px;
+            font-weight: 900;
+        }
+
+        .topbar a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+
+        .page {
+            width: min(1000px, 100%);
+            margin: auto;
+            padding: 25px 15px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 14px;
+            border: 1px solid #e5e7eb;
+            padding: 20px;
+        }
+
+        .transaction {
+            padding: 15px 0;
+            border-bottom: 1px solid #e5e7eb;
+
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .type {
+            font-weight: 800;
+        }
+
+        .credit {
+            color: #16a34a;
+        }
+
+        .debit {
+            color: #dc2626;
+        }
+
+        .muted {
+            color: #6b7280;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<header class="topbar">
+
+    <div class="brand">
+        🏏 CrickBet
+    </div>
+
+    <div>
+
+        <a href="/profile">
+            Profile
+        </a>
+
+        <a href="/dashboard">
+            Dashboard
+        </a>
+
+    </div>
+
+</header>
+
+
+<main class="page">
+
+    <div class="card">
+
+        <h1>
+            Account Statement
+        </h1>
+
+        {% if transactions %}
+
+            {% for transaction in transactions %}
+
+            <div class="transaction">
+
+                <div>
+
+                    <div class="type">
+                        {{ transaction.transaction_type }}
+                    </div>
+
+                    <div class="muted">
+                        {{ transaction.created_at }}
+                    </div>
+
+                </div>
+
+                <strong
+                    class="{% if transaction.amount >= 0 %}credit{% else %}debit{% endif %}"
+                >
+                    ₹{{ "%.2f"|format(transaction.amount or 0) }}
+                </strong>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p>
+                No transactions found.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</main>
+
+</body>
+
+</html>

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card">
+
+    <h2>Verify OTP</h2>
+
+    <p class="card-subtitle">
+        Enter the 6-digit OTP sent to your registered phone number.
+    </p>
+
+    {% if message %}
+    <div class="alert">
+        {{ message }}
+    </div>
+    {% endif %}
+
+    <form method="POST" action="/verify-reset-otp">
+
+        <input
+            type="text"
+            name="otp"
+            placeholder="Enter 6-digit OTP"
+            maxlength="6"
+            inputmode="numeric"
+            pattern="[0-9]{6}"
+            required
+        >
+
+        <button type="submit">
+            Verify OTP
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

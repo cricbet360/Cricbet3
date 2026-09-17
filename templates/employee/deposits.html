@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+```
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Pending Deposits - CrickBet Employee</title>
+
+<link
+    rel="stylesheet"
+    href="/static/css/employee.css"
+>
+```
+
+</head>
+
+<body class="employee-body">
+
+<div class="employee-dashboard-page">
+
+```
+<main class="employee-dashboard-container">
+
+    <!-- HEADER -->
+
+    <header class="employee-dashboard-header">
+
+        <div class="employee-dashboard-title">
+
+            <div class="employee-dashboard-brand">
+                <span class="employee-dashboard-brand-icon">
+                    🏏
+                </span>
+
+                CrickBet Employee Portal
+            </div>
+
+            <h1>
+                Pending Deposits
+            </h1>
+
+            <p>
+                Review and verify customer deposit requests.
+            </p>
+
+        </div>
+
+        <div class="employee-profile">
+
+            <div class="employee-profile-icon">
+                👤
+            </div>
+
+            <div class="employee-profile-info">
+
+                <span>
+                    EMPLOYEE ID
+                </span>
+
+                <strong>
+                    {{ employee.employee_id }}
+                </strong>
+
+            </div>
+
+            <a
+                href="/employee/dashboard"
+                class="employee-dashboard-logout"
+            >
+                Dashboard
+            </a>
+
+            <a
+                href="/employee/logout"
+                class="employee-dashboard-logout"
+            >
+                Logout
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- PAGE CARD -->
+
+    <section class="employee-dashboard-section">
+
+        <div class="employee-section-title">
+
+            <div>
+                <h2>
+                    💰 Deposit Requests
+                </h2>
+
+                <p>
+                    These deposits are waiting for payment verification.
+                </p>
+            </div>
+
+            <div class="employee-count-badge">
+                {{ deposits|length }} Pending
+            </div>
+
+        </div>
+
+
+        {% if deposits %}
+
+        <div class="employee-table-wrapper">
+
+            <table class="employee-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            User
+                        </th>
+
+                        <th>
+                            Amount
+                        </th>
+
+                        <th>
+                            UTR
+                        </th>
+
+                        <th>
+                            Payment Screenshot
+                        </th>
+
+                        <th>
+                            Date / Time
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% for deposit in deposits %}
+
+                    <tr>
+
+                        <!-- USER -->
+
+                        <td>
+
+                            <div class="employee-user-cell">
+
+                                <strong>
+                                    {{ deposit.user.username }}
+                                </strong>
+
+                                <small>
+                                    {{ deposit.user.email }}
+                                </small>
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- AMOUNT -->
+
+                        <td>
+
+                            <strong class="employee-amount">
+                                ₹{{ "%.2f"|format(deposit.amount) }}
+                            </strong>
+
+                        </td>
+
+
+                        <!-- UTR -->
+
+                        <td>
+
+                            <span class="employee-utr">
+                                {{ deposit.utr_number }}
+                            </span>
+
+                        </td>
+
+
+                        <!-- SCREENSHOT -->
+
+                        <td>
+
+                            <a
+                                href="/{{ deposit.payment_screenshot }}"
+                                target="_blank"
+                                class="employee-screenshot-button"
+                            >
+                                🖼 View Screenshot
+                            </a>
+
+                        </td>
+
+
+                        <!-- DATE -->
+
+                        <td>
+
+                            <span class="employee-date">
+
+                                {{ deposit.created_at.strftime("%d %b %Y") }}
+
+                                <br>
+
+                                <small>
+                                    {{ deposit.created_at.strftime("%I:%M %p") }}
+                                </small>
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- STATUS -->
+
+                        <td>
+
+                            <span class="employee-status pending">
+                                {{ deposit.status }}
+                            </span>
+
+                        </td>
+
+
+                        <!-- ACTION -->
+
+                        <td>
+
+                            <form
+                                method="POST"
+                                action="/employee/deposits/{{ deposit.id }}/done"
+                                onsubmit="return confirm('Are you sure you want to approve this deposit? The amount will be added to the user balance.');"
+                            >
+
+                                <button
+                                    type="submit"
+                                    class="employee-done-button"
+                                >
+                                    ✓ DONE
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <!-- EMPTY STATE -->
+
+        <div class="employee-empty-state">
+
+            <div class="employee-empty-icon">
+                ✓
+            </div>
+
+            <h3>
+                No Pending Deposits
+            </h3>
+
+            <p>
+                There are currently no deposit requests waiting
+                for verification.
+            </p>
+
+            <a
+                href="/employee/dashboard"
+                class="employee-dashboard-logout"
+            >
+                Back to Dashboard
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- SECURITY NOTICE -->
+
+    <div class="employee-security">
+
+        <div class="employee-security-icon">
+            🔐
+        </div>
+
+        <div>
+
+            <h3>
+                Payment Verification
+            </h3>
+
+            <p>
+                Verify the payment screenshot and UTR number before
+                approving a deposit. Once approved, the deposit amount
+                will be credited to the customer's balance.
+            </p>
+
+        </div>
+
+    </div>
+
+</main>
+```
+
+</div>
+
+</body>
+
+</html>
