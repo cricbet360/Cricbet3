@@ -239,3 +239,5 @@ app.include_router(
 app.include_router(
     cricket_api_router
 )
+
+app.include_router(bets_router)
