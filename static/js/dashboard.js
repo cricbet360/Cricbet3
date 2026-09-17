@@ -118,21 +118,129 @@ function getSelectionId(match, index) {
 }
 
 
-function isLive(match) {
-
-    const value =
-        match?.in_play ??
-        match?.inPlay;
+function getEventTime(match) {
 
     return (
-        value === true ||
-        value === 1 ||
-        value === "1" ||
-        value === "true" ||
-        value === "True"
+        match?.event_time ??
+        match?.eventTime ??
+        match?.start_time ??
+        match?.startTime ??
+        ""
     );
 }
 
+
+/* =========================================================
+   MATCH STATUS
+========================================================= */
+
+/*
+ * ProExch may return in_play=false even when the scheduled
+ * event time has already passed.
+ *
+ * Therefore status is determined using BOTH:
+ *
+ * 1. in_play / inPlay
+ * 2. eventTime
+ */
+
+function getMatchStatus(match) {
+
+    const liveValue =
+        match?.in_play ??
+        match?.inPlay;
+
+    const explicitlyLive =
+        liveValue === true ||
+        liveValue === 1 ||
+        liveValue === "1" ||
+        liveValue === "true" ||
+        liveValue === "True";
+
+    if (explicitlyLive) {
+
+        return {
+            type: "live",
+            label: "LIVE"
+        };
+    }
+
+    const eventTime =
+        getEventTime(match);
+
+    if (!eventTime) {
+
+        return {
+            type: "upcoming",
+            label: "UPCOMING"
+        };
+    }
+
+    const timestamp =
+        new Date(eventTime).getTime();
+
+    if (
+        Number.isNaN(timestamp)
+    ) {
+
+        return {
+            type: "upcoming",
+            label: "UPCOMING"
+        };
+    }
+
+    const now =
+        Date.now();
+
+    /*
+     * Give a small 10-minute window around the
+     * scheduled start time where the match can
+     * still be considered live/started.
+     */
+
+    if (
+        timestamp <= now &&
+        timestamp >= now - (10 * 60 * 1000)
+    ) {
+
+        return {
+            type: "live",
+            label: "LIVE"
+        };
+    }
+
+    /*
+     * Older events should not be called UPCOMING.
+     *
+     * They may be finished or awaiting result.
+     */
+
+    if (
+        timestamp < now
+    ) {
+
+        return {
+            type: "started",
+            label: "STARTED"
+        };
+    }
+
+    return {
+        type: "upcoming",
+        label: "UPCOMING"
+    };
+}
+
+
+function isLive(match) {
+
+    return getMatchStatus(match).type === "live";
+}
+
+
+/* =========================================================
+   DATE / TIME
+========================================================= */
 
 function formatDate(value) {
 
@@ -140,7 +248,8 @@ function formatDate(value) {
         return "";
     }
 
-    const date = new Date(value);
+    const date =
+        new Date(value);
 
     if (
         Number.isNaN(
@@ -154,10 +263,59 @@ function formatDate(value) {
         "en-IN",
         {
             day: "2-digit",
-            month: "2-digit",
+            month: "short",
             year: "numeric",
             hour: "2-digit",
             minute: "2-digit"
+        }
+    );
+}
+
+
+/*
+ * Sort matches chronologically.
+ *
+ * Earliest match first.
+ * Matches without a valid time go to the bottom.
+ */
+
+function sortMatchesByTime(matches) {
+
+    return [...matches].sort(
+        (a, b) => {
+
+            const aTime =
+                new Date(
+                    getEventTime(a)
+                ).getTime();
+
+            const bTime =
+                new Date(
+                    getEventTime(b)
+                ).getTime();
+
+            const aValid =
+                Number.isFinite(aTime);
+
+            const bValid =
+                Number.isFinite(bTime);
+
+            if (
+                !aValid &&
+                !bValid
+            ) {
+                return 0;
+            }
+
+            if (!aValid) {
+                return 1;
+            }
+
+            if (!bValid) {
+                return -1;
+            }
+
+            return aTime - bTime;
         }
     );
 }
@@ -201,7 +359,7 @@ function openWithdrawWhatsApp() {
 
 
 /* =========================================================
-   ODDS RESPONSE HELPERS
+   ODDS RESPONSE
 ========================================================= */
 
 function getOddsRoot(payload) {
@@ -249,49 +407,21 @@ function getMatchOddsMarkets(payload) {
     }
 
     if (
-        Array.isArray(
-            root.match_odds
-        )
+        Array.isArray(root.match_odds)
     ) {
         return root.match_odds;
     }
 
     if (
-        Array.isArray(
-            root.matchOdds
-        )
+        Array.isArray(root.matchOdds)
     ) {
         return root.matchOdds;
     }
 
     if (
-        Array.isArray(
-            root.MATCH_ODDS
-        )
+        Array.isArray(root.MATCH_ODDS)
     ) {
         return root.MATCH_ODDS;
-    }
-
-    for (
-        const key of Object.keys(root)
-    ) {
-
-        const lower =
-            key.toLowerCase();
-
-        if (
-            lower === "matchodds" ||
-            lower === "match_odds"
-        ) {
-
-            if (
-                Array.isArray(
-                    root[key]
-                )
-            ) {
-                return root[key];
-            }
-        }
     }
 
     return [];
@@ -299,7 +429,7 @@ function getMatchOddsMarkets(payload) {
 
 
 /* =========================================================
-   RUNNER DETECTION
+   RUNNERS
 ========================================================= */
 
 function isProExchRunner(item) {
@@ -339,9 +469,7 @@ function findRunners(value) {
 
         if (
             value.length &&
-            value.some(
-                isProExchRunner
-            )
+            value.some(isProExchRunner)
         ) {
 
             return value.filter(
@@ -375,9 +503,7 @@ function findRunners(value) {
     }
 
     if (
-        Array.isArray(
-            value.oddDatas
-        )
+        Array.isArray(value.oddDatas)
     ) {
 
         const runners =
@@ -431,10 +557,6 @@ function findRunners(value) {
 }
 
 
-/* =========================================================
-   RUNNER FIELDS
-========================================================= */
-
 function getRunnerSelectionId(item) {
 
     return (
@@ -487,7 +609,6 @@ function extractPrice(value) {
     if (
         typeof value === "string"
     ) {
-
         return toNumber(value);
     }
 
@@ -519,14 +640,10 @@ function getBackPrice(item) {
         item?.back_odds,
         item?.backRate,
         item?.back_rate,
-        item?.backOdd,
-        item?.back_odd,
 
         item?.b1,
         item?.b2,
-        item?.b3,
-
-        item?.back1
+        item?.b3
     ];
 
     for (
@@ -559,14 +676,10 @@ function getLayPrice(item) {
         item?.lay_odds,
         item?.layRate,
         item?.lay_rate,
-        item?.layOdd,
-        item?.lay_odd,
 
         item?.l1,
         item?.l2,
-        item?.l3,
-
-        item?.lay1
+        item?.l3
     ];
 
     for (
@@ -613,10 +726,6 @@ function getLaySize(item) {
 }
 
 
-/* =========================================================
-   NORMALIZE RUNNERS
-========================================================= */
-
 function normalizeRunners(runners) {
 
     if (
@@ -660,10 +769,6 @@ function normalizeRunners(runners) {
 }
 
 
-/* =========================================================
-   EMPTY ODDS
-========================================================= */
-
 function emptyOdds() {
 
     return {
@@ -692,24 +797,17 @@ function emptyOdds() {
 }
 
 
-/* =========================================================
-   NORMALIZE MATCH ODDS
-========================================================= */
-
 function normalizeMatchOdds(
     match,
     payload
 ) {
 
     const markets =
-        getMatchOddsMarkets(
-            payload
-        );
+        getMatchOddsMarkets(payload);
 
     if (
         !markets.length
     ) {
-
         return emptyOdds();
     }
 
@@ -727,7 +825,6 @@ function normalizeMatchOdds(
         ) {
 
             runners = found;
-
             break;
         }
     }
@@ -735,31 +832,17 @@ function normalizeMatchOdds(
     if (
         !runners.length
     ) {
-
         return emptyOdds();
     }
 
     const normalized =
-        normalizeRunners(
-            runners
-        );
+        normalizeRunners(runners);
 
     const selectionIds = [
 
-        getSelectionId(
-            match,
-            1
-        ),
-
-        getSelectionId(
-            match,
-            2
-        ),
-
-        getSelectionId(
-            match,
-            3
-        )
+        getSelectionId(match, 1),
+        getSelectionId(match, 2),
+        getSelectionId(match, 3)
     ];
 
     const result =
@@ -795,17 +878,10 @@ function normalizeMatchOdds(
                     slots[index]
                 ] = {
 
-                    back:
-                        runner.back,
-
-                    lay:
-                        runner.lay,
-
-                    backSize:
-                        runner.backSize,
-
-                    laySize:
-                        runner.laySize
+                    back: runner.back,
+                    lay: runner.lay,
+                    backSize: runner.backSize,
+                    laySize: runner.laySize
                 };
             }
         }
@@ -814,10 +890,7 @@ function normalizeMatchOdds(
     normalized
         .slice(0, 3)
         .forEach(
-            (
-                runner,
-                index
-            ) => {
+            (runner, index) => {
 
                 const slot =
                     slots[index];
@@ -829,17 +902,10 @@ function normalizeMatchOdds(
 
                     result[slot] = {
 
-                        back:
-                            runner.back,
-
-                        lay:
-                            runner.lay,
-
-                        backSize:
-                            runner.backSize,
-
-                        laySize:
-                            runner.laySize
+                        back: runner.back,
+                        lay: runner.lay,
+                        backSize: runner.backSize,
+                        laySize: runner.laySize
                     };
                 }
             }
@@ -850,7 +916,7 @@ function normalizeMatchOdds(
 
 
 /* =========================================================
-   CREATE ODDS BUTTON
+   ODDS BUTTON
 ========================================================= */
 
 function createOddsButton({
@@ -896,7 +962,7 @@ function createOddsButton({
 
 
 /* =========================================================
-   CREATE MATCH ROW
+   MATCH ROW
 ========================================================= */
 
 function createMatchRow(match) {
@@ -916,9 +982,7 @@ function createMatchRow(match) {
         "Cricket Match";
 
     const eventTime =
-        match.event_time ??
-        match.eventTime ??
-        "";
+        getEventTime(match);
 
     const team1 =
         match.team1 ??
@@ -935,6 +999,9 @@ function createMatchRow(match) {
         match.runnerName3 ??
         "";
 
+    const status =
+        getMatchStatus(match);
+
     const odds =
         oddsCache.has(gameId)
             ? normalizeMatchOdds(
@@ -942,6 +1009,13 @@ function createMatchRow(match) {
                 oddsCache.get(gameId)
             )
             : emptyOdds();
+
+    const statusClass =
+        status.type === "live"
+            ? "live-status"
+            : status.type === "started"
+                ? "started-status"
+                : "upcoming-status";
 
     return `
         <div
@@ -956,19 +1030,16 @@ function createMatchRow(match) {
                 <div class="match-status-line">
 
                     ${
-                        isLive(match)
+                        status.type === "live"
                             ? `
                                 <span class="live-dot"></span>
-                                <span class="match-status live-status">
-                                    LIVE
-                                </span>
                             `
-                            : `
-                                <span class="match-status upcoming-status">
-                                    UPCOMING
-                                </span>
-                            `
+                            : ""
                     }
+
+                    <span class="match-status ${statusClass}">
+                        ${escapeHtml(status.label)}
+                    </span>
 
                     <span class="match-time">
                         ${escapeHtml(
@@ -978,9 +1049,11 @@ function createMatchRow(match) {
 
                 </div>
 
+
                 <div class="match-name">
                     ${escapeHtml(eventName)}
                 </div>
+
 
                 <div class="team-names">
 
@@ -1004,11 +1077,13 @@ function createMatchRow(match) {
 
                 </div>
 
+
                 <div class="match-league">
                     Cricket
                 </div>
 
             </div>
+
 
             ${createOddsButton({
                 gameId,
@@ -1026,6 +1101,7 @@ function createMatchRow(match) {
                     "odds-team-1"
             })}
 
+
             ${createOddsButton({
                 gameId,
                 eventId,
@@ -1041,6 +1117,7 @@ function createMatchRow(match) {
                 className:
                     "odds-team-2"
             })}
+
 
             ${
                 team3
@@ -1062,6 +1139,7 @@ function createMatchRow(match) {
                     })
                     : ""
             }
+
 
             <div class="match-action">
 
@@ -1093,27 +1171,6 @@ async function loadMatches() {
 
     if (!container) {
         return;
-    }
-
-    if (!allMatches.length) {
-
-        container.innerHTML = `
-            <div class="empty-state">
-
-                <div class="empty-state-icon">
-                    🏏
-                </div>
-
-                <div class="empty-state-title">
-                    Loading cricket matches...
-                </div>
-
-                <div class="empty-state-text">
-                    Fetching live cricket data.
-                </div>
-
-            </div>
-        `;
     }
 
     try {
@@ -1156,32 +1213,24 @@ async function loadMatches() {
         }
 
         let matches =
-            payload.data;
+            Array.isArray(payload.data)
+                ? payload.data
+                : Array.isArray(payload.matches)
+                    ? payload.matches
+                    : [];
 
-        if (
-            !Array.isArray(matches)
-        ) {
-
-            if (
-                Array.isArray(
-                    payload.matches
-                )
-            ) {
-
-                matches =
-                    payload.matches;
-
-            } else {
-
-                matches = [];
-            }
-        }
+        /*
+         * IMPORTANT:
+         *
+         * Always sort the complete API response
+         * by event time before displaying it.
+         */
 
         allMatches =
-            matches;
+            sortMatchesByTime(matches);
 
         console.log(
-            "[CricBet] Matches:",
+            "[CricBet] Sorted matches:",
             allMatches
         );
 
@@ -1268,6 +1317,7 @@ async function loadOddsForMatch(match) {
         );
 
         if (eventId) {
+
             params.set(
                 "eventId",
                 eventId
@@ -1275,6 +1325,7 @@ async function loadOddsForMatch(match) {
         }
 
         if (marketId) {
+
             params.set(
                 "marketId",
                 marketId
@@ -1323,9 +1374,7 @@ async function loadOddsForMatch(match) {
             payload
         );
 
-        updateMatchOdds(
-            match
-        );
+        updateMatchOdds(match);
 
     } catch (error) {
 
@@ -1344,15 +1393,9 @@ async function loadOddsForMatch(match) {
 }
 
 
-/* =========================================================
-   LOAD ALL ODDS
-========================================================= */
-
 async function loadAllOdds() {
 
-    if (
-        !allMatches.length
-    ) {
+    if (!allMatches.length) {
         return;
     }
 
@@ -1380,7 +1423,7 @@ async function loadAllOdds() {
 
 
 /* =========================================================
-   UPDATE MATCH ODDS
+   UPDATE ODDS
 ========================================================= */
 
 function updateMatchOdds(match) {
@@ -1455,7 +1498,6 @@ function updateOddsButton(
     ) {
 
         button.disabled = true;
-
         button.dataset.price = "";
 
         if (span) {
@@ -1496,8 +1538,7 @@ function setFilter(filter) {
 
                 button.classList.toggle(
                     "active",
-                    button.dataset.filter ===
-                        filter
+                    button.dataset.filter === filter
                 );
             }
         );
@@ -1526,7 +1567,9 @@ function renderMatches() {
 
         matches =
             matches.filter(
-                isLive
+                match =>
+                    getMatchStatus(match).type ===
+                    "live"
             );
     }
 
@@ -1537,9 +1580,17 @@ function renderMatches() {
         matches =
             matches.filter(
                 match =>
-                    !isLive(match)
+                    getMatchStatus(match).type ===
+                    "upcoming"
             );
     }
+
+    /*
+     * Keep chronological order even after filtering.
+     */
+
+    matches =
+        sortMatchesByTime(matches);
 
     if (!matches.length) {
 
@@ -1610,21 +1661,14 @@ async function loadBalance() {
             return;
         }
 
-        const balance =
-            Number(
-                data.balance
-            );
-
         const formatted =
-            Number.isFinite(balance)
-                ? balance.toLocaleString(
-                    "en-IN",
-                    {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }
-                )
-                : "0.00";
+            Number(data.balance).toLocaleString(
+                "en-IN",
+                {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }
+            );
 
         const balanceElement =
             document.getElementById(
@@ -1659,7 +1703,7 @@ async function loadBalance() {
 
 
 /* =========================================================
-   BETS
+   MY BETS
 ========================================================= */
 
 async function loadMyBets() {
@@ -1707,11 +1751,6 @@ async function loadMyBets() {
                 ? payload.bets
                 : [];
 
-        console.log(
-            "[CricBet] My Bets:",
-            userBets
-        );
-
         renderBetslip();
 
     } catch (error) {
@@ -1729,7 +1768,7 @@ async function loadMyBets() {
 
 
 /* =========================================================
-   BETSLIP RENDER
+   BETSLIP
 ========================================================= */
 
 function renderBetslip() {
@@ -1744,11 +1783,6 @@ function renderBetslip() {
             "betslipCount"
         );
 
-    const placeButton =
-        document.getElementById(
-            "placeBetButton"
-        );
-
     if (!content) {
         return;
     }
@@ -1759,15 +1793,14 @@ function renderBetslip() {
             String(userBets.length);
     }
 
-    /*
-     * Bets already placed in the database
-     * are displayed here.
-     */
-
     if (!userBets.length) {
 
         content.innerHTML = `
             <div class="betslip-empty">
+
+                <div class="betslip-empty-icon">
+                    🎟️
+                </div>
 
                 <h3>
                     Your bet slip is empty
@@ -1780,19 +1813,33 @@ function renderBetslip() {
             </div>
         `;
 
-        if (placeButton) {
-            placeButton.disabled = true;
-        }
-
         return;
     }
 
-    if (placeButton) {
-        placeButton.disabled = true;
-    }
+    /*
+     * Newest bet first.
+     */
+
+    const sortedBets =
+        [...userBets].sort(
+            (a, b) => {
+
+                const aTime =
+                    new Date(
+                        a.created_at || 0
+                    ).getTime();
+
+                const bTime =
+                    new Date(
+                        b.created_at || 0
+                    ).getTime();
+
+                return bTime - aTime;
+            }
+        );
 
     content.innerHTML =
-        userBets
+        sortedBets
             .slice(0, 10)
             .map(
                 renderPlacedBet
@@ -1813,36 +1860,61 @@ function renderPlacedBet(bet) {
 
     const side =
         String(
-            selection?.side ||
-            ""
+            selection?.side || "-"
         ).toUpperCase();
 
     const status =
         String(
-            bet.status ||
-            "pending"
+            bet.status || "pending"
         );
+
+    const statusClass =
+        status.toLowerCase();
 
     const statusText =
         status.charAt(0).toUpperCase() +
         status.slice(1);
 
-    const statusClass =
-        status.toLowerCase();
+    const odds =
+        Number(bet.total_odds);
+
+    const stake =
+        Number(bet.stake);
+
+    const potentialWin =
+        Number(bet.potential_win);
 
     return `
-        <div class="betslip-bet-card">
+        <article class="betslip-bet-card">
 
-            <div class="betslip-bet-top">
+            <div class="betslip-bet-header">
 
-                <strong>
-                    ${
-                        escapeHtml(
-                            selection?.runner_name ||
-                            "Selection"
-                        )
-                    }
-                </strong>
+                <div class="betslip-bet-title">
+
+                    <span class="betslip-sport-icon">
+                        🏏
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            ${escapeHtml(
+                                selection?.runner_name ||
+                                "Selection"
+                            )}
+                        </strong>
+
+                        <small>
+                            ${escapeHtml(
+                                selection?.market_name ||
+                                "Match Odds"
+                            )}
+                        </small>
+
+                    </div>
+
+                </div>
+
 
                 <span
                     class="betslip-status ${escapeHtml(statusClass)}"
@@ -1853,89 +1925,99 @@ function renderPlacedBet(bet) {
             </div>
 
 
-            <div class="betslip-bet-match">
+            <div class="betslip-match-name">
 
-                ${
-                    escapeHtml(
-                        selection?.event_name ||
-                        "Cricket Match"
-                    )
-                }
+                ${escapeHtml(
+                    selection?.event_name ||
+                    "Cricket Match"
+                )}
 
             </div>
 
 
-            <div class="betslip-bet-row">
+            <div class="betslip-details-grid">
 
-                <span>
-                    Type
-                </span>
+                <div class="betslip-detail">
 
-                <strong>
-                    ${escapeHtml(side || "-")}
-                </strong>
+                    <span>
+                        SIDE
+                    </span>
+
+                    <strong
+                        class="${side === "BACK"
+                            ? "bet-back"
+                            : "bet-lay"}"
+                    >
+                        ${escapeHtml(side)}
+                    </strong>
+
+                </div>
+
+
+                <div class="betslip-detail">
+
+                    <span>
+                        ODDS
+                    </span>
+
+                    <strong>
+                        ${
+                            Number.isFinite(odds)
+                                ? odds.toFixed(2)
+                                : "-"
+                        }
+                    </strong>
+
+                </div>
+
+
+                <div class="betslip-detail">
+
+                    <span>
+                        STAKE
+                    </span>
+
+                    <strong>
+                        ${money(stake)}
+                    </strong>
+
+                </div>
+
+
+                <div class="betslip-detail">
+
+                    <span>
+                        POTENTIAL WIN
+                    </span>
+
+                    <strong>
+                        ${money(potentialWin)}
+                    </strong>
+
+                </div>
 
             </div>
 
 
-            <div class="betslip-bet-row">
+            <div class="betslip-bet-footer">
 
                 <span>
-                    Odds
+                    Bet #${escapeHtml(
+                        bet.id
+                    )}
                 </span>
 
-                <strong>
-                    ${
-                        Number.isFinite(
-                            Number(bet.total_odds)
+                <span>
+                    ${escapeHtml(
+                        formatDate(
+                            bet.created_at
                         )
-                            ? Number(
-                                bet.total_odds
-                            ).toFixed(2)
-                            : "-"
-                    }
-                </strong>
-
-            </div>
-
-
-            <div class="betslip-bet-row">
-
-                <span>
-                    Stake
+                    )}
                 </span>
 
-                <strong>
-                    ${money(bet.stake)}
-                </strong>
-
             </div>
 
-
-            <div class="betslip-bet-row">
-
-                <span>
-                    Potential Win
-                </span>
-
-                <strong>
-                    ${money(bet.potential_win)}
-                </strong>
-
-            </div>
-
-
-            <div class="betslip-bet-time">
-
-                ${
-                    formatDate(
-                        bet.created_at
-                    )
-                }
-
-            </div>
-
-        </div>
+        </article>
     `;
 }
 
@@ -1954,6 +2036,10 @@ function renderBetslipError(message) {
     content.innerHTML = `
         <div class="betslip-empty">
 
+            <div class="betslip-empty-icon">
+                ⚠️
+            </div>
+
             <h3>
                 Unable to load bets
             </h3>
@@ -1971,7 +2057,7 @@ function renderBetslipError(message) {
 
 
 /* =========================================================
-   BETSLIP OPEN / CLOSE
+   BETSLIP OPEN / MINIMIZE
 ========================================================= */
 
 function openBetslip() {
@@ -1986,11 +2072,17 @@ function openBetslip() {
     }
 
     /*
-     * hidden is used instead of relying only
-     * on the CSS "open" class.
+     * Remove hidden attribute.
      */
 
     betslip.hidden = false;
+
+    /*
+     * Force visibility even if existing CSS
+     * has display:none rules.
+     */
+
+    betslip.style.display = "flex";
 
     betslip.classList.add(
         "open"
@@ -2013,12 +2105,6 @@ function minimizeBetslip() {
         return;
     }
 
-    /*
-     * This guarantees the panel actually
-     * disappears even if the existing CSS
-     * does not have a minimized class.
-     */
-
     betslip.classList.remove(
         "open"
     );
@@ -2026,6 +2112,13 @@ function minimizeBetslip() {
     betslip.classList.add(
         "minimized"
     );
+
+    /*
+     * Force it completely off-screen/hidden.
+     * This avoids conflicts with the existing CSS.
+     */
+
+    betslip.style.display = "none";
 
     betslip.hidden = true;
 }
@@ -2048,18 +2141,20 @@ function setupBetslip() {
             "mobileBetslipButton"
         );
 
+    /*
+     * Start minimized.
+     */
+
     if (betslip) {
 
-        /*
-         * Start minimized.
-         */
-
         betslip.hidden = true;
+
+        betslip.style.display =
+            "none";
     }
 
-    if (
-        closeButton
-    ) {
+
+    if (closeButton) {
 
         closeButton.addEventListener(
             "click",
@@ -2073,15 +2168,15 @@ function setupBetslip() {
         );
     }
 
-    if (
-        mobileButton
-    ) {
+
+    if (mobileButton) {
 
         mobileButton.addEventListener(
             "click",
             event => {
 
                 event.preventDefault();
+                event.stopPropagation();
 
                 openBetslip();
             }
