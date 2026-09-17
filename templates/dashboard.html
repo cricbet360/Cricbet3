@@ -14,11 +14,11 @@
 
     <link
         rel="stylesheet"
-        href="/static/css/dashboard.css?v=33"
+        href="/static/css/dashboard.css?v=34"
     >
 
     <script
-        src="/static/js/dashboard.js?v=33"
+        src="/static/js/dashboard.js?v=34"
         defer
     ></script>
 
@@ -254,6 +254,7 @@
     id="betslip"
     class="betslip"
     hidden
+    aria-hidden="true"
 >
 
     <div class="betslip-header">
@@ -276,6 +277,7 @@
             id="betslipClose"
             class="betslip-close"
             aria-label="Minimize bet slip"
+            title="Minimize"
         >
             ×
         </button>
@@ -289,6 +291,10 @@
     >
 
         <div class="betslip-empty">
+
+            <div class="betslip-empty-icon">
+                🎟️
+            </div>
 
             <h3>
                 Loading bets...
@@ -321,6 +327,11 @@
         </div>
 
 
+        <!--
+            Kept for compatibility with the existing dashboard.
+            Actual bet placement continues through the match page.
+        -->
+
         <button
             type="button"
             id="placeBetButton"
@@ -344,6 +355,7 @@
     id="mobileBetslipButton"
     class="mobile-betslip-button"
     aria-label="Open bet slip"
+    aria-controls="betslip"
 >
 
     <span>

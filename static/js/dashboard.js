@@ -2,7 +2,7 @@
 
 
 /* =========================================================
-   CONFIG
+   CONFIGURATION
 ========================================================= */
 
 const WHATSAPP_NUMBER = "918895898319";
@@ -10,6 +10,9 @@ const WHATSAPP_NUMBER = "918895898319";
 const MATCH_REFRESH_MS = 30000;
 const ODDS_REFRESH_MS = 5000;
 const BET_REFRESH_MS = 10000;
+const BALANCE_REFRESH_MS = 15000;
+
+const ODDS_BATCH_SIZE = 5;
 
 let allMatches = [];
 let currentFilter = "all";
@@ -21,7 +24,7 @@ let userBets = [];
 
 
 /* =========================================================
-   HELPERS
+   HTML HELPERS
 ========================================================= */
 
 function escapeHtml(value) {
@@ -78,11 +81,16 @@ function money(value) {
 }
 
 
+/* =========================================================
+   MATCH FIELD HELPERS
+========================================================= */
+
 function getGameId(match) {
 
     return String(
         match?.game_id ??
         match?.gameId ??
+        match?.id ??
         ""
     ).trim();
 }
@@ -108,13 +116,47 @@ function getMarketId(match) {
 }
 
 
-function getSelectionId(match, index) {
+function getEventName(match) {
 
-    return String(
-        match?.[`selection_id${index}`] ??
-        match?.[`selectionId${index}`] ??
+    return (
+        match?.event_name ??
+        match?.eventName ??
+        match?.name ??
+        "Cricket Match"
+    );
+}
+
+
+function getTeam1(match) {
+
+    return (
+        match?.team1 ??
+        match?.runnerName1 ??
+        match?.runner_name1 ??
+        "Team 1"
+    );
+}
+
+
+function getTeam2(match) {
+
+    return (
+        match?.team2 ??
+        match?.runnerName2 ??
+        match?.runner_name2 ??
+        "Team 2"
+    );
+}
+
+
+function getTeam3(match) {
+
+    return (
+        match?.team3 ??
+        match?.runnerName3 ??
+        match?.runner_name3 ??
         ""
-    ).trim();
+    );
 }
 
 
@@ -130,117 +172,36 @@ function getEventTime(match) {
 }
 
 
-/* =========================================================
-   MATCH STATUS
-========================================================= */
+function getSelectionId(match, index) {
 
-/*
- * ProExch may return in_play=false even when the scheduled
- * event time has already passed.
- *
- * Therefore status is determined using BOTH:
- *
- * 1. in_play / inPlay
- * 2. eventTime
- */
+    const value =
+        match?.[`selection_id${index}`] ??
+        match?.[`selectionId${index}`] ??
+        match?.[`sid${index}`] ??
+        "";
 
-function getMatchStatus(match) {
-
-    const liveValue =
-        match?.in_play ??
-        match?.inPlay;
-
-    const explicitlyLive =
-        liveValue === true ||
-        liveValue === 1 ||
-        liveValue === "1" ||
-        liveValue === "true" ||
-        liveValue === "True";
-
-    if (explicitlyLive) {
-
-        return {
-            type: "live",
-            label: "LIVE"
-        };
-    }
-
-    const eventTime =
-        getEventTime(match);
-
-    if (!eventTime) {
-
-        return {
-            type: "upcoming",
-            label: "UPCOMING"
-        };
-    }
-
-    const timestamp =
-        new Date(eventTime).getTime();
-
-    if (
-        Number.isNaN(timestamp)
-    ) {
-
-        return {
-            type: "upcoming",
-            label: "UPCOMING"
-        };
-    }
-
-    const now =
-        Date.now();
-
-    /*
-     * Give a small 10-minute window around the
-     * scheduled start time where the match can
-     * still be considered live/started.
-     */
-
-    if (
-        timestamp <= now &&
-        timestamp >= now - (10 * 60 * 1000)
-    ) {
-
-        return {
-            type: "live",
-            label: "LIVE"
-        };
-    }
-
-    /*
-     * Older events should not be called UPCOMING.
-     *
-     * They may be finished or awaiting result.
-     */
-
-    if (
-        timestamp < now
-    ) {
-
-        return {
-            type: "started",
-            label: "STARTED"
-        };
-    }
-
-    return {
-        type: "upcoming",
-        label: "UPCOMING"
-    };
-}
-
-
-function isLive(match) {
-
-    return getMatchStatus(match).type === "live";
+    return String(value).trim();
 }
 
 
 /* =========================================================
    DATE / TIME
 ========================================================= */
+
+function getTimestamp(value) {
+
+    if (!value) {
+        return NaN;
+    }
+
+    const timestamp =
+        new Date(value).getTime();
+
+    return Number.isFinite(timestamp)
+        ? timestamp
+        : NaN;
+}
+
 
 function formatDate(value) {
 
@@ -272,12 +233,222 @@ function formatDate(value) {
 }
 
 
-/*
- * Sort matches chronologically.
- *
- * Earliest match first.
- * Matches without a valid time go to the bottom.
- */
+/* =========================================================
+   MATCH STATUS
+========================================================= */
+
+function getBooleanValue(value) {
+
+    if (
+        value === true ||
+        value === 1
+    ) {
+        return true;
+    }
+
+    if (
+        typeof value === "string"
+    ) {
+
+        return [
+            "true",
+            "1",
+            "yes",
+            "live",
+            "inplay",
+            "in-play"
+        ].includes(
+            value.trim().toLowerCase()
+        );
+    }
+
+    return false;
+}
+
+
+function getProviderStatus(match) {
+
+    const values = [
+
+        match?.status,
+        match?.match_status,
+        match?.matchStatus,
+        match?.event_status,
+        match?.eventStatus,
+        match?.mstatus,
+        match?.market_status,
+        match?.marketStatus
+
+    ];
+
+    for (
+        const value of values
+    ) {
+
+        if (
+            value === null ||
+            value === undefined ||
+            value === ""
+        ) {
+            continue;
+        }
+
+        const status =
+            String(value)
+                .trim()
+                .toLowerCase();
+
+        if (
+            [
+                "finished",
+                "finish",
+                "completed",
+                "complete",
+                "closed",
+                "ended",
+                "result",
+                "settled"
+            ].includes(status)
+        ) {
+
+            return "finished";
+        }
+
+        if (
+            [
+                "live",
+                "inplay",
+                "in-play",
+                "in_play",
+                "started"
+            ].includes(status)
+        ) {
+
+            return "live";
+        }
+    }
+
+    return null;
+}
+
+
+function getMatchStatus(match) {
+
+    /*
+     * Provider live flag takes highest priority.
+     */
+
+    const liveValue =
+        match?.in_play ??
+        match?.inPlay;
+
+    if (
+        getBooleanValue(liveValue)
+    ) {
+
+        return {
+            type: "live",
+            label: "LIVE"
+        };
+    }
+
+
+    /*
+     * Explicit provider status.
+     */
+
+    const providerStatus =
+        getProviderStatus(match);
+
+    if (
+        providerStatus === "live"
+    ) {
+
+        return {
+            type: "live",
+            label: "LIVE"
+        };
+    }
+
+
+    if (
+        providerStatus === "finished"
+    ) {
+
+        return {
+            type: "finished",
+            label: "FINISHED"
+        };
+    }
+
+
+    /*
+     * Determine remaining status from event time.
+     */
+
+    const timestamp =
+        getTimestamp(
+            getEventTime(match)
+        );
+
+
+    /*
+     * No usable event time.
+     *
+     * Do not manufacture a live status.
+     */
+    if (
+        !Number.isFinite(timestamp)
+    ) {
+
+        return {
+            type: "unknown",
+            label: "STATUS"
+        };
+    }
+
+
+    const now =
+        Date.now();
+
+
+    /*
+     * Future event.
+     */
+    if (
+        timestamp > now
+    ) {
+
+        return {
+            type: "upcoming",
+            label: "UPCOMING"
+        };
+    }
+
+
+    /*
+     * If the provider has not marked the match
+     * live and the scheduled time has passed,
+     * don't incorrectly show UPCOMING.
+     */
+    return {
+        type: "started",
+        label: "STARTED"
+    };
+}
+
+
+function isLive(match) {
+
+    return (
+        getMatchStatus(match).type === "live"
+    );
+}
+
+
+/* =========================================================
+   MATCH SORTING
+========================================================= */
 
 function sortMatchesByTime(matches) {
 
@@ -285,35 +456,37 @@ function sortMatchesByTime(matches) {
         (a, b) => {
 
             const aTime =
-                new Date(
+                getTimestamp(
                     getEventTime(a)
-                ).getTime();
+                );
 
             const bTime =
-                new Date(
+                getTimestamp(
                     getEventTime(b)
-                ).getTime();
+                );
 
-            const aValid =
-                Number.isFinite(aTime);
-
-            const bValid =
-                Number.isFinite(bTime);
 
             if (
-                !aValid &&
-                !bValid
+                !Number.isFinite(aTime) &&
+                !Number.isFinite(bTime)
             ) {
                 return 0;
             }
 
-            if (!aValid) {
+
+            if (
+                !Number.isFinite(aTime)
+            ) {
                 return 1;
             }
 
-            if (!bValid) {
+
+            if (
+                !Number.isFinite(bTime)
+            ) {
                 return -1;
             }
+
 
             return aTime - bTime;
         }
@@ -368,12 +541,15 @@ function getOddsRoot(payload) {
         return null;
     }
 
+
     if (
         payload.odds &&
         typeof payload.odds === "object"
     ) {
+
         return payload.odds;
     }
+
 
     if (
         payload.data &&
@@ -384,11 +560,13 @@ function getOddsRoot(payload) {
             payload.data.data &&
             typeof payload.data.data === "object"
         ) {
+
             return payload.data.data;
         }
 
         return payload.data;
     }
+
 
     return payload;
 }
@@ -406,11 +584,13 @@ function getMatchOddsMarkets(payload) {
         return [];
     }
 
+
     if (
         Array.isArray(root.match_odds)
     ) {
         return root.match_odds;
     }
+
 
     if (
         Array.isArray(root.matchOdds)
@@ -418,18 +598,20 @@ function getMatchOddsMarkets(payload) {
         return root.matchOdds;
     }
 
+
     if (
         Array.isArray(root.MATCH_ODDS)
     ) {
         return root.MATCH_ODDS;
     }
 
+
     return [];
 }
 
 
 /* =========================================================
-   RUNNERS
+   RUNNER DETECTION
 ========================================================= */
 
 function isProExchRunner(item) {
@@ -441,18 +623,31 @@ function isProExchRunner(item) {
         return false;
     }
 
+
     return (
+
         item.sid !== undefined ||
+
         item.rname !== undefined ||
+
         item.b1 !== undefined ||
+
         item.l1 !== undefined ||
+
         item.selectionId !== undefined ||
+
         item.selection_id !== undefined ||
+
         item.runnerId !== undefined ||
+
         item.runnerName !== undefined ||
+
         item.runner_name !== undefined ||
+
         item.back !== undefined ||
+
         item.lay !== undefined
+
     );
 }
 
@@ -462,6 +657,7 @@ function findRunners(value) {
     if (!value) {
         return [];
     }
+
 
     if (
         Array.isArray(value)
@@ -479,6 +675,7 @@ function findRunners(value) {
             );
         }
 
+
         for (
             const item of value
         ) {
@@ -489,18 +686,22 @@ function findRunners(value) {
             if (
                 result.length
             ) {
+
                 return result;
             }
         }
 
+
         return [];
     }
+
 
     if (
         typeof value !== "object"
     ) {
         return [];
     }
+
 
     if (
         Array.isArray(value.oddDatas)
@@ -514,11 +715,14 @@ function findRunners(value) {
         if (
             runners.length
         ) {
+
             return runners;
         }
     }
 
+
     const keys = [
+
         "runners",
         "runner",
         "selections",
@@ -528,7 +732,9 @@ function findRunners(value) {
         "data",
         "matchOdds",
         "match_odds"
+
     ];
+
 
     for (
         const key of keys
@@ -541,21 +747,29 @@ function findRunners(value) {
             continue;
         }
 
+
         const result =
             findRunners(
                 value[key]
             );
 
+
         if (
             result.length
         ) {
+
             return result;
         }
     }
 
+
     return [];
 }
 
+
+/* =========================================================
+   RUNNER HELPERS
+========================================================= */
 
 function getRunnerSelectionId(item) {
 
@@ -597,6 +811,7 @@ function extractPrice(value) {
         return null;
     }
 
+
     if (
         typeof value === "number"
     ) {
@@ -606,11 +821,14 @@ function extractPrice(value) {
             : null;
     }
 
+
     if (
         typeof value === "string"
     ) {
+
         return toNumber(value);
     }
+
 
     if (
         typeof value === "object"
@@ -623,6 +841,7 @@ function extractPrice(value) {
             toNumber(value.value)
         );
     }
+
 
     return null;
 }
@@ -644,7 +863,9 @@ function getBackPrice(item) {
         item?.b1,
         item?.b2,
         item?.b3
+
     ];
+
 
     for (
         const value of values
@@ -656,9 +877,11 @@ function getBackPrice(item) {
         if (
             price !== null
         ) {
+
             return price;
         }
     }
+
 
     return null;
 }
@@ -680,7 +903,9 @@ function getLayPrice(item) {
         item?.l1,
         item?.l2,
         item?.l3
+
     ];
+
 
     for (
         const value of values
@@ -692,9 +917,11 @@ function getLayPrice(item) {
         if (
             price !== null
         ) {
+
             return price;
         }
     }
+
 
     return null;
 }
@@ -734,6 +961,7 @@ function normalizeRunners(runners) {
         return [];
     }
 
+
     return runners
         .map(item => {
 
@@ -743,6 +971,7 @@ function normalizeRunners(runners) {
             ) {
                 return null;
             }
+
 
             return {
 
@@ -763,17 +992,24 @@ function normalizeRunners(runners) {
 
                 laySize:
                     getLaySize(item)
+
             };
         })
         .filter(Boolean);
 }
 
 
+/* =========================================================
+   EMPTY ODDS
+========================================================= */
+
 function emptyOdds() {
 
     return {
 
         team1: {
+            selectionId: "",
+            name: "",
             back: null,
             lay: null,
             backSize: null,
@@ -781,6 +1017,8 @@ function emptyOdds() {
         },
 
         team2: {
+            selectionId: "",
+            name: "",
             back: null,
             lay: null,
             backSize: null,
@@ -788,14 +1026,21 @@ function emptyOdds() {
         },
 
         team3: {
+            selectionId: "",
+            name: "",
             back: null,
             lay: null,
             backSize: null,
             laySize: null
         }
+
     };
 }
 
+
+/* =========================================================
+   NORMALIZE MATCH ODDS
+========================================================= */
 
 function normalizeMatchOdds(
     match,
@@ -805,13 +1050,16 @@ function normalizeMatchOdds(
     const markets =
         getMatchOddsMarkets(payload);
 
+
     if (
         !markets.length
     ) {
         return emptyOdds();
     }
 
+
     let runners = [];
+
 
     for (
         const market of markets
@@ -820,39 +1068,53 @@ function normalizeMatchOdds(
         const found =
             findRunners(market);
 
+
         if (
             found.length
         ) {
 
             runners = found;
+
             break;
         }
     }
 
+
     if (
         !runners.length
     ) {
+
         return emptyOdds();
     }
+
 
     const normalized =
         normalizeRunners(runners);
 
-    const selectionIds = [
-
-        getSelectionId(match, 1),
-        getSelectionId(match, 2),
-        getSelectionId(match, 3)
-    ];
 
     const result =
         emptyOdds();
+
 
     const slots = [
         "team1",
         "team2",
         "team3"
     ];
+
+
+    /*
+     * First try matching by known selection IDs.
+     */
+
+    const knownSelectionIds = [
+
+        getSelectionId(match, 1),
+        getSelectionId(match, 2),
+        getSelectionId(match, 3)
+
+    ];
+
 
     normalized.forEach(
         runner => {
@@ -865,10 +1127,12 @@ function normalizeMatchOdds(
                         runner.selectionId
                     );
 
+
             const index =
-                selectionIds.indexOf(
+                knownSelectionIds.indexOf(
                     runnerId
                 );
+
 
             if (
                 index >= 0
@@ -878,14 +1142,34 @@ function normalizeMatchOdds(
                     slots[index]
                 ] = {
 
-                    back: runner.back,
-                    lay: runner.lay,
-                    backSize: runner.backSize,
-                    laySize: runner.laySize
+                    selectionId:
+                        runner.selectionId,
+
+                    name:
+                        runner.name,
+
+                    back:
+                        runner.back,
+
+                    lay:
+                        runner.lay,
+
+                    backSize:
+                        runner.backSize,
+
+                    laySize:
+                        runner.laySize
+
                 };
             }
         }
     );
+
+
+    /*
+     * Fill any unmatched slots using provider
+     * runner order.
+     */
 
     normalized
         .slice(0, 3)
@@ -895,6 +1179,7 @@ function normalizeMatchOdds(
                 const slot =
                     slots[index];
 
+
                 if (
                     result[slot].back === null &&
                     result[slot].lay === null
@@ -902,14 +1187,29 @@ function normalizeMatchOdds(
 
                     result[slot] = {
 
-                        back: runner.back,
-                        lay: runner.lay,
-                        backSize: runner.backSize,
-                        laySize: runner.laySize
+                        selectionId:
+                            runner.selectionId,
+
+                        name:
+                            runner.name,
+
+                        back:
+                            runner.back,
+
+                        lay:
+                            runner.lay,
+
+                        backSize:
+                            runner.backSize,
+
+                        laySize:
+                            runner.laySize
+
                     };
                 }
             }
         );
+
 
     return result;
 }
@@ -933,25 +1233,37 @@ function createOddsButton({
     const numericPrice =
         toNumber(price);
 
+
+    /*
+     * ProExch can return 0 when a side is unavailable.
+     * Odds below/equal to 1 are not valid bet odds.
+     */
+
     const disabled =
-        numericPrice === null;
+        numericPrice === null ||
+        numericPrice <= 1;
+
 
     return `
         <button
             type="button"
-            class="odds-cell ${className}"
+            class="odds-cell ${escapeHtml(className)}"
             data-game-id="${escapeHtml(gameId)}"
             data-event-id="${escapeHtml(eventId)}"
             data-market-id="${escapeHtml(marketId)}"
-            data-selection-id="${escapeHtml(selectionId)}"
+            data-selection-id="${escapeHtml(selectionId || "")}"
             data-team="${escapeHtml(team)}"
             data-side="${escapeHtml(side)}"
-            data-price="${numericPrice ?? ""}"
+            data-price="${
+                numericPrice !== null
+                    ? numericPrice
+                    : ""
+            }"
             ${disabled ? "disabled" : ""}
         >
             <span class="odds-price">
                 ${
-                    numericPrice !== null
+                    !disabled
                         ? numericPrice.toFixed(2)
                         : "-"
                 }
@@ -977,30 +1289,24 @@ function createMatchRow(match) {
         getMarketId(match);
 
     const eventName =
-        match.event_name ??
-        match.eventName ??
-        "Cricket Match";
+        getEventName(match);
 
     const eventTime =
         getEventTime(match);
 
     const team1 =
-        match.team1 ??
-        match.runnerName1 ??
-        "Team 1";
+        getTeam1(match);
 
     const team2 =
-        match.team2 ??
-        match.runnerName2 ??
-        "Team 2";
+        getTeam2(match);
 
     const team3 =
-        match.team3 ??
-        match.runnerName3 ??
-        "";
+        getTeam3(match);
+
 
     const status =
         getMatchStatus(match);
+
 
     const odds =
         oddsCache.has(gameId)
@@ -1010,12 +1316,65 @@ function createMatchRow(match) {
             )
             : emptyOdds();
 
-    const statusClass =
+
+    let statusClass =
+        "upcoming-status";
+
+
+    if (
         status.type === "live"
-            ? "live-status"
-            : status.type === "started"
-                ? "started-status"
-                : "upcoming-status";
+    ) {
+
+        statusClass =
+            "live-status";
+
+    } else if (
+        status.type === "started"
+    ) {
+
+        statusClass =
+            "started-status";
+
+    } else if (
+        status.type === "finished"
+    ) {
+
+        statusClass =
+            "finished-status";
+    }
+
+
+    /*
+     * The dashboard has three odds columns.
+     *
+     * We preserve the existing layout:
+     *
+     * Column 1 = Match
+     * Column 2 = Back
+     * Column 3 = Lay
+     * Column 4 = Draw
+     *
+     * The BACK/ LAY cells show the first available
+     * team selection. The detailed Match page contains
+     * the complete market.
+     *
+     * To avoid misleading the user, we use the first
+     * team's BACK, second team's LAY, and draw/team3
+     * BACK in the existing compact table.
+     */
+
+
+    const team1Back =
+        odds.team1.back;
+
+    const team2Lay =
+        odds.team2.lay;
+
+    const drawBack =
+        team3
+            ? odds.team3.back
+            : null;
+
 
     return `
         <div
@@ -1025,7 +1384,9 @@ function createMatchRow(match) {
             data-market-id="${escapeHtml(marketId)}"
         >
 
+
             <div class="match-information">
+
 
                 <div class="match-status-line">
 
@@ -1037,9 +1398,13 @@ function createMatchRow(match) {
                             : ""
                     }
 
-                    <span class="match-status ${statusClass}">
+
+                    <span
+                        class="match-status ${statusClass}"
+                    >
                         ${escapeHtml(status.label)}
                     </span>
+
 
                     <span class="match-time">
                         ${escapeHtml(
@@ -1061,9 +1426,11 @@ function createMatchRow(match) {
                         ${escapeHtml(team1)}
                     </div>
 
+
                     <div class="team-name">
                         ${escapeHtml(team2)}
                     </div>
+
 
                     ${
                         team3
@@ -1085,59 +1452,103 @@ function createMatchRow(match) {
             </div>
 
 
+            <!-- BACK -->
+
             ${createOddsButton({
+
                 gameId,
                 eventId,
                 marketId,
+
                 selectionId:
-                    getSelectionId(
-                        match,
-                        1
-                    ),
-                team: team1,
-                side: "back",
-                price: odds.team1.back,
+                    odds.team1.selectionId ||
+                    getSelectionId(match, 1),
+
+                team:
+                    odds.team1.name ||
+                    team1,
+
+                side:
+                    "back",
+
+                price:
+                    team1Back,
+
                 className:
                     "odds-team-1"
+
             })}
 
 
+            <!-- LAY -->
+
             ${createOddsButton({
+
                 gameId,
                 eventId,
                 marketId,
+
                 selectionId:
-                    getSelectionId(
-                        match,
-                        2
-                    ),
-                team: team2,
-                side: "back",
-                price: odds.team2.back,
+                    odds.team2.selectionId ||
+                    getSelectionId(match, 2),
+
+                team:
+                    odds.team2.name ||
+                    team2,
+
+                side:
+                    "lay",
+
+                price:
+                    team2Lay,
+
                 className:
                     "odds-team-2"
+
             })}
 
+
+            <!-- DRAW / THIRD RUNNER -->
 
             ${
                 team3
                     ? createOddsButton({
+
                         gameId,
                         eventId,
                         marketId,
+
                         selectionId:
+                            odds.team3.selectionId ||
                             getSelectionId(
                                 match,
                                 3
                             ),
-                        team: team3,
-                        side: "back",
+
+                        team:
+                            odds.team3.name ||
+                            team3,
+
+                        side:
+                            "back",
+
                         price:
-                            odds.team3.back,
+                            drawBack,
+
                         className:
                             "odds-draw"
+
                     })
-                    : ""
+                    : `
+                        <div
+                            class="odds-cell odds-empty"
+                            aria-disabled="true"
+                        >
+                            <span class="odds-price">
+                                -
+                            </span>
+                        </div>
+                    `
             }
 
 
@@ -1152,6 +1563,7 @@ function createMatchRow(match) {
                 </a>
 
             </div>
+
 
         </div>
     `;
@@ -1169,9 +1581,11 @@ async function loadMatches() {
             "matches"
         );
 
+
     if (!container) {
         return;
     }
+
 
     try {
 
@@ -1180,8 +1594,13 @@ async function loadMatches() {
                 "/api/cricket/matches",
                 {
                     method: "GET",
-                    credentials: "same-origin",
-                    cache: "no-store",
+
+                    credentials:
+                        "same-origin",
+
+                    cache:
+                        "no-store",
+
                     headers: {
                         Accept:
                             "application/json"
@@ -1189,10 +1608,14 @@ async function loadMatches() {
                 }
             );
 
+
         const payload =
             await response.json();
 
-        if (!response.ok) {
+
+        if (
+            !response.ok
+        ) {
 
             throw new Error(
                 payload?.detail ||
@@ -1200,6 +1623,7 @@ async function loadMatches() {
                 `HTTP ${response.status}`
             );
         }
+
 
         if (
             payload.success !== true
@@ -1212,6 +1636,7 @@ async function loadMatches() {
             );
         }
 
+
         let matches =
             Array.isArray(payload.data)
                 ? payload.data
@@ -1219,24 +1644,69 @@ async function loadMatches() {
                     ? payload.matches
                     : [];
 
+
         /*
-         * IMPORTANT:
-         *
-         * Always sort the complete API response
-         * by event time before displaying it.
+         * Remove duplicate game IDs.
+         */
+
+        const uniqueMatches =
+            new Map();
+
+
+        matches.forEach(
+            match => {
+
+                const gameId =
+                    getGameId(match);
+
+
+                if (
+                    gameId
+                ) {
+
+                    uniqueMatches.set(
+                        gameId,
+                        match
+                    );
+                }
+            }
+        );
+
+
+        matches =
+            Array.from(
+                uniqueMatches.values()
+            );
+
+
+        /*
+         * Always sort the COMPLETE API response
+         * before applying the current filter.
          */
 
         allMatches =
-            sortMatchesByTime(matches);
+            sortMatchesByTime(
+                matches
+            );
+
+
+        console.log(
+            "[CricBet] Matches loaded:",
+            allMatches.length
+        );
+
 
         console.log(
             "[CricBet] Sorted matches:",
             allMatches
         );
 
+
         renderMatches();
 
+
         await loadAllOdds();
+
 
     } catch (error) {
 
@@ -1245,9 +1715,13 @@ async function loadMatches() {
             error
         );
 
-        if (!allMatches.length) {
+
+        if (
+            !allMatches.length
+        ) {
 
             container.innerHTML = `
+
                 <div class="empty-state">
 
                     <div class="empty-state-icon">
@@ -1267,20 +1741,38 @@ async function loadMatches() {
                     <button
                         type="button"
                         class="retry-matches-button"
-                        onclick="loadMatches()"
+                        id="retryMatchesButton"
                     >
                         RETRY
                     </button>
 
                 </div>
+
             `;
+
+
+            const retryButton =
+                document.getElementById(
+                    "retryMatchesButton"
+                );
+
+
+            if (
+                retryButton
+            ) {
+
+                retryButton.addEventListener(
+                    "click",
+                    loadMatches
+                );
+            }
         }
     }
 }
 
 
 /* =========================================================
-   LOAD ODDS
+   LOAD ODDS FOR ONE MATCH
 ========================================================= */
 
 async function loadOddsForMatch(match) {
@@ -1294,9 +1786,13 @@ async function loadOddsForMatch(match) {
     const marketId =
         getMarketId(match);
 
-    if (!gameId) {
+
+    if (
+        !gameId
+    ) {
         return;
     }
+
 
     if (
         oddsLoading.has(gameId)
@@ -1304,19 +1800,25 @@ async function loadOddsForMatch(match) {
         return;
     }
 
+
     oddsLoading.add(gameId);
+
 
     try {
 
         const params =
             new URLSearchParams();
 
+
         params.set(
             "gameId",
             gameId
         );
 
-        if (eventId) {
+
+        if (
+            eventId
+        ) {
 
             params.set(
                 "eventId",
@@ -1324,7 +1826,10 @@ async function loadOddsForMatch(match) {
             );
         }
 
-        if (marketId) {
+
+        if (
+            marketId
+        ) {
 
             params.set(
                 "marketId",
@@ -1332,13 +1837,19 @@ async function loadOddsForMatch(match) {
             );
         }
 
+
         const response =
             await fetch(
                 `/api/cricket/odds?${params.toString()}`,
                 {
                     method: "GET",
-                    credentials: "same-origin",
-                    cache: "no-store",
+
+                    credentials:
+                        "same-origin",
+
+                    cache:
+                        "no-store",
+
                     headers: {
                         Accept:
                             "application/json"
@@ -1346,10 +1857,14 @@ async function loadOddsForMatch(match) {
                 }
             );
 
+
         const payload =
             await response.json();
 
-        if (!response.ok) {
+
+        if (
+            !response.ok
+        ) {
 
             throw new Error(
                 payload?.detail ||
@@ -1357,6 +1872,7 @@ async function loadOddsForMatch(match) {
                 `Odds HTTP ${response.status}`
             );
         }
+
 
         if (
             payload.success !== true
@@ -1369,12 +1885,15 @@ async function loadOddsForMatch(match) {
             );
         }
 
+
         oddsCache.set(
             gameId,
             payload
         );
 
+
         updateMatchOdds(match);
+
 
     } catch (error) {
 
@@ -1383,6 +1902,7 @@ async function loadOddsForMatch(match) {
             gameId,
             error.message
         );
+
 
     } finally {
 
@@ -1393,25 +1913,31 @@ async function loadOddsForMatch(match) {
 }
 
 
+/* =========================================================
+   LOAD ALL ODDS
+========================================================= */
+
 async function loadAllOdds() {
 
-    if (!allMatches.length) {
+    if (
+        !allMatches.length
+    ) {
         return;
     }
 
-    const batchSize = 5;
 
     for (
         let i = 0;
         i < allMatches.length;
-        i += batchSize
+        i += ODDS_BATCH_SIZE
     ) {
 
         const batch =
             allMatches.slice(
                 i,
-                i + batchSize
+                i + ODDS_BATCH_SIZE
             );
+
 
         await Promise.all(
             batch.map(
@@ -1423,13 +1949,14 @@ async function loadAllOdds() {
 
 
 /* =========================================================
-   UPDATE ODDS
+   UPDATE MATCH ODDS
 ========================================================= */
 
 function updateMatchOdds(match) {
 
     const gameId =
         getGameId(match);
+
 
     if (
         !gameId ||
@@ -1438,14 +1965,29 @@ function updateMatchOdds(match) {
         return;
     }
 
+
+    const escapedGameId =
+        typeof CSS !== "undefined" &&
+        CSS.escape
+            ? CSS.escape(gameId)
+            : gameId.replaceAll(
+                '"',
+                '\\"'
+            );
+
+
     const row =
         document.querySelector(
-            `.sportsbook-match-row[data-game-id="${CSS.escape(gameId)}"]`
+            `.sportsbook-match-row[data-game-id="${escapedGameId}"]`
         );
 
-    if (!row) {
+
+    if (
+        !row
+    ) {
         return;
     }
+
 
     const odds =
         normalizeMatchOdds(
@@ -1453,66 +1995,153 @@ function updateMatchOdds(match) {
             oddsCache.get(gameId)
         );
 
-    updateOddsButton(
+
+    const backButton =
         row.querySelector(
             ".odds-team-1"
-        ),
+        );
+
+
+    const layButton =
+        row.querySelector(
+            ".odds-team-2"
+        );
+
+
+    const drawButton =
+        row.querySelector(
+            ".odds-draw"
+        );
+
+
+    updateOddsButton(
+        backButton,
         odds.team1.back
     );
 
-    updateOddsButton(
-        row.querySelector(
-            ".odds-team-2"
-        ),
-        odds.team2.back
-    );
 
     updateOddsButton(
-        row.querySelector(
-            ".odds-draw"
-        ),
+        layButton,
+        odds.team2.lay
+    );
+
+
+    updateOddsButton(
+        drawButton,
         odds.team3.back
     );
+
+
+    /*
+     * Keep actual ProExch selection IDs on the
+     * clickable dashboard buttons.
+     */
+
+    if (
+        backButton &&
+        odds.team1.selectionId !== null &&
+        odds.team1.selectionId !== undefined
+    ) {
+
+        backButton.dataset.selectionId =
+            String(
+                odds.team1.selectionId
+            );
+    }
+
+
+    if (
+        layButton &&
+        odds.team2.selectionId !== null &&
+        odds.team2.selectionId !== undefined
+    ) {
+
+        layButton.dataset.selectionId =
+            String(
+                odds.team2.selectionId
+            );
+    }
+
+
+    if (
+        drawButton &&
+        odds.team3.selectionId !== null &&
+        odds.team3.selectionId !== undefined
+    ) {
+
+        drawButton.dataset.selectionId =
+            String(
+                odds.team3.selectionId
+            );
+    }
 }
 
+
+/* =========================================================
+   UPDATE ODDS BUTTON
+========================================================= */
 
 function updateOddsButton(
     button,
     price
 ) {
 
-    if (!button) {
+    if (
+        !button
+    ) {
         return;
     }
 
+
     const numericPrice =
         toNumber(price);
+
 
     const span =
         button.querySelector(
             ".odds-price"
         );
 
+
+    /*
+     * Odds <= 1 are treated as unavailable.
+     */
+
     if (
-        numericPrice === null
+        numericPrice === null ||
+        numericPrice <= 1
     ) {
 
         button.disabled = true;
+
         button.dataset.price = "";
 
-        if (span) {
-            span.textContent = "-";
+
+        if (
+            span
+        ) {
+
+            span.textContent =
+                "-";
         }
+
 
         return;
     }
 
+
     button.disabled = false;
 
-    button.dataset.price =
-        String(numericPrice);
 
-    if (span) {
+    button.dataset.price =
+        String(
+            numericPrice
+        );
+
+
+    if (
+        span
+    ) {
 
         span.textContent =
             numericPrice.toFixed(2);
@@ -1526,8 +2155,24 @@ function updateOddsButton(
 
 function setFilter(filter) {
 
+    const validFilters = [
+        "all",
+        "live",
+        "upcoming"
+    ];
+
+
+    if (
+        !validFilters.includes(filter)
+    ) {
+
+        filter = "all";
+    }
+
+
     currentFilter =
         filter;
+
 
     document
         .querySelectorAll(
@@ -1543,9 +2188,14 @@ function setFilter(filter) {
             }
         );
 
+
     renderMatches();
 }
 
+
+/* =========================================================
+   RENDER MATCHES
+========================================================= */
 
 function renderMatches() {
 
@@ -1554,12 +2204,21 @@ function renderMatches() {
             "matches"
         );
 
-    if (!container) {
+
+    if (
+        !container
+    ) {
         return;
     }
 
+
     let matches =
         [...allMatches];
+
+
+    /*
+     * LIVE FILTER
+     */
 
     if (
         currentFilter === "live"
@@ -1573,6 +2232,13 @@ function renderMatches() {
             );
     }
 
+
+    /*
+     * UPCOMING FILTER
+     *
+     * Only genuinely future matches.
+     */
+
     if (
         currentFilter === "upcoming"
     ) {
@@ -1585,16 +2251,45 @@ function renderMatches() {
             );
     }
 
+
     /*
-     * Keep chronological order even after filtering.
+     * Always preserve chronological order.
      */
 
     matches =
-        sortMatchesByTime(matches);
+        sortMatchesByTime(
+            matches
+        );
 
-    if (!matches.length) {
+
+    if (
+        !matches.length
+    ) {
+
+        let message =
+            "No matches are currently available for this filter.";
+
+
+        if (
+            currentFilter === "live"
+        ) {
+
+            message =
+                "There are no live cricket matches right now.";
+        }
+
+
+        if (
+            currentFilter === "upcoming"
+        ) {
+
+            message =
+                "There are no upcoming cricket matches currently available.";
+        }
+
 
         container.innerHTML = `
+
             <div class="empty-state">
 
                 <div class="empty-state-icon">
@@ -1606,19 +2301,29 @@ function renderMatches() {
                 </div>
 
                 <div class="empty-state-text">
-                    No matches are currently available for this filter.
+                    ${escapeHtml(message)}
                 </div>
 
             </div>
+
         `;
+
 
         return;
     }
 
+
     container.innerHTML =
         matches
-            .map(createMatchRow)
+            .map(
+                createMatchRow
+            )
             .join("");
+
+
+    /*
+     * Apply already-loaded odds immediately.
+     */
 
     matches.forEach(
         updateMatchOdds
@@ -1639,8 +2344,13 @@ async function loadBalance() {
                 "/api/user/balance",
                 {
                     method: "GET",
-                    credentials: "same-origin",
-                    cache: "no-store",
+
+                    credentials:
+                        "same-origin",
+
+                    cache:
+                        "no-store",
+
                     headers: {
                         Accept:
                             "application/json"
@@ -1648,12 +2358,17 @@ async function loadBalance() {
                 }
             );
 
-        if (!response.ok) {
+
+        if (
+            !response.ok
+        ) {
             return;
         }
 
+
         const data =
             await response.json();
+
 
         if (
             data.balance === undefined
@@ -1661,8 +2376,22 @@ async function loadBalance() {
             return;
         }
 
+
+        const number =
+            Number(
+                data.balance
+            );
+
+
+        if (
+            !Number.isFinite(number)
+        ) {
+            return;
+        }
+
+
         const formatted =
-            Number(data.balance).toLocaleString(
+            number.toLocaleString(
                 "en-IN",
                 {
                     minimumFractionDigits: 2,
@@ -1670,27 +2399,36 @@ async function loadBalance() {
                 }
             );
 
+
         const balanceElement =
             document.getElementById(
                 "balance"
             );
+
 
         const betslipBalance =
             document.getElementById(
                 "betslipBalance"
             );
 
-        if (balanceElement) {
+
+        if (
+            balanceElement
+        ) {
 
             balanceElement.textContent =
                 `₹${formatted}`;
         }
 
-        if (betslipBalance) {
+
+        if (
+            betslipBalance
+        ) {
 
             betslipBalance.textContent =
                 `₹${formatted}`;
         }
+
 
     } catch (error) {
 
@@ -1715,8 +2453,13 @@ async function loadMyBets() {
                 "/bets/my-bets",
                 {
                     method: "GET",
-                    credentials: "same-origin",
-                    cache: "no-store",
+
+                    credentials:
+                        "same-origin",
+
+                    cache:
+                        "no-store",
+
                     headers: {
                         Accept:
                             "application/json"
@@ -1724,10 +2467,14 @@ async function loadMyBets() {
                 }
             );
 
+
         const payload =
             await response.json();
 
-        if (!response.ok) {
+
+        if (
+            !response.ok
+        ) {
 
             throw new Error(
                 payload?.message ||
@@ -1735,6 +2482,7 @@ async function loadMyBets() {
                 `HTTP ${response.status}`
             );
         }
+
 
         if (
             payload.success !== true
@@ -1746,12 +2494,17 @@ async function loadMyBets() {
             );
         }
 
+
         userBets =
-            Array.isArray(payload.bets)
+            Array.isArray(
+                payload.bets
+            )
                 ? payload.bets
                 : [];
 
+
         renderBetslip();
+
 
     } catch (error) {
 
@@ -1759,6 +2512,7 @@ async function loadMyBets() {
             "[CricBet] MY BETS ERROR:",
             error
         );
+
 
         renderBetslipError(
             error.message
@@ -1778,24 +2532,37 @@ function renderBetslip() {
             "betslipContent"
         );
 
+
     const count =
         document.getElementById(
             "betslipCount"
         );
 
-    if (!content) {
+
+    if (
+        !content
+    ) {
         return;
     }
 
-    if (count) {
+
+    if (
+        count
+    ) {
 
         count.textContent =
-            String(userBets.length);
+            String(
+                userBets.length
+            );
     }
 
-    if (!userBets.length) {
+
+    if (
+        !userBets.length
+    ) {
 
         content.innerHTML = `
+
             <div class="betslip-empty">
 
                 <div class="betslip-empty-icon">
@@ -1811,13 +2578,16 @@ function renderBetslip() {
                 </p>
 
             </div>
+
         `;
+
 
         return;
     }
 
+
     /*
-     * Newest bet first.
+     * Newest bets first.
      */
 
     const sortedBets =
@@ -1825,18 +2595,43 @@ function renderBetslip() {
             (a, b) => {
 
                 const aTime =
-                    new Date(
-                        a.created_at || 0
-                    ).getTime();
+                    getTimestamp(
+                        a.created_at
+                    );
+
 
                 const bTime =
-                    new Date(
-                        b.created_at || 0
-                    ).getTime();
+                    getTimestamp(
+                        b.created_at
+                    );
+
+
+                if (
+                    !Number.isFinite(aTime) &&
+                    !Number.isFinite(bTime)
+                ) {
+                    return 0;
+                }
+
+
+                if (
+                    !Number.isFinite(aTime)
+                ) {
+                    return 1;
+                }
+
+
+                if (
+                    !Number.isFinite(bTime)
+                ) {
+                    return -1;
+                }
+
 
                 return bTime - aTime;
             }
         );
+
 
     content.innerHTML =
         sortedBets
@@ -1848,6 +2643,10 @@ function renderBetslip() {
 }
 
 
+/* =========================================================
+   RENDER INDIVIDUAL BET
+========================================================= */
+
 function renderPlacedBet(bet) {
 
     const selection =
@@ -1858,36 +2657,75 @@ function renderPlacedBet(bet) {
             ? bet.selections[0]
             : null;
 
+
     const side =
         String(
             selection?.side || "-"
         ).toUpperCase();
+
 
     const status =
         String(
             bet.status || "pending"
         );
 
+
     const statusClass =
-        status.toLowerCase();
+        status
+            .toLowerCase()
+            .replaceAll(
+                " ",
+                "-"
+            );
+
 
     const statusText =
         status.charAt(0).toUpperCase() +
         status.slice(1);
 
+
     const odds =
-        Number(bet.total_odds);
+        Number(
+            bet.total_odds
+        );
+
 
     const stake =
-        Number(bet.stake);
+        Number(
+            bet.stake
+        );
+
 
     const potentialWin =
-        Number(bet.potential_win);
+        Number(
+            bet.potential_win
+        );
+
+
+    const marketName =
+        selection?.market_name ||
+        "Match Odds";
+
+
+    const selectionName =
+        selection?.runner_name ||
+        "Selection";
+
+
+    const eventName =
+        selection?.event_name ||
+        "Cricket Match";
+
 
     return `
-        <article class="betslip-bet-card">
+
+        <article
+            class="betslip-bet-card"
+        >
+
 
             <div class="betslip-bet-header">
+
 
                 <div class="betslip-bet-title">
 
@@ -1895,19 +2733,19 @@ function renderPlacedBet(bet) {
                         🏏
                     </span>
 
+
                     <div>
 
                         <strong>
                             ${escapeHtml(
-                                selection?.runner_name ||
-                                "Selection"
+                                selectionName
                             )}
                         </strong>
 
+
                         <small>
                             ${escapeHtml(
-                                selection?.market_name ||
-                                "Match Odds"
+                                marketName
                             )}
                         </small>
 
@@ -1917,9 +2755,13 @@ function renderPlacedBet(bet) {
 
 
                 <span
-                    class="betslip-status ${escapeHtml(statusClass)}"
+                    class="betslip-status ${escapeHtml(
+                        statusClass
+                    )}"
                 >
-                    ${escapeHtml(statusText)}
+                    ${escapeHtml(
+                        statusText
+                    )}
                 </span>
 
             </div>
@@ -1928,8 +2770,7 @@ function renderPlacedBet(bet) {
             <div class="betslip-match-name">
 
                 ${escapeHtml(
-                    selection?.event_name ||
-                    "Cricket Match"
+                    eventName
                 )}
 
             </div>
@@ -1937,16 +2778,22 @@ function renderPlacedBet(bet) {
 
             <div class="betslip-details-grid">
 
+
                 <div class="betslip-detail">
 
                     <span>
                         SIDE
                     </span>
 
+
                     <strong
-                        class="${side === "BACK"
-                            ? "bet-back"
-                            : "bet-lay"}"
+                        class="${
+                            side === "BACK"
+                                ? "bet-back"
+                                : side === "LAY"
+                                    ? "bet-lay"
+                                    : ""
+                        }"
                     >
                         ${escapeHtml(side)}
                     </strong>
@@ -1959,6 +2806,7 @@ function renderPlacedBet(bet) {
                     <span>
                         ODDS
                     </span>
+
 
                     <strong>
                         ${
@@ -1977,6 +2825,7 @@ function renderPlacedBet(bet) {
                         STAKE
                     </span>
 
+
                     <strong>
                         ${money(stake)}
                     </strong>
@@ -1990,11 +2839,13 @@ function renderPlacedBet(bet) {
                         POTENTIAL WIN
                     </span>
 
+
                     <strong>
                         ${money(potentialWin)}
                     </strong>
 
                 </div>
+
 
             </div>
 
@@ -2007,6 +2858,7 @@ function renderPlacedBet(bet) {
                     )}
                 </span>
 
+
                 <span>
                     ${escapeHtml(
                         formatDate(
@@ -2017,10 +2869,16 @@ function renderPlacedBet(bet) {
 
             </div>
 
+
         </article>
+
     `;
 }
 
+
+/* =========================================================
+   BETSLIP ERROR
+========================================================= */
 
 function renderBetslipError(message) {
 
@@ -2029,11 +2887,16 @@ function renderBetslipError(message) {
             "betslipContent"
         );
 
-    if (!content) {
+
+    if (
+        !content
+    ) {
         return;
     }
 
+
     content.innerHTML = `
+
         <div class="betslip-empty">
 
             <div class="betslip-empty-icon">
@@ -2052,12 +2915,13 @@ function renderBetslipError(message) {
             </p>
 
         </div>
+
     `;
 }
 
 
 /* =========================================================
-   BETSLIP OPEN / MINIMIZE
+   OPEN BETSLIP
 ========================================================= */
 
 function openBetslip() {
@@ -2067,32 +2931,73 @@ function openBetslip() {
             "betslip"
         );
 
-    if (!betslip) {
+
+    if (
+        !betslip
+    ) {
         return;
     }
 
+
     /*
-     * Remove hidden attribute.
+     * Remove HTML hidden state.
      */
 
     betslip.hidden = false;
 
+
     /*
-     * Force visibility even if existing CSS
-     * has display:none rules.
+     * Accessibility state.
      */
 
-    betslip.style.display = "flex";
+    betslip.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+
+    /*
+     * Remove minimized state.
+     */
+
+    betslip.classList.remove(
+        "minimized"
+    );
+
+
+    /*
+     * Add open state.
+     */
 
     betslip.classList.add(
         "open"
     );
 
-    betslip.classList.remove(
-        "minimized"
+
+    /*
+     * Explicit display prevents
+     * old CSS from hiding the panel.
+     */
+
+    betslip.style.setProperty(
+        "display",
+        "flex",
+        "important"
     );
+
+
+    /*
+     * Refresh bets whenever the user opens
+     * the panel so the displayed list is current.
+     */
+
+    loadMyBets();
 }
 
+
+/* =========================================================
+   MINIMIZE BETSLIP
+========================================================= */
 
 function minimizeBetslip() {
 
@@ -2101,28 +3006,50 @@ function minimizeBetslip() {
             "betslip"
         );
 
-    if (!betslip) {
+
+    if (
+        !betslip
+    ) {
         return;
     }
+
 
     betslip.classList.remove(
         "open"
     );
 
+
     betslip.classList.add(
         "minimized"
     );
 
+
+    betslip.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+
     /*
-     * Force it completely off-screen/hidden.
-     * This avoids conflicts with the existing CSS.
+     * Completely hide the panel.
+     *
+     * The floating BET SLIP button remains visible.
      */
 
-    betslip.style.display = "none";
+    betslip.style.setProperty(
+        "display",
+        "none",
+        "important"
+    );
+
 
     betslip.hidden = true;
 }
 
+
+/* =========================================================
+   SETUP BETSLIP
+========================================================= */
 
 function setupBetslip() {
 
@@ -2131,36 +3058,66 @@ function setupBetslip() {
             "betslip"
         );
 
+
     const closeButton =
         document.getElementById(
             "betslipClose"
         );
 
-    const mobileButton =
+
+    const openButton =
         document.getElementById(
             "mobileBetslipButton"
         );
 
+
     /*
      * Start minimized.
+     *
+     * User opens it by tapping BET SLIP.
      */
 
-    if (betslip) {
+    if (
+        betslip
+    ) {
 
         betslip.hidden = true;
 
-        betslip.style.display =
-            "none";
+        betslip.classList.remove(
+            "open"
+        );
+
+        betslip.classList.add(
+            "minimized"
+        );
+
+        betslip.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+        betslip.style.setProperty(
+            "display",
+            "none",
+            "important"
+        );
     }
 
 
-    if (closeButton) {
+    /*
+     * MINIMIZE button.
+     */
+
+    if (
+        closeButton
+    ) {
 
         closeButton.addEventListener(
             "click",
             event => {
 
                 event.preventDefault();
+
                 event.stopPropagation();
 
                 minimizeBetslip();
@@ -2169,13 +3126,20 @@ function setupBetslip() {
     }
 
 
-    if (mobileButton) {
+    /*
+     * OPEN button.
+     */
 
-        mobileButton.addEventListener(
+    if (
+        openButton
+    ) {
+
+        openButton.addEventListener(
             "click",
             event => {
 
                 event.preventDefault();
+
                 event.stopPropagation();
 
                 openBetslip();
@@ -2198,6 +3162,7 @@ document.addEventListener(
                 ".odds-cell"
             );
 
+
         if (
             !button ||
             button.disabled
@@ -2205,16 +3170,20 @@ document.addEventListener(
             return;
         }
 
+
         const price =
             Number(
                 button.dataset.price
             );
 
+
         if (
-            !Number.isFinite(price)
+            !Number.isFinite(price) ||
+            price <= 1
         ) {
             return;
         }
+
 
         const selection = {
 
@@ -2237,12 +3206,20 @@ document.addEventListener(
                 button.dataset.side,
 
             price
+
         };
+
 
         console.log(
             "[CricBet] Odds selected:",
             selection
         );
+
+
+        /*
+         * Keep compatibility with existing
+         * dashboard bet selection handlers.
+         */
 
         document.dispatchEvent(
             new CustomEvent(
@@ -2253,8 +3230,96 @@ document.addEventListener(
                 }
             )
         );
+
+
+        /*
+         * Dashboard compact odds are not the full
+         * bet placement interface.
+         *
+         * Open the detailed match page where the
+         * complete market/betslip is available.
+         */
+
+        if (
+            selection.gameId
+        ) {
+
+            window.location.href =
+                `/match/${encodeURIComponent(
+                    selection.gameId
+                )}`;
+        }
+
     }
 );
+
+
+/* =========================================================
+   FILTER BUTTON SETUP
+========================================================= */
+
+function setupFilters() {
+
+    document
+        .querySelectorAll(
+            ".sport-filter"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        setFilter(
+                            button.dataset.filter
+                        );
+                    }
+                );
+            }
+        );
+}
+
+
+/* =========================================================
+   TOP BAR SETUP
+========================================================= */
+
+function setupTopbar() {
+
+    const depositButton =
+        document.getElementById(
+            "depositBtn"
+        );
+
+
+    if (
+        depositButton
+    ) {
+
+        depositButton.addEventListener(
+            "click",
+            openDepositWhatsApp
+        );
+    }
+
+
+    const withdrawButton =
+        document.getElementById(
+            "withdrawBtn"
+        );
+
+
+    if (
+        withdrawButton
+    ) {
+
+        withdrawButton.addEventListener(
+            "click",
+            openWithdrawWhatsApp
+        );
+    }
+}
 
 
 /* =========================================================
@@ -2265,52 +3330,15 @@ document.addEventListener(
     "DOMContentLoaded",
     () => {
 
-        document
-            .querySelectorAll(
-                ".sport-filter"
-            )
-            .forEach(
-                button => {
-
-                    button.addEventListener(
-                        "click",
-                        () => {
-
-                            setFilter(
-                                button.dataset.filter
-                            );
-                        }
-                    );
-                }
-            );
+        console.log(
+            "[CricBet] Dashboard initializing..."
+        );
 
 
-        const depositButton =
-            document.getElementById(
-                "depositBtn"
-            );
-
-        if (depositButton) {
-
-            depositButton.addEventListener(
-                "click",
-                openDepositWhatsApp
-            );
-        }
+        setupFilters();
 
 
-        const withdrawButton =
-            document.getElementById(
-                "withdrawBtn"
-            );
-
-        if (withdrawButton) {
-
-            withdrawButton.addEventListener(
-                "click",
-                openWithdrawWhatsApp
-            );
-        }
+        setupTopbar();
 
 
         setupBetslip();
@@ -2325,11 +3353,19 @@ document.addEventListener(
         loadMatches();
 
 
+        /*
+         * Refresh matches every 30 seconds.
+         */
+
         setInterval(
             loadMatches,
             MATCH_REFRESH_MS
         );
 
+
+        /*
+         * Refresh odds every 5 seconds.
+         */
 
         setInterval(
             () => {
@@ -2339,7 +3375,11 @@ document.addEventListener(
                 ) {
 
                     allMatches.forEach(
-                        loadOddsForMatch
+                        match => {
+                            loadOddsForMatch(
+                                match
+                            );
+                        }
                     );
                 }
 
@@ -2348,11 +3388,19 @@ document.addEventListener(
         );
 
 
+        /*
+         * Refresh balance.
+         */
+
         setInterval(
             loadBalance,
-            15000
+            BALANCE_REFRESH_MS
         );
 
+
+        /*
+         * Refresh My Bets.
+         */
 
         setInterval(
             loadMyBets,

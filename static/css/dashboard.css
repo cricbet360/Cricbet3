@@ -1,3 +1,10 @@
+
+/* =========================================================
+   CRICBET DASHBOARD
+   
+========================================================= */
+
+
 /* =========================================================
    RESET
 ========================================================= */
@@ -14,10 +21,33 @@ body {
 }
 
 body {
-    font-family: Inter, Arial, sans-serif;
-    background: #07120d;
-    color: #e8f5ed;
+    background: #071b12;
+    color: #f1f5f3;
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
     font-size: 14px;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button {
+    border: 0;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
 }
 
 
@@ -26,40 +56,57 @@ body {
 ========================================================= */
 
 .topbar {
-    min-height: 60px;
-    padding: 0 24px;
+    width: 100%;
+    min-height: 64px;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
 
-    background: #071a12;
-    border-bottom: 1px solid #173b2b;
+    padding: 0 24px;
 
-    color: #ffffff;
+    background: #0a2117;
+    border-bottom: 1px solid #173c2a;
+
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
+
+
+/* =========================================================
+   BRAND
+========================================================= */
 
 .brand {
     display: flex;
     align-items: center;
     gap: 9px;
 
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: .5px;
+    user-select: none;
 }
 
 .brand-icon {
-    font-size: 21px;
+    font-size: 25px;
+    line-height: 1;
 }
 
 .brand-text {
     color: #ffffff;
+
+    font-size: 21px;
+    font-weight: 900;
+    letter-spacing: 1.2px;
 }
 
 .brand-accent {
-    color: #20c77a;
+    color: #22b56b;
 }
+
+
+/* =========================================================
+   TOPBAR RIGHT
+========================================================= */
 
 .topbar-right {
     display: flex;
@@ -69,127 +116,147 @@ body {
 
 .balance {
     display: flex;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column;
+    align-items: flex-end;
 
-    padding: 8px 14px;
-
-    border: 1px solid #214a37;
-    border-radius: 6px;
-
-    background: #10291e;
-
-    font-size: 13px;
-    font-weight: 600;
+    margin-right: 6px;
 }
 
 .balance-label {
-    color: #8fa99b;
+    color: #8da99b;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .7px;
 }
 
 .balance-value {
-    color: #38d98a;
-    font-weight: 800;
-}
-
-.topbar-action {
-    border: none;
-    border-radius: 5px;
-
-    padding: 9px 17px;
-
     color: #ffffff;
-
-    font-size: 13px;
-    font-weight: 700;
-
-    cursor: pointer;
-
-    transition:
-        background .2s ease,
-        transform .15s ease;
-}
-
-.topbar-action:hover {
-    transform: translateY(-1px);
-}
-
-.deposit-action {
-    background: #159a60;
-}
-
-.deposit-action:hover {
-    background: #18b56e;
-}
-
-.withdraw-action {
-    background: #bd7b18;
-}
-
-.withdraw-action:hover {
-    background: #d89124;
-}
-
-.profile-link,
-.logout {
-    color: #b9cfc3;
-
-    text-decoration: none;
-
-    font-size: 13px;
-
-    transition: color .2s ease;
-}
-
-.profile-link:hover,
-.logout:hover {
-    color: #35d98a;
+    font-size: 14px;
+    font-weight: 800;
 }
 
 
 /* =========================================================
-   MAIN NAVIGATION
+   TOPBAR BUTTONS
 ========================================================= */
 
-.main-mode-nav {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px;
+.topbar-action,
+.profile-link,
+.logout {
+    min-height: 36px;
 
-    padding: 6px 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
-    background: #0b2117;
-    border-bottom: 1px solid #173b2b;
-}
+    padding: 0 13px;
 
-.mode-tab {
-    border: none;
-    border-radius: 5px;
+    border-radius: 6px;
 
-    padding: 13px;
-
-    background: #102c20;
-
-    color: #9bb5a7;
-
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 800;
-
-    cursor: pointer;
 
     transition:
         background .2s ease,
-        color .2s ease;
+        border-color .2s ease,
+        color .2s ease,
+        transform .15s ease;
+}
+
+.topbar-action {
+    cursor: pointer;
+}
+
+.deposit-action {
+    background: #138653;
+    color: #ffffff;
+}
+
+.deposit-action:hover {
+    background: #17a565;
+    transform: translateY(-1px);
+}
+
+.withdraw-action {
+    background: #132d21;
+    color: #dce9e3;
+    border: 1px solid #28533e;
+}
+
+.withdraw-action:hover {
+    background: #1a3a2a;
+    border-color: #397357;
+}
+
+.profile-link {
+    color: #b9cdc3;
+}
+
+.profile-link:hover {
+    color: #ffffff;
+    background: #112d20;
+}
+
+.logout {
+    color: #d59b9b;
+}
+
+.logout:hover {
+    color: #ffb1b1;
+    background: #321817;
+}
+
+
+/* =========================================================
+   MAIN MODE NAV
+========================================================= */
+
+.main-mode-nav {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 24px;
+
+    background: #091f15;
+    border-bottom: 1px solid #173b29;
+}
+
+.mode-tab {
+    min-width: 100px;
+    height: 45px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    background: transparent;
+    color: #779287;
+
+    border-bottom: 2px solid transparent;
+
+    cursor: pointer;
+
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: .8px;
+
+    transition:
+        color .2s ease,
+        border-color .2s ease,
+        background .2s ease;
 }
 
 .mode-tab:hover {
-    background: #163b2a;
-    color: #dff8ea;
+    color: #ffffff;
+    background: #0d281c;
 }
 
 .mode-tab.active {
-    background: #138653;
-    color: #ffffff;
+    color: #27c274;
+    border-bottom-color: #20ad68;
 }
 
 
@@ -198,9 +265,12 @@ body {
 ========================================================= */
 
 .sportsbook-container {
-    width: min(1500px, calc(100% - 32px));
+    width: 100%;
+    max-width: 1500px;
 
-    margin: 14px auto 90px;
+    margin: 0 auto;
+
+    padding: 22px 24px 100px;
 }
 
 
@@ -209,116 +279,124 @@ body {
 ========================================================= */
 
 .sportsbook-header {
+    min-height: 76px;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
 
-    padding: 13px 16px;
+    gap: 20px;
 
-    background: #0e2118;
+    margin-bottom: 16px;
+    padding: 16px 18px;
 
-    border: 1px solid #193b2c;
-    border-bottom: none;
-
-    border-radius: 7px 7px 0 0;
+    background: #0b2418;
+    border: 1px solid #173d2b;
+    border-radius: 8px;
 }
 
 .sport-title {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 13px;
 }
 
 .sport-icon {
-    width: 34px;
-    height: 34px;
+    width: 42px;
+    height: 42px;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    border-radius: 7px;
+    background: #103623;
+    border: 1px solid #24543b;
+    border-radius: 8px;
 
-    background: #123c2a;
-
-    font-size: 18px;
+    font-size: 22px;
 }
 
 .sport-title h2 {
-    margin: 0;
+    margin: 0 0 3px;
 
-    color: #f1fff7;
+    color: #ffffff;
 
-    font-size: 17px;
-    font-weight: 800;
+    font-size: 20px;
+    font-weight: 850;
 }
 
 .sport-title p {
-    margin: 3px 0 0;
+    margin: 0;
 
-    color: #789789;
+    color: #7f998e;
 
-    font-size: 11px;
+    font-size: 12px;
 }
+
+
+/* =========================================================
+   FILTERS
+========================================================= */
 
 .sport-filters {
     display: flex;
+    align-items: center;
     gap: 7px;
 }
 
 .sport-filter {
-    border: 1px solid #234a37;
-    border-radius: 16px;
+    min-width: 75px;
+    height: 34px;
 
-    padding: 7px 13px;
+    padding: 0 13px;
 
-    background: #10291e;
+    background: #0e2b1e;
+    color: #91a99f;
 
-    color: #91aa9c;
-
-    font-size: 11px;
-    font-weight: 700;
+    border: 1px solid #204a35;
+    border-radius: 5px;
 
     cursor: pointer;
 
+    font-size: 11px;
+    font-weight: 800;
+
     transition:
         background .2s ease,
-        color .2s ease,
-        border-color .2s ease;
+        border-color .2s ease,
+        color .2s ease;
 }
 
 .sport-filter:hover {
-    border-color: #2b7453;
-    color: #d8f5e4;
+    color: #ffffff;
+    border-color: #397457;
 }
 
 .sport-filter.active {
     background: #138653;
-    border-color: #138653;
-
     color: #ffffff;
+    border-color: #138653;
 }
 
 
 /* =========================================================
-   MATCH TABLE
+   MATCHES WRAPPER
 ========================================================= */
 
 .matches-wrapper {
-    background: #0b1c14;
-
-    border: 1px solid #193b2c;
-    border-radius: 0 0 7px 7px;
+    width: 100%;
 
     overflow: hidden;
 
-    box-shadow:
-        0 5px 20px rgba(0, 0, 0, .25);
+    background: #0a2117;
+
+    border: 1px solid #173d2b;
+    border-radius: 8px;
 }
 
 
 /* =========================================================
-   COLUMN HEADER
+   ODDS HEADER
 ========================================================= */
 
 .odds-header {
@@ -330,50 +408,49 @@ body {
         170px
         170px;
 
-    min-height: 42px;
+    min-height: 44px;
 
-    background: #10271c;
+    background: #0d291d;
 
-    border-bottom: 1px solid #1b3c2d;
+    border-bottom: 1px solid #1a402e;
 }
 
-.match-column {
-    display: flex;
-    align-items: center;
-
-    padding-left: 16px;
-
-    color: #789789;
-
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
-}
-
+.match-column,
 .odds-column-header {
     display: flex;
     align-items: center;
+
+    padding: 0 16px;
+
+    color: #829a90;
+
+    font-size: 10px;
+    font-weight: 900;
+
+    text-transform: uppercase;
+    letter-spacing: .8px;
+}
+
+.match-column {
+    justify-content: flex-start;
+}
+
+.odds-column-header {
     justify-content: center;
 
-    color: #9bb6a7;
-
-    font-size: 12px;
-    font-weight: 800;
+    border-left: 1px solid #173b29;
 }
 
 .back-header {
-    background: rgba(21, 154, 96, .08);
-    color: #42d994;
+    color: #4dd28b;
 }
 
 .lay-header {
-    background: rgba(202, 83, 83, .08);
-    color: #e98c8c;
+    color: #e19b9b;
 }
 
 .draw-header {
-    background: rgba(188, 137, 35, .08);
-    color: #d9ae5d;
+    color: #d5b575;
 }
 
 
@@ -390,21 +467,20 @@ body {
         170px
         170px;
 
-    min-height: 76px;
+    background: #0a2117;
 
-    background: #0b1c14;
+    border-bottom: 1px solid #153728;
 
-    border-bottom: 1px solid #183529;
-
-    transition: background .2s ease;
-}
-
-.sportsbook-match-row:hover {
-    background: #0e2419;
+    transition:
+        background .2s ease;
 }
 
 .sportsbook-match-row:last-child {
-    border-bottom: none;
+    border-bottom: 0;
+}
+
+.sportsbook-match-row:hover {
+    background: #0c261b;
 }
 
 
@@ -415,110 +491,108 @@ body {
 .match-information {
     min-width: 0;
 
-    padding: 10px 16px;
+    padding: 14px 16px 10px;
 }
 
 .match-status-line {
+    min-height: 18px;
+
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
 
     margin-bottom: 5px;
 }
 
 .match-status {
-    font-size: 10px;
-    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
 
-    text-transform: uppercase;
+    font-size: 9px;
+    font-weight: 900;
+
+    letter-spacing: .6px;
 }
 
 .live-status {
-    color: #ff6565;
+    color: #35d27f;
 }
 
 .upcoming-status {
-    color: #80988b;
+    color: #d5b96f;
+}
+
+.started-status {
+    color: #d3a067;
+}
+
+.finished-status {
+    color: #8a9b94;
+}
+
+.match-time {
+    color: #718a7f;
+
+    font-size: 10px;
+    font-weight: 600;
 }
 
 .live-dot {
     width: 7px;
     height: 7px;
 
+    flex: 0 0 7px;
+
     border-radius: 50%;
 
-    background: #ff4e4e;
+    background: #28c875;
 
     box-shadow:
-        0 0 0 3px rgba(255, 78, 78, .12);
-
-    animation: livePulse 1.5s infinite;
-}
-
-@keyframes livePulse {
-    0% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: .4;
-    }
-
-    100% {
-        opacity: 1;
-    }
-}
-
-.match-time {
-    color: #718b7d;
-
-    font-size: 11px;
+        0 0 0 3px rgba(40, 200, 117, .10);
 }
 
 .match-name {
-    overflow: hidden;
+    max-width: 100%;
 
-    color: #eaf8ef;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: #ffffff;
 
     font-size: 14px;
     font-weight: 800;
 
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-.match-name span {
-    color: #759286;
-
-    font-weight: 500;
-}
-
-.match-league {
-    margin-top: 4px;
-
-    overflow: hidden;
-
-    color: #637e70;
-
-    font-size: 11px;
-
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    margin-bottom: 8px;
 }
 
 .team-names {
     display: flex;
     flex-direction: column;
     gap: 3px;
-
-    margin-top: 6px;
 }
 
 .team-name {
-    color: #cfe5d8;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: #c4d4ce;
 
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 650;
+}
+
+.match-league {
+    margin-top: 7px;
+
+    color: #617b70;
+
+    font-size: 9px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: .5px;
 }
 
 
@@ -527,76 +601,79 @@ body {
 ========================================================= */
 
 .odds-cell {
-    margin: 7px 5px;
-
-    border: 1px solid transparent;
-    border-radius: 5px;
-
     min-width: 0;
+    min-height: 78px;
 
-    font-size: 14px;
-    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 10px 7px;
+
+    padding: 0;
+
+    border-radius: 6px;
 
     cursor: pointer;
 
     transition:
-        transform .15s ease,
-        filter .15s ease,
-        border-color .15s ease;
+        background .15s ease,
+        border-color .15s ease,
+        transform .1s ease;
 }
 
-.odds-cell:hover:not(:disabled) {
-    filter: brightness(1.08);
-
-    transform: scale(.985);
+.odds-cell:not(:disabled):active {
+    transform: scale(.98);
 }
 
 .odds-cell:disabled {
     cursor: default;
-    opacity: .45;
+    opacity: 1;
 }
 
-.odds-team-1,
+.odds-team-1 {
+    background: #103b29;
+    border: 1px solid #205b3e;
+}
+
+.odds-team-1:not(:disabled):hover {
+    background: #15563a;
+    border-color: #2b8057;
+}
+
 .odds-team-2 {
-    background: #123a2a;
-
-    border-color: #1c5940;
-
-    color: #49dc94;
+    background: #321d20;
+    border: 1px solid #5c3438;
 }
 
-.odds-team-1:hover:not(:disabled),
-.odds-team-2:hover:not(:disabled) {
-    border-color: #2a8a61;
+.odds-team-2:not(:disabled):hover {
+    background: #482529;
+    border-color: #8a484e;
 }
 
 .odds-draw {
-    background: #3a2c16;
-
-    border-color: #624c25;
-
-    color: #e1b75e;
+    background: #302816;
+    border: 1px solid #5d4b27;
 }
 
-.odds-draw:hover:not(:disabled) {
-    border-color: #957033;
+.odds-draw:not(:disabled):hover {
+    background: #44371b;
+    border-color: #806632;
 }
 
 .odds-empty {
-    background: #14221b;
-
-    color: #526a5d;
-
+    background: #0c2419;
+    border: 1px solid #173b29;
     cursor: default;
 }
 
-.odds-cell[data-odds=""],
-.odds-cell[data-odds="None"] {
-    cursor: default;
+.odds-price {
+    color: #ffffff;
 
-    background: #121f18;
+    font-size: 15px;
+    font-weight: 900;
 
-    color: #526a5d;
+    letter-spacing: .2px;
 }
 
 
@@ -611,58 +688,49 @@ body {
     align-items: center;
     justify-content: flex-end;
 
-    padding: 0 16px 10px;
+    padding: 0 16px 12px;
 }
 
 .view-match-button {
+    min-width: 125px;
+    height: 32px;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
 
-    padding: 6px 12px;
+    gap: 7px;
 
-    border: 1px solid #245b41;
+    padding: 0 12px;
+
+    background: #102f21;
+    color: #55cf8e;
+
+    border: 1px solid #27583f;
     border-radius: 5px;
 
-    background: #102c20;
+    font-size: 10px;
+    font-weight: 900;
 
-    color: #50d995;
-
-    font-size: 11px;
-    font-weight: 700;
-
-    text-decoration: none;
-
-    cursor: pointer;
+    letter-spacing: .5px;
 
     transition:
         background .2s ease,
+        color .2s ease,
         border-color .2s ease,
-        color .2s ease;
+        transform .15s ease;
 }
 
 .view-match-button:hover {
     background: #138653;
+    color: #ffffff;
     border-color: #138653;
 
-    color: #ffffff;
+    transform: translateY(-1px);
 }
 
-
-/* =========================================================
-   MATCH FOOTER
-========================================================= */
-
-.match-footer {
-    padding: 10px 16px;
-
-    background: #0a1912;
-
-    border-top: 1px solid #183529;
-
-    color: #688274;
-
-    font-size: 11px;
+.view-match-button span {
+    font-size: 14px;
 }
 
 
@@ -671,49 +739,62 @@ body {
 ========================================================= */
 
 .empty-state {
-    text-align: center;
+    min-height: 230px;
 
-    padding: 60px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 40px 20px;
+
+    text-align: center;
 }
 
 .empty-state-icon {
     margin-bottom: 10px;
 
     font-size: 35px;
-    opacity: .65;
 }
 
 .empty-state-title {
-    margin-bottom: 6px;
-
-    color: #d8eee1;
+    color: #dce9e3;
 
     font-size: 15px;
     font-weight: 800;
 }
 
 .empty-state-text {
-    color: #718b7d;
+    max-width: 460px;
 
-    font-size: 12px;
+    margin-top: 7px;
+
+    color: #718b80;
+
+    font-size: 11px;
+    line-height: 1.6;
 }
 
 .retry-matches-button {
-    margin-top: 15px;
+    margin-top: 16px;
 
-    padding: 8px 16px;
+    height: 34px;
 
-    border: 1px solid #266346;
+    padding: 0 18px;
+
+    background: #138653;
+    color: #ffffff;
+
     border-radius: 5px;
 
-    background: #123a2a;
-
-    color: #50d995;
-
-    font-size: 12px;
-    font-weight: 700;
-
     cursor: pointer;
+
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.retry-matches-button:hover {
+    background: #17a565;
 }
 
 
@@ -725,155 +806,579 @@ body {
     position: fixed;
 
     right: 20px;
-    bottom: 20px;
+    bottom: 76px;
 
-    width: 340px;
-    max-height: 75vh;
+    width: 390px;
+    max-width: calc(100vw - 40px);
+
+    max-height: min(720px, calc(100vh - 105px));
 
     display: flex;
     flex-direction: column;
 
-    background: #0d2117;
-
-    border: 1px solid #214b37;
-    border-radius: 8px;
-
-    box-shadow:
-        0 15px 45px rgba(0, 0, 0, .45);
-
     overflow: hidden;
 
-    z-index: 100;
+    background: #0a2117;
+
+    border: 1px solid #28533e;
+    border-radius: 10px;
+
+    box-shadow:
+        0 18px 50px rgba(0, 0, 0, .55),
+        0 5px 18px rgba(0, 0, 0, .30);
+
+    z-index: 9998;
+
+    opacity: 1;
+
+    transition:
+        opacity .2s ease,
+        transform .2s ease;
 }
 
+.betslip.open {
+    display: flex !important;
+
+    opacity: 1;
+
+    transform: translateY(0);
+}
+
+.betslip.minimized {
+    display: none !important;
+}
+
+
+/*
+ * HTML hidden attribute must always hide the panel.
+ */
+
+.betslip[hidden] {
+    display: none !important;
+}
+
+
+/* =========================================================
+   BETSLIP HEADER
+========================================================= */
+
 .betslip-header {
+    min-height: 62px;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
 
-    padding: 14px;
+    padding: 12px 14px;
 
-    background: #102f21;
+    background: #0d2a1d;
 
-    border-bottom: 1px solid #1e4935;
-
-    color: #ffffff;
+    border-bottom: 1px solid #1d4431;
 }
 
 .betslip-header h2 {
-    margin: 0;
+    margin: 0 0 3px;
+
+    color: #ffffff;
 
     font-size: 16px;
+    font-weight: 850;
 }
 
-.betslip-header span {
-    font-size: 11px;
+#betslipSubtitle {
+    color: #759086;
 
-    color: #7fa594;
+    font-size: 10px;
+    font-weight: 650;
 }
 
 .betslip-close {
-    border: none;
+    width: 31px;
+    height: 31px;
 
-    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    color: #a9c3b5;
+    background: #132f22;
+    color: #a4b8af;
 
-    font-size: 25px;
-    line-height: 1;
+    border: 1px solid #2a513e;
+    border-radius: 5px;
 
     cursor: pointer;
+
+    font-size: 22px;
+    line-height: 1;
+
+    transition:
+        background .2s ease,
+        color .2s ease,
+        border-color .2s ease;
 }
 
 .betslip-close:hover {
-    color: #ffffff;
+    background: #3a2023;
+    color: #ffb5b5;
+    border-color: #694044;
 }
+
+
+/* =========================================================
+   BETSLIP CONTENT
+========================================================= */
 
 .betslip-content {
-    min-height: 130px;
+    flex: 1;
 
-    padding: 14px;
+    min-height: 0;
 
     overflow-y: auto;
+
+    padding: 10px;
+
+    scrollbar-width: thin;
+    scrollbar-color: #28523d #0a2117;
 }
 
+.betslip-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.betslip-content::-webkit-scrollbar-track {
+    background: #0a2117;
+}
+
+.betslip-content::-webkit-scrollbar-thumb {
+    background: #28523d;
+    border-radius: 10px;
+}
+
+
+/* =========================================================
+   EMPTY BETSLIP
+========================================================= */
+
 .betslip-empty {
-    padding: 20px 10px;
+    min-height: 190px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 30px 20px;
 
     text-align: center;
+}
 
-    color: #718b7d;
+.betslip-empty-icon {
+    margin-bottom: 10px;
+
+    font-size: 30px;
 }
 
 .betslip-empty h3 {
     margin: 0 0 6px;
 
-    color: #c9dfd1;
+    color: #dce8e2;
 
     font-size: 14px;
+    font-weight: 800;
 }
 
 .betslip-empty p {
+    max-width: 270px;
+
     margin: 0;
 
-    font-size: 12px;
-}
+    color: #70897e;
 
-.betslip-footer {
-    padding: 13px;
-
-    border-top: 1px solid #1d3d2e;
-
-    background: #0a1a12;
-}
-
-.betslip-balance {
-    display: flex;
-    justify-content: space-between;
-
-    margin-bottom: 10px;
-
-    color: #8ca99a;
-
-    font-size: 12px;
-}
-
-.place-bet-button {
-    width: 100%;
-
-    border: none;
-    border-radius: 5px;
-
-    padding: 11px;
-
-    background: #138653;
-
-    color: #ffffff;
-
-    font-weight: 800;
-
-    cursor: pointer;
-
-    transition: background .2s ease;
-}
-
-.place-bet-button:hover:not(:disabled) {
-    background: #18a866;
-}
-
-.place-bet-button:disabled {
-    opacity: .45;
-
-    cursor: not-allowed;
+    font-size: 11px;
+    line-height: 1.5;
 }
 
 
 /* =========================================================
-   MOBILE BET SLIP BUTTON
+   BET CARD
 ========================================================= */
 
+.betslip-bet-card {
+    margin-bottom: 9px;
+    padding: 12px;
+
+    background: #0d281c;
+
+    border: 1px solid #1d4632;
+    border-radius: 7px;
+}
+
+.betslip-bet-card:last-child {
+    margin-bottom: 0;
+}
+
+.betslip-bet-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-bottom: 9px;
+}
+
+.betslip-bet-title {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.betslip-sport-icon {
+    width: 28px;
+    height: 28px;
+
+    flex: 0 0 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #123824;
+
+    border: 1px solid #25583d;
+    border-radius: 5px;
+
+    font-size: 14px;
+}
+
+.betslip-bet-title > div {
+    min-width: 0;
+}
+
+.betslip-bet-title strong {
+    display: block;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: #e9f2ee;
+
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.betslip-bet-title small {
+    display: block;
+
+    margin-top: 2px;
+
+    color: #759086;
+
+    font-size: 9px;
+    font-weight: 600;
+}
+
+.betslip-status {
+    flex: 0 0 auto;
+
+    padding: 4px 6px;
+
+    border-radius: 4px;
+
+    font-size: 8px;
+    font-weight: 900;
+
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
+
+.betslip-status.pending {
+    background: #392e17;
+    color: #dfbd70;
+}
+
+.betslip-status.completed,
+.betslip-status.won {
+    background: #123d28;
+    color: #5fe09a;
+}
+
+.betslip-status.lost,
+.betslip-status.failed {
+    background: #3a2022;
+    color: #e5969b;
+}
+
+.betslip-status.cancelled,
+.betslip-status.canceled {
+    background: #252a28;
+    color: #a0aea8;
+}
+
+
+/* =========================================================
+   BET MATCH NAME
+========================================================= */
+
+.betslip-match-name {
+    margin-bottom: 10px;
+
+    padding-bottom: 9px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: #9eb5aa;
+
+    border-bottom: 1px solid #1a3b2b;
+
+    font-size: 10px;
+    font-weight: 650;
+}
+
+
+/* =========================================================
+   BET DETAILS
+========================================================= */
+
+.betslip-details-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 7px;
+}
+
+.betslip-detail {
+    min-width: 0;
+
+    padding: 8px;
+
+    background: #0a2117;
+
+    border: 1px solid #173c2b;
+    border-radius: 5px;
+}
+
+.betslip-detail span {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: #657f74;
+
+    font-size: 8px;
+    font-weight: 800;
+
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.betslip-detail strong {
+    display: block;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: #e6f0eb;
+
+    font-size: 11px;
+    font-weight: 850;
+}
+
+.bet-back {
+    color: #4ed18c !important;
+}
+
+.bet-lay {
+    color: #e2989d !important;
+}
+
+
+/* =========================================================
+   BET FOOTER
+========================================================= */
+
+.betslip-bet-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-top: 9px;
+
+    color: #5e776c;
+
+    font-size: 8px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   BETSLIP FOOTER
+========================================================= */
+
+.betslip-footer {
+    min-height: 67px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding: 10px 13px;
+
+    background: #0d2a1d;
+
+    border-top: 1px solid #1d4431;
+}
+
+.betslip-balance {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.betslip-balance span {
+    color: #70897e;
+
+    font-size: 9px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.betslip-balance strong {
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 850;
+}
+
+.place-bet-button {
+    height: 38px;
+
+    padding: 0 14px;
+
+    background: #24513a;
+    color: #7f9d8f;
+
+    border-radius: 5px;
+
+    cursor: not-allowed;
+
+    font-size: 9px;
+    font-weight: 900;
+
+    letter-spacing: .5px;
+}
+
+
+/* =========================================================
+   BETSLIP OPEN BUTTON
+========================================================= */
+
+/*
+ * Important:
+ * This is intentionally visible on DESKTOP too.
+ *
+ * Your previous CSS hid .mobile-betslip-button on desktop,
+ * which meant there was no way to reopen the minimized slip.
+ */
+
 .mobile-betslip-button {
-    display: none;
+    position: fixed;
+
+    right: 20px;
+    bottom: 20px;
+
+    min-width: 125px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    padding: 0 15px;
+
+    background: #102f21;
+    color: #ffffff;
+
+    border: 1px solid #2a5a40;
+    border-radius: 7px;
+
+    cursor: pointer;
+
+    z-index: 9999;
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, .40);
+
+    font-size: 11px;
+    font-weight: 900;
+
+    letter-spacing: .4px;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        transform .15s ease,
+        box-shadow .2s ease;
+}
+
+.mobile-betslip-button:hover {
+    background: #138653;
+    border-color: #138653;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 11px 30px rgba(0, 0, 0, .45);
+}
+
+.mobile-betslip-button:active {
+    transform: translateY(0);
+}
+
+.betslip-count {
+    min-width: 20px;
+    height: 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 5px;
+
+    background: #d99122;
+    color: #ffffff;
+
+    border-radius: 50%;
+
+    font-size: 9px;
+    font-weight: 900;
+}
+
+
+/* =========================================================
+   FOCUS
+========================================================= */
+
+button:focus-visible,
+a:focus-visible {
+    outline: 2px solid #28c878;
+    outline-offset: 2px;
 }
 
 
@@ -881,32 +1386,22 @@ body {
    TABLET
 ========================================================= */
 
-@media (max-width: 900px) {
-
-    .topbar {
-        padding: 0 15px;
-    }
+@media (max-width: 1050px) {
 
     .sportsbook-container {
-        width: calc(100% - 16px);
-    }
-
-    .main-mode-nav {
-        padding: 6px 8px;
+        padding-left: 16px;
+        padding-right: 16px;
     }
 
     .odds-header,
     .sportsbook-match-row {
         grid-template-columns:
             minmax(0, 1fr)
-            110px
-            110px
-            110px;
+            140px
+            140px
+            140px;
     }
 
-    .betslip {
-        width: 310px;
-    }
 }
 
 
@@ -914,267 +1409,196 @@ body {
    MOBILE
 ========================================================= */
 
-@media (max-width: 650px) {
-
-    body {
-        font-size: 13px;
-    }
-
-
-    /* TOPBAR */
+@media (max-width: 750px) {
 
     .topbar {
-        min-height: 52px;
+        min-height: 58px;
+
         padding: 0 12px;
     }
 
-    .brand {
+    .brand-text {
         font-size: 18px;
     }
 
     .brand-icon {
-        font-size: 16px;
+        font-size: 21px;
+    }
+
+    .topbar-right {
+        gap: 5px;
     }
 
     .balance {
-        padding: 7px 9px;
-
-        font-size: 11px;
+        margin-right: 2px;
     }
 
     .balance-label {
         display: none;
     }
 
-    .deposit-action,
-    .withdraw-action,
+    .topbar-action,
     .profile-link,
     .logout {
-        display: none;
+        min-height: 32px;
+
+        padding: 0 8px;
+
+        font-size: 9px;
     }
 
-
-    /* NAVIGATION */
-
     .main-mode-nav {
-        padding: 5px;
-        gap: 3px;
+        padding: 0 12px;
     }
 
     .mode-tab {
-        padding: 11px 5px;
+        min-width: 82px;
+        height: 41px;
 
-        font-size: 12px;
-    }
-
-
-    /* MAIN */
-
-    .sportsbook-container {
-        width: 100%;
-
-        margin: 0 0 75px;
-    }
-
-    .sportsbook-header {
-        padding: 10px 12px;
-
-        border-radius: 0;
-    }
-
-    .sport-title {
-        gap: 7px;
-    }
-
-    .sport-icon {
-        width: 29px;
-        height: 29px;
-
-        font-size: 15px;
-    }
-
-    .sport-title h2 {
-        font-size: 14px;
-    }
-
-    .sport-title p {
-        font-size: 9px;
-    }
-
-    .sport-filters {
-        gap: 4px;
-    }
-
-    .sport-filter {
-        padding: 6px 8px;
-
-        font-size: 9px;
-    }
-
-
-    /* TABLE HEADER */
-
-    .odds-header {
-        grid-template-columns:
-            minmax(0, 1fr)
-            23%
-            23%
-            23%;
-
-        min-height: 35px;
-    }
-
-    .match-column {
-        padding-left: 10px;
-
-        font-size: 9px;
-    }
-
-    .odds-column-header {
         font-size: 10px;
     }
 
+    .sportsbook-container {
+        padding: 12px 10px 90px;
+    }
 
-    /* MATCH ROW */
+    .sportsbook-header {
+        min-height: auto;
+
+        flex-direction: column;
+        align-items: stretch;
+
+        padding: 13px;
+
+        gap: 13px;
+    }
+
+    .sport-title {
+        justify-content: flex-start;
+    }
+
+    .sport-title h2 {
+        font-size: 17px;
+    }
+
+    .sport-title p {
+        font-size: 10px;
+    }
+
+    .sport-filters {
+        width: 100%;
+    }
+
+    .sport-filter {
+        flex: 1;
+
+        min-width: 0;
+    }
+
+
+    /*
+     * Mobile match list becomes card-style.
+     */
+
+    .odds-header {
+        display: none;
+    }
 
     .sportsbook-match-row {
-        grid-template-columns:
-            minmax(0, 1fr)
-            23%
-            23%
-            23%;
+        display: grid;
 
-        min-height: 70px;
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
+        gap: 0;
+
+        padding-top: 2px;
     }
 
     .match-information {
-        padding: 8px 9px;
-    }
+        grid-column: 1 / -1;
 
-    .match-status-line {
-        gap: 5px;
-
-        margin-bottom: 3px;
-    }
-
-    .match-status {
-        font-size: 8px;
-    }
-
-    .match-time {
-        font-size: 8px;
-    }
-
-    .match-name {
-        font-size: 11px;
-
-        white-space: normal;
-        overflow: visible;
-    }
-
-    .match-league {
-        margin-top: 3px;
-
-        font-size: 8px;
-    }
-
-    .team-names {
-        gap: 2px;
-        margin-top: 4px;
-    }
-
-    .team-name {
-        font-size: 9px;
+        padding: 13px 13px 8px;
     }
 
     .odds-cell {
-        margin: 5px 2px;
+        min-height: 58px;
 
-        font-size: 11px;
+        margin: 4px;
+
+        border-radius: 5px;
+    }
+
+    .odds-price {
+        font-size: 13px;
     }
 
     .match-action {
-        padding: 0 9px 8px;
+        grid-column: 1 / -1;
+
+        padding:
+            6px
+            10px
+            11px;
     }
 
     .view-match-button {
-        padding: 5px 9px;
-
-        font-size: 9px;
+        width: 100%;
     }
 
 
-    /* BET SLIP */
+    /*
+     * Bet slip becomes a bottom sheet.
+     */
 
     .betslip {
         right: 0;
-        bottom: 0;
+        bottom: 54px;
 
         width: 100%;
-        max-height: 75vh;
+        max-width: none;
 
-        border-radius: 14px 14px 0 0;
+        max-height: 78vh;
 
-        transform: translateY(100%);
+        border-radius: 12px 12px 0 0;
 
-        transition: transform .25s ease;
+        transform: translateY(0);
     }
 
     .betslip.open {
         transform: translateY(0);
     }
 
+    .betslip.minimized,
+    .betslip[hidden] {
+        display: none !important;
+    }
 
-    /* MOBILE BET SLIP BUTTON */
+
+    /*
+     * Mobile floating/open button.
+     */
 
     .mobile-betslip-button {
-        position: fixed;
-
         left: 0;
         right: 0;
         bottom: 0;
 
         width: 100%;
+        min-width: 0;
+
         height: 54px;
 
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        border-radius: 0;
 
-        gap: 8px;
+        border-left: 0;
+        border-right: 0;
+        border-bottom: 0;
 
-        border: none;
-
-        background: #102f21;
-
-        color: #ffffff;
-
-        font-size: 13px;
-        font-weight: 800;
-
-        z-index: 99;
+        box-shadow:
+            0 -5px 20px rgba(0, 0, 0, .35);
     }
 
-    .mobile-betslip-button:hover {
-        background: #16412d;
-    }
-
-    .betslip-count {
-        min-width: 20px;
-        height: 20px;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        border-radius: 50%;
-
-        background: #d99122;
-
-        color: #ffffff;
-
-        font-size: 10px;
-    }
 }
 
 
@@ -1182,329 +1606,97 @@ body {
    SMALL MOBILE
 ========================================================= */
 
-@media (max-width: 400px) {
+@media (max-width: 480px) {
 
     .topbar {
-        padding: 0 9px;
+        padding: 0 8px;
     }
 
-    .brand {
+    .brand-text {
         font-size: 16px;
     }
 
-    .balance {
-        padding: 6px 8px;
+    .brand-icon {
+        display: none;
     }
 
-    .sportsbook-header {
-        padding: 9px;
+    .profile-link {
+        display: none;
     }
 
-    .sport-filters {
-        gap: 2px;
-    }
-
-    .sport-filter {
-        padding: 5px 6px;
-    }
-
-    .odds-cell {
-        margin: 4px 1px;
-
-        font-size: 10px;
-    }
-
-    .match-information {
+    .logout {
         padding-left: 7px;
-        padding-right: 5px;
+        padding-right: 7px;
     }
-}
 
-/* =========================================================
-   CRICBET BET SLIP - ORGANIZED
-========================================================= */
-
-#betslip[hidden] {
-    display: none !important;
-}
-
-#betslip.betslip {
-    flex-direction: column;
-    overflow: hidden;
-}
-
-#betslip.betslip.minimized {
-    display: none !important;
-}
-
-
-/* ---------------------------------------------------------
-   BET HEADER
---------------------------------------------------------- */
-
-.betslip-header {
-    flex-shrink: 0;
-}
-
-.betslip-header h2 {
-    margin: 0;
-}
-
-.betslip-header span {
-    font-size: 12px;
-    opacity: 0.65;
-}
-
-
-/* ---------------------------------------------------------
-   BET CONTENT
---------------------------------------------------------- */
-
-.betslip-content {
-    overflow-y: auto;
-    padding: 12px;
-}
-
-
-/* ---------------------------------------------------------
-   EMPTY STATE
---------------------------------------------------------- */
-
-.betslip-empty {
-    padding: 30px 18px;
-    text-align: center;
-}
-
-.betslip-empty-icon {
-    font-size: 34px;
-    margin-bottom: 10px;
-}
-
-.betslip-empty h3 {
-    margin: 0 0 8px;
-    font-size: 15px;
-}
-
-.betslip-empty p {
-    margin: 0;
-    font-size: 12px;
-    opacity: 0.65;
-}
-
-
-/* ---------------------------------------------------------
-   INDIVIDUAL BET CARD
---------------------------------------------------------- */
-
-.betslip-bet-card {
-    margin-bottom: 12px;
-    padding: 14px;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    background: rgba(255,255,255,0.035);
-}
-
-.betslip-bet-card:last-child {
-    margin-bottom: 0;
-}
-
-
-/* ---------------------------------------------------------
-   BET CARD HEADER
---------------------------------------------------------- */
-
-.betslip-bet-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-.betslip-bet-title {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    min-width: 0;
-}
-
-.betslip-sport-icon {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    border-radius: 8px;
-    background: rgba(0, 200, 100, 0.10);
-}
-
-.betslip-bet-title strong {
-    display: block;
-    font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.betslip-bet-title small {
-    display: block;
-    margin-top: 3px;
-    font-size: 11px;
-    opacity: 0.55;
-}
-
-
-/* ---------------------------------------------------------
-   STATUS
---------------------------------------------------------- */
-
-.betslip-status {
-    flex-shrink: 0;
-    padding: 4px 8px;
-    border-radius: 20px;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-}
-
-.betslip-status.pending {
-    background: rgba(255, 193, 7, 0.12);
-    color: #ffc107;
-}
-
-.betslip-status.completed,
-.betslip-status.won {
-    background: rgba(0, 200, 100, 0.12);
-    color: #00d084;
-}
-
-.betslip-status.lost,
-.betslip-status.cancelled {
-    background: rgba(255, 70, 70, 0.12);
-    color: #ff7070;
-}
-
-
-/* ---------------------------------------------------------
-   MATCH NAME
---------------------------------------------------------- */
-
-.betslip-match-name {
-    padding: 9px 10px;
-    margin-bottom: 12px;
-    border-radius: 7px;
-    background: rgba(0,0,0,0.16);
-    font-size: 12px;
-    line-height: 1.4;
-}
-
-
-/* ---------------------------------------------------------
-   DETAILS GRID
---------------------------------------------------------- */
-
-.betslip-details-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-}
-
-.betslip-detail {
-    padding: 9px;
-    border-radius: 7px;
-    background: rgba(255,255,255,0.025);
-}
-
-.betslip-detail span {
-    display: block;
-    margin-bottom: 4px;
-    font-size: 9px;
-    letter-spacing: 0.5px;
-    opacity: 0.5;
-}
-
-.betslip-detail strong {
-    font-size: 13px;
-}
-
-
-/* ---------------------------------------------------------
-   BACK / LAY
---------------------------------------------------------- */
-
-.betslip-detail .bet-back {
-    color: #35d58a;
-}
-
-.betslip-detail .bet-lay {
-    color: #ff7272;
-}
-
-
-/* ---------------------------------------------------------
-   BET FOOTER
---------------------------------------------------------- */
-
-.betslip-bet-footer {
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-    margin-top: 11px;
-    padding-top: 9px;
-    border-top: 1px solid rgba(255,255,255,0.06);
-    font-size: 9px;
-    opacity: 0.45;
-}
-
-
-/* ---------------------------------------------------------
-   BET SLIP OPEN BUTTON
---------------------------------------------------------- */
-
-.mobile-betslip-button {
-    z-index: 9999;
-    cursor: pointer;
-}
-
-.mobile-betslip-button:hover {
-    transform: translateY(-1px);
-}
-
-
-/* ---------------------------------------------------------
-   STATUS LABELS ON MATCHES
---------------------------------------------------------- */
-
-.live-status {
-    font-weight: 800;
-}
-
-.started-status {
-    opacity: 0.75;
-}
-
-.upcoming-status {
-    opacity: 0.75;
-}
-
-
-/* ---------------------------------------------------------
-   MOBILE
---------------------------------------------------------- */
-
-@media (max-width: 700px) {
-
-    .betslip-bet-card {
-        padding: 12px;
+    .topbar-action {
+        padding-left: 7px;
+        padding-right: 7px;
+    }
+
+    .sportsbook-container {
+        padding-left: 7px;
+        padding-right: 7px;
     }
 
     .betslip-details-grid {
-        gap: 6px;
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
     }
 
-    .betslip-detail {
-        padding: 8px;
+    .betslip-header {
+        min-height: 57px;
+    }
+
+    .betslip-footer {
+        min-height: 62px;
     }
 
 }
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 360px) {
+
+    .withdraw-action {
+        display: none;
+    }
+
+    .brand-text {
+        font-size: 15px;
+    }
+
+    .balance-value {
+        font-size: 12px;
+    }
+
+    .match-name {
+        font-size: 13px;
+    }
+
+    .team-name {
+        font-size: 11px;
+    }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+        animation: none !important;
+    }
+
+}
+
