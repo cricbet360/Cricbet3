@@ -1,3 +1,4 @@
+
 from typing import Optional
 
 from fastapi import APIRouter, Request
@@ -50,7 +51,9 @@ def cricket_matches(
 
     try:
 
-        matches = proexch_api.get_matches()
+        matches = (
+            proexch_api.get_matches()
+        )
 
         return {
             "success": True,
@@ -61,7 +64,8 @@ def cricket_matches(
     except Exception as exc:
 
         print(
-            f"[CRICKET] matches error: {exc}"
+            "[CRICKET] matches error:",
+            exc,
         )
 
         return JSONResponse(
@@ -69,7 +73,8 @@ def cricket_matches(
             content={
                 "success": False,
                 "detail": (
-                    "Unable to load cricket matches"
+                    "Unable to load "
+                    "cricket matches"
                 ),
             },
         )
@@ -95,8 +100,10 @@ def refresh_matches(
 
     try:
 
-        matches = proexch_api.get_matches(
-            force_refresh=True
+        matches = (
+            proexch_api.get_matches(
+                force_refresh=True
+            )
         )
 
         return {
@@ -108,7 +115,8 @@ def refresh_matches(
     except Exception as exc:
 
         print(
-            f"[CRICKET] match refresh error: {exc}"
+            "[CRICKET] match refresh error:",
+            exc,
         )
 
         return JSONResponse(
@@ -116,7 +124,8 @@ def refresh_matches(
             content={
                 "success": False,
                 "detail": (
-                    "Unable to refresh cricket matches"
+                    "Unable to refresh "
+                    "cricket matches"
                 ),
             },
         )
@@ -129,12 +138,15 @@ def refresh_matches(
 @router.get("/odds")
 def cricket_odds(
     request: Request,
+
     gameId: Optional[str] = None,
     eventId: Optional[str] = None,
     marketId: Optional[str] = None,
+
     game_id: Optional[str] = None,
     event_id: Optional[str] = None,
     market_id: Optional[str] = None,
+
     refresh: bool = False,
 ):
 
@@ -151,110 +163,154 @@ def cricket_odds(
     # Accept both frontend naming styles
     # -----------------------------------------------------
 
-    game_id = (
+    resolved_game_id = (
         gameId
         or game_id
     )
 
-    event_id = (
+    resolved_event_id = (
         eventId
         or event_id
     )
 
-    market_id = (
+    resolved_market_id = (
         marketId
         or market_id
     )
 
-    if not game_id:
+    if not resolved_game_id:
 
         return JSONResponse(
             status_code=422,
             content={
                 "success": False,
-                "detail": "gameId is required",
+                "detail": (
+                    "gameId is required"
+                ),
             },
         )
 
     try:
 
         # -------------------------------------------------
-        # If marketId wasn't supplied, resolve it from
-        # the short-lived matches cache.
+        # Resolve IDs from cached match data.
         # -------------------------------------------------
 
-        if not market_id:
+        ids = (
+            proexch_api.get_match_ids(
+                resolved_game_id
+            )
+        )
 
-            ids = proexch_api.get_match_ids(
-                game_id
+        if not resolved_market_id:
+
+            resolved_market_id = (
+                ids.get(
+                    "market_id"
+                )
             )
 
-            market_id = ids.get(
-                "market_id"
-            )
+        if not resolved_event_id:
 
-            if not event_id:
-                event_id = ids.get(
+            resolved_event_id = (
+                ids.get(
                     "event_id"
                 )
+            )
 
-        if not market_id:
+        if not resolved_market_id:
 
             return JSONResponse(
                 status_code=422,
                 content={
                     "success": False,
                     "detail": (
-                        "marketId could not be "
-                        "resolved for this match"
+                        "marketId could not "
+                        "be resolved for "
+                        "this match"
                     ),
-                    "game_id": str(game_id),
+                    "game_id": str(
+                        resolved_game_id
+                    ),
                 },
             )
 
         print(
             "[CRICKET] odds request:",
-            "game_id=", game_id,
-            "event_id=", event_id,
-            "market_id=", market_id,
+            "game_id=",
+            resolved_game_id,
+            "event_id=",
+            resolved_event_id,
+            "market_id=",
+            resolved_market_id,
         )
 
-        odds = proexch_api.get_odds(
-            game_id=game_id,
-            event_id=event_id,
-            market_id=market_id,
-            force_refresh=refresh,
+        odds = (
+            proexch_api.get_odds(
+                game_id=resolved_game_id,
+                event_id=resolved_event_id,
+                market_id=resolved_market_id,
+                force_refresh=refresh,
+            )
         )
 
         counts = odds.get(
             "counts",
-            {}
+            {},
         )
 
         print(
             "[CRICKET] odds received:",
             "match_markets=",
-            counts.get("match_markets", 0),
+            counts.get(
+                "match_markets",
+                0,
+            ),
             "match_runners=",
-            counts.get("match_runners", 0),
+            counts.get(
+                "match_runners",
+                0,
+            ),
             "bookmaker_markets=",
-            counts.get("bookmaker_markets", 0),
+            counts.get(
+                "bookmaker_markets",
+                0,
+            ),
+            "bookmaker_runners=",
+            counts.get(
+                "bookmaker_runners",
+                0,
+            ),
             "fancy_markets=",
-            counts.get("fancy_markets", 0),
+            counts.get(
+                "fancy_markets",
+                0,
+            ),
             "fancy_rows=",
-            counts.get("fancy_rows", 0),
+            counts.get(
+                "fancy_rows",
+                0,
+            ),
         )
 
         return {
             "success": True,
 
-            "game_id": str(game_id),
-            "event_id": (
-                str(event_id)
-                if event_id
-                else str(game_id)
+            "game_id": str(
+                resolved_game_id
             ),
-            "market_id": str(market_id),
+
+            "event_id": (
+                str(resolved_event_id)
+                if resolved_event_id
+                else str(
+                    resolved_game_id
+                )
+            ),
+
+            "market_id": str(
+                resolved_market_id
+            ),
 
             "match_odds": odds.get(
                 "match_odds",
@@ -271,10 +327,11 @@ def cricket_odds(
                 [],
             ),
 
-            "other_market_odds": odds.get(
-                "other_market_odds",
-                [],
-            ),
+            "other_market_odds":
+                odds.get(
+                    "other_market_odds",
+                    [],
+                ),
 
             "counts": counts,
         }
@@ -292,7 +349,8 @@ def cricket_odds(
     except Exception as exc:
 
         print(
-            f"[CRICKET] odds error: {exc}"
+            "[CRICKET] odds error:",
+            exc,
         )
 
         return JSONResponse(
@@ -300,14 +358,15 @@ def cricket_odds(
             content={
                 "success": False,
                 "detail": (
-                    "Unable to load cricket odds"
+                    "Unable to load "
+                    "cricket odds"
                 ),
             },
         )
 
 
 # =========================================================
-# SCOREBOARD / RESULTS
+# SCOREBOARD
 # =========================================================
 
 @router.get("/score/{score_id}")
@@ -315,22 +374,34 @@ def cricket_score(
     request: Request,
     score_id: str,
 ):
-    """Backend proxy for the cricket scoreboard."""
+
     if not _is_logged_in(request):
+
         return JSONResponse(
             status_code=401,
-            content={"detail": "Login required"},
+            content={
+                "detail": "Login required"
+            },
         )
 
     try:
-        data = proexch_api.get_score(score_id)
+
+        data = (
+            proexch_api.get_score(
+                score_id
+            )
+        )
+
         return {
             "success": True,
-            "score_id": str(score_id),
+            "score_id": str(
+                score_id
+            ),
             "data": data,
         }
 
     except ValueError as exc:
+
         return JSONResponse(
             status_code=422,
             content={
@@ -340,37 +411,61 @@ def cricket_score(
         )
 
     except Exception as exc:
-        print(f"[CRICKET] score error: {exc}")
+
+        print(
+            "[CRICKET] score error:",
+            exc,
+        )
+
         return JSONResponse(
             status_code=502,
             content={
                 "success": False,
-                "detail": "Unable to load scoreboard",
+                "detail": (
+                    "Unable to load "
+                    "scoreboard"
+                ),
             },
         )
 
+
+# =========================================================
+# CRICKETBZ RESULT
+# =========================================================
 
 @router.get("/results/{result_id}")
 def cricket_results(
     request: Request,
     result_id: str,
 ):
-    """Backend proxy for match/result data."""
+
     if not _is_logged_in(request):
+
         return JSONResponse(
             status_code=401,
-            content={"detail": "Login required"},
+            content={
+                "detail": "Login required"
+            },
         )
 
     try:
-        data = proexch_api.get_result(result_id)
+
+        data = (
+            proexch_api.get_cricketbz_result(
+                result_id
+            )
+        )
+
         return {
             "success": True,
-            "result_id": str(result_id),
+            "result_id": str(
+                result_id
+            ),
             "data": data,
         }
 
     except ValueError as exc:
+
         return JSONResponse(
             status_code=422,
             content={
@@ -380,12 +475,86 @@ def cricket_results(
         )
 
     except Exception as exc:
-        print(f"[CRICKET] result error: {exc}")
+
+        print(
+            "[CRICKET] result error:",
+            exc,
+        )
+
         return JSONResponse(
             status_code=502,
             content={
                 "success": False,
-                "detail": "Unable to load match result",
+                "detail": (
+                    "Unable to load "
+                    "match result"
+                ),
+            },
+        )
+
+
+# =========================================================
+# PROEXCH RESULT / SETTLEMENT
+# =========================================================
+# Kept separately so the application can access the
+# ProExch betfair-result endpoint when needed.
+
+@router.get("/proexch-result/{market_id}")
+def proexch_result(
+    request: Request,
+    market_id: str,
+):
+
+    if not _is_logged_in(request):
+
+        return JSONResponse(
+            status_code=401,
+            content={
+                "detail": "Login required"
+            },
+        )
+
+    try:
+
+        data = (
+            proexch_api.get_proexch_result(
+                market_id
+            )
+        )
+
+        return {
+            "success": True,
+            "market_id": str(
+                market_id
+            ),
+            "data": data,
+        }
+
+    except ValueError as exc:
+
+        return JSONResponse(
+            status_code=422,
+            content={
+                "success": False,
+                "detail": str(exc),
+            },
+        )
+
+    except Exception as exc:
+
+        print(
+            "[CRICKET] ProExch result error:",
+            exc,
+        )
+
+        return JSONResponse(
+            status_code=502,
+            content={
+                "success": False,
+                "detail": (
+                    "Unable to load "
+                    "ProExch result"
+                ),
             },
         )
 
@@ -411,8 +580,10 @@ def cricket_match(
 
     try:
 
-        match = proexch_api.find_match(
-            game_id
+        match = (
+            proexch_api.find_match(
+                game_id
+            )
         )
 
         if not match:
@@ -421,16 +592,36 @@ def cricket_match(
                 status_code=404,
                 content={
                     "success": False,
-                    "detail": "Match not found",
+                    "detail": (
+                        "Match not found"
+                    ),
                 },
             )
 
-        market_id = match.get(
-            "market_id"
+        market_id = (
+            match.get(
+                "market_id"
+            )
         )
 
-        event_id = match.get(
-            "event_id"
+        event_id = (
+            match.get(
+                "event_id"
+            )
+        )
+
+        score_id = (
+            match.get(
+                "score_id"
+            )
+            or game_id
+        )
+
+        result_id = (
+            match.get(
+                "result_id"
+            )
+            or game_id
         )
 
         odds = {
@@ -442,27 +633,60 @@ def cricket_match(
         }
 
         # -------------------------------------------------
-        # Only call odds if a market ID exists.
+        # Load ProExch odds only when market ID exists.
         # -------------------------------------------------
 
         if market_id:
 
-            odds = proexch_api.get_odds(
-                game_id=game_id,
-                event_id=event_id,
-                market_id=market_id,
+            odds = (
+                proexch_api.get_odds(
+                    game_id=game_id,
+                    event_id=event_id,
+                    market_id=market_id,
+                )
             )
 
         return {
             "success": True,
+
             "match": match,
+
+            "ids": {
+                "game_id": str(
+                    game_id
+                ),
+
+                "event_id": (
+                    str(event_id)
+                    if event_id
+                    else str(
+                        game_id
+                    )
+                ),
+
+                "market_id": (
+                    str(market_id)
+                    if market_id
+                    else ""
+                ),
+
+                "score_id": str(
+                    score_id
+                ),
+
+                "result_id": str(
+                    result_id
+                ),
+            },
+
             "odds": odds,
         }
 
     except Exception as exc:
 
         print(
-            f"[CRICKET] single match error: {exc}"
+            "[CRICKET] single match error:",
+            exc,
         )
 
         return JSONResponse(
@@ -470,7 +694,288 @@ def cricket_match(
             content={
                 "success": False,
                 "detail": (
-                    "Unable to load match"
+                    "Unable to load "
+                    "match"
+                ),
+            },
+        )
+
+
+# =========================================================
+# CRICKETBZ SCORE FOR GAME
+# =========================================================
+# Convenience endpoint.
+# Frontend can simply provide gameId.
+
+@router.get("/match/{game_id}/score")
+def cricket_match_score(
+    request: Request,
+    game_id: str,
+):
+
+    if not _is_logged_in(request):
+
+        return JSONResponse(
+            status_code=401,
+            content={
+                "detail": "Login required"
+            },
+        )
+
+    try:
+
+        match = (
+            proexch_api.find_match(
+                game_id
+            )
+        )
+
+        score_id = (
+            match.get("score_id")
+            if match
+            else None
+        )
+
+        score_id = (
+            score_id
+            or game_id
+        )
+
+        data = (
+            proexch_api.get_score(
+                score_id
+            )
+        )
+
+        return {
+            "success": True,
+            "game_id": str(
+                game_id
+            ),
+            "score_id": str(
+                score_id
+            ),
+            "data": data,
+        }
+
+    except ValueError as exc:
+
+        return JSONResponse(
+            status_code=422,
+            content={
+                "success": False,
+                "detail": str(exc),
+            },
+        )
+
+    except Exception as exc:
+
+        print(
+            "[CRICKET] match score error:",
+            exc,
+        )
+
+        return JSONResponse(
+            status_code=502,
+            content={
+                "success": False,
+                "detail": (
+                    "Unable to load "
+                    "match score"
+                ),
+            },
+        )
+
+
+# =========================================================
+# CRICKETBZ RESULT FOR GAME
+# =========================================================
+# Convenience endpoint.
+# Frontend can simply provide gameId.
+
+@router.get("/match/{game_id}/result")
+def cricket_match_result(
+    request: Request,
+    game_id: str,
+):
+
+    if not _is_logged_in(request):
+
+        return JSONResponse(
+            status_code=401,
+            content={
+                "detail": "Login required"
+            },
+        )
+
+    try:
+
+        match = (
+            proexch_api.find_match(
+                game_id
+            )
+        )
+
+        result_id = (
+            match.get("result_id")
+            if match
+            else None
+        )
+
+        result_id = (
+            result_id
+            or game_id
+        )
+
+        data = (
+            proexch_api.get_cricketbz_result(
+                result_id
+            )
+        )
+
+        return {
+            "success": True,
+            "game_id": str(
+                game_id
+            ),
+            "result_id": str(
+                result_id
+            ),
+            "data": data,
+        }
+
+    except ValueError as exc:
+
+        return JSONResponse(
+            status_code=422,
+            content={
+                "success": False,
+                "detail": str(exc),
+            },
+        )
+
+    except Exception as exc:
+
+        print(
+            "[CRICKET] match result error:",
+            exc,
+        )
+
+        return JSONResponse(
+            status_code=502,
+            content={
+                "success": False,
+                "detail": (
+                    "Unable to load "
+                    "match result"
+                ),
+            },
+        )
+
+
+# =========================================================
+# CRICKETBZ / PROEXCH CRICKETBZ DATA
+# =========================================================
+
+@router.get("/cricketbz/{game_id}")
+def cricketbz_data(
+    request: Request,
+    game_id: str,
+):
+
+    if not _is_logged_in(request):
+
+        return JSONResponse(
+            status_code=401,
+            content={
+                "detail": "Login required"
+            },
+        )
+
+    try:
+
+        data = (
+            proexch_api.get_cricketbz(
+                game_id
+            )
+        )
+
+        return {
+            "success": True,
+            "game_id": str(
+                game_id
+            ),
+            "data": data,
+        }
+
+    except Exception as exc:
+
+        print(
+            "[CRICKET] cricketbz error:",
+            exc,
+        )
+
+        return JSONResponse(
+            status_code=502,
+            content={
+                "success": False,
+                "detail": (
+                    "Unable to load "
+                    "CricketBZ data"
+                ),
+            },
+        )
+
+
+# =========================================================
+# VIDEO
+# =========================================================
+
+@router.get("/video/{game_id}")
+def cricket_video(
+    request: Request,
+    game_id: str,
+):
+
+    if not _is_logged_in(request):
+
+        return JSONResponse(
+            status_code=401,
+            content={
+                "detail": "Login required"
+            },
+        )
+
+    try:
+
+        data = (
+            proexch_api.get_video(
+                game_id
+            )
+        )
+
+        return {
+            "success": True,
+            "game_id": str(
+                game_id
+            ),
+            "data": data,
+        }
+
+    except Exception as exc:
+
+        print(
+            "[CRICKET] video error:",
+            exc,
+        )
+
+        return JSONResponse(
+            status_code=502,
+            content={
+                "success": False,
+                "detail": (
+                    "Unable to load "
+                    "match video"
                 ),
             },
         )
@@ -498,5 +1003,8 @@ def clear_cricket_cache(
 
     return {
         "success": True,
-        "message": "Cricket cache cleared",
+        "message": (
+            "Cricket cache cleared"
+        ),
     }
+

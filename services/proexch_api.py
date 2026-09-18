@@ -1,3 +1,4 @@
+
 import time
 from typing import Any, Dict, List, Optional
 
@@ -20,76 +21,14 @@ ODDS_CACHE_TTL = 2.0
 # Leave empty when your server IP is whitelisted.
 PROXY = ""
 
+
 # =========================================================
-# CRICKET SCORE / RESULT PROVIDER
+# CRICKETBZ SCORE / RESULT PROVIDER
 # =========================================================
-# These endpoints are called by the backend only. The browser
-# never calls cricketbz.app directly.
+# These endpoints are called by the backend only.
+# The browser never calls cricketbz.app directly.
+
 CRICKETBZ_BASE_URL = "https://cricketbz.app"
-
-
-def _request_external_json_or_text(url: str) -> Any:
-    """Fetch an external provider response and preserve its shape.
-
-    Some provider endpoints may return JSON while others may return
-    plain text/HTML. Keep both forms instead of assuming a schema
-    that has not been documented.
-    """
-    try:
-        response = session.get(
-            url,
-            timeout=REQUEST_TIMEOUT,
-            headers={
-                "Accept": "application/json,text/plain,*/*",
-                "User-Agent": "CrickBet/1.0",
-            },
-        )
-        response.raise_for_status()
-
-        content_type = (
-            response.headers.get("content-type", "")
-            .lower()
-        )
-
-        if "json" in content_type:
-            try:
-                return response.json()
-            except ValueError:
-                pass
-
-        try:
-            return response.json()
-        except ValueError:
-            return response.text
-
-    except Exception as exc:
-        raise RuntimeError(
-            f"External cricket provider request failed: {exc}"
-        ) from exc
-
-
-def get_score(score_id: str) -> Any:
-    """Get scoreboard data through the backend."""
-    score_id = str(score_id).strip()
-
-    if not score_id:
-        raise ValueError("score_id is required")
-
-    return _request_external_json_or_text(
-        f"{CRICKETBZ_BASE_URL}/getScore/{score_id}"
-    )
-
-
-def get_result(result_id: str) -> Any:
-    """Get match/result data through the backend."""
-    result_id = str(result_id).strip()
-
-    if not result_id:
-        raise ValueError("result_id is required")
-
-    return _request_external_json_or_text(
-        f"{CRICKETBZ_BASE_URL}/getResults/{result_id}"
-    )
 
 
 # =========================================================
@@ -162,6 +101,10 @@ def _safe_int(value: Any) -> Optional[int]:
         return None
 
 
+# =========================================================
+# PROEXCH REQUEST
+# =========================================================
+
 def _request(
     path: str,
     params: Optional[Dict[str, Any]] = None,
@@ -174,6 +117,7 @@ def _request(
     for attempt in range(MAX_RETRIES + 1):
 
         try:
+
             response = session.get(
                 url,
                 params=params,
@@ -196,7 +140,161 @@ def _request(
     )
 
 
-def _unwrap_matches(payload: Any) -> List[Dict[str, Any]]:
+# =========================================================
+# CRICKETBZ REQUEST
+# =========================================================
+
+def _request_cricketbz(
+    url: str,
+) -> Any:
+    """
+    Fetch CricketBZ response through the backend.
+
+    The provider may return JSON or plain text.
+    Both formats are preserved.
+    """
+
+    try:
+
+        response = session.get(
+            url,
+            timeout=REQUEST_TIMEOUT,
+            headers={
+                "Accept": "application/json,text/plain,*/*",
+                "User-Agent": "CrickBet/1.0",
+            },
+        )
+
+        response.raise_for_status()
+
+        content_type = (
+            response.headers
+            .get("content-type", "")
+            .lower()
+        )
+
+        if "json" in content_type:
+
+            try:
+                return response.json()
+
+            except ValueError:
+                pass
+
+        try:
+            return response.json()
+
+        except ValueError:
+            return response.text
+
+    except Exception as exc:
+
+        raise RuntimeError(
+            "CricketBZ request failed: "
+            f"{exc}"
+        ) from exc
+
+
+# =========================================================
+# CRICKETBZ SCORE
+# =========================================================
+
+def get_score(
+    score_id: str,
+) -> Any:
+    """
+    Get live scoreboard data from CricketBZ.
+
+    Endpoint:
+        https://cricketbz.app/getScore/<score_id>
+    """
+
+    score_id = str(score_id).strip()
+
+    if not score_id:
+        raise ValueError(
+            "score_id is required"
+        )
+
+    url = (
+        f"{CRICKETBZ_BASE_URL}"
+        f"/getScore/{score_id}"
+    )
+
+    return _request_cricketbz(url)
+
+
+# =========================================================
+# CRICKETBZ RESULT
+# =========================================================
+
+def get_cricketbz_result(
+    result_id: str,
+) -> Any:
+    """
+    Get match/result data from CricketBZ.
+
+    Endpoint:
+        https://cricketbz.app/getResults/<result_id>
+
+    IMPORTANT:
+    This has a different function name from the ProExch
+    betfair-result endpoint so there is no function collision.
+    """
+
+    result_id = str(result_id).strip()
+
+    if not result_id:
+        raise ValueError(
+            "result_id is required"
+        )
+
+    url = (
+        f"{CRICKETBZ_BASE_URL}"
+        f"/getResults/{result_id}"
+    )
+
+    return _request_cricketbz(url)
+
+
+# =========================================================
+# PROEXCH RESULT
+# =========================================================
+
+def get_proexch_result(
+    market_id: str,
+) -> Any:
+    """
+    Get result/settlement information from ProExch.
+
+    Endpoint:
+        /api/betfair-result
+    """
+
+    market_id = str(market_id).strip()
+
+    if not market_id:
+        raise ValueError(
+            "market_id is required"
+        )
+
+    return _request(
+        "/api/betfair-result",
+        params={
+            "sport": "cricket",
+            "type": "new_fancy",
+            "marketId": market_id,
+        },
+    )
+
+
+# =========================================================
+# MATCH RESPONSE UNWRAPPER
+# =========================================================
+
+def _unwrap_matches(
+    payload: Any,
+) -> List[Dict[str, Any]]:
 
     if not isinstance(payload, dict):
         return []
@@ -212,7 +310,13 @@ def _unwrap_matches(payload: Any) -> List[Dict[str, Any]]:
     return []
 
 
-def _unwrap_odds(payload: Any) -> Dict[str, Any]:
+# =========================================================
+# ODDS RESPONSE UNWRAPPER
+# =========================================================
+
+def _unwrap_odds(
+    payload: Any,
+) -> Dict[str, Any]:
 
     if not isinstance(payload, dict):
         return {}
@@ -240,8 +344,10 @@ def get_matches(
     if (
         not force_refresh
         and _matches_cache["data"]
-        and current - _matches_cache["timestamp"]
-        < MATCH_CACHE_TTL
+        and (
+            current
+            - _matches_cache["timestamp"]
+        ) < MATCH_CACHE_TTL
     ):
         return _matches_cache["data"]
 
@@ -249,7 +355,9 @@ def get_matches(
         "/api/cricket/matches"
     )
 
-    raw_matches = _unwrap_matches(payload)
+    raw_matches = _unwrap_matches(
+        payload
+    )
 
     matches: List[Dict[str, Any]] = []
 
@@ -308,52 +416,78 @@ def get_matches(
 
         tv = item.get("tv")
 
-        # Optional IDs used by the scoreboard/result provider.
-        # If ProExch does not supply them, the frontend/backend can
-        # fall back to game_id.
+        # -------------------------------------------------
+        # Optional score/result identifiers.
+        #
+        # If ProExch supplies these, use them.
+        # Otherwise leave empty so the frontend/backend
+        # can fall back to game_id.
+        # -------------------------------------------------
+
         score_id = (
             item.get("scoreId")
             or item.get("score_id")
         )
+
         result_id = (
             item.get("resultId")
             or item.get("result_id")
         )
 
         normalized = {
-            "game_id": str(game_id) if game_id is not None else "",
+            "game_id": (
+                str(game_id)
+                if game_id is not None
+                else ""
+            ),
+
             "market_id": (
                 str(market_id)
                 if market_id is not None
                 else ""
             ),
+
             "event_id": (
                 str(event_id)
                 if event_id is not None
                 else ""
             ),
-            "event_name": str(event_name),
+
+            "event_name": str(
+                event_name
+            ),
+
             "event_time": event_time,
-            "in_play": bool(in_play),
+
+            "in_play": bool(
+                in_play
+            ),
+
             "tv": tv,
+
             "score_id": (
                 str(score_id)
                 if score_id is not None
                 else ""
             ),
+
             "result_id": (
                 str(result_id)
                 if result_id is not None
                 else ""
             ),
+
             "team1": str(team1),
             "team2": str(team2),
             "team3": str(team3),
+
             "raw": item,
         }
 
         if normalized["game_id"]:
-            matches.append(normalized)
+            matches.append(
+                normalized
+            )
 
     _matches_cache = {
         "timestamp": current,
@@ -361,50 +495,104 @@ def get_matches(
     }
 
     print(
-        f"[PROEXCH] matches refreshed: {len(matches)}"
+        "[PROEXCH] matches refreshed: "
+        f"{len(matches)}"
     )
 
     return matches
 
 
+# =========================================================
+# FIND MATCH
+# =========================================================
+
 def find_match(
     game_id: str,
 ) -> Optional[Dict[str, Any]]:
 
-    game_id = str(game_id)
+    game_id = str(
+        game_id
+    ).strip()
 
     matches = get_matches()
 
     for match in matches:
 
-        if str(match.get("game_id")) == game_id:
+        if (
+            str(match.get("game_id"))
+            == game_id
+        ):
             return match
 
     return None
 
 
+# =========================================================
+# GET MATCH IDS
+# =========================================================
+
 def get_match_ids(
     game_id: str,
 ) -> Dict[str, str]:
 
-    match = find_match(game_id)
+    game_id = str(
+        game_id
+    ).strip()
+
+    match = find_match(
+        game_id
+    )
 
     if not match:
+
         return {
-            "game_id": str(game_id),
-            "event_id": str(game_id),
+            "game_id": game_id,
+            "event_id": game_id,
             "market_id": "",
+            "score_id": game_id,
+            "result_id": game_id,
         }
 
     return {
         "game_id": str(
-            match.get("game_id") or game_id
+            match.get(
+                "game_id"
+            )
+            or game_id
         ),
+
         "event_id": str(
-            match.get("event_id") or game_id
+            match.get(
+                "event_id"
+            )
+            or game_id
         ),
+
         "market_id": str(
-            match.get("market_id") or ""
+            match.get(
+                "market_id"
+            )
+            or ""
+        ),
+
+        "score_id": str(
+            match.get(
+                "score_id"
+            )
+            or match.get(
+                "game_id"
+            )
+            or game_id
+        ),
+
+        "result_id": str(
+            match.get(
+                "result_id"
+            )
+            or match.get(
+                "game_id"
+            )
+            or game_id
         ),
     }
 
@@ -420,43 +608,60 @@ def get_odds(
     force_refresh: bool = False,
 ) -> Dict[str, Any]:
 
-    game_id = str(game_id)
+    game_id = str(
+        game_id
+    ).strip()
 
     if not market_id:
 
-        ids = get_match_ids(game_id)
+        ids = get_match_ids(
+            game_id
+        )
 
-        market_id = ids.get("market_id")
+        market_id = ids.get(
+            "market_id"
+        )
 
         if not event_id:
-            event_id = ids.get("event_id")
+            event_id = ids.get(
+                "event_id"
+            )
 
     if not market_id:
 
         raise ValueError(
-            f"Market ID not found for gameId={game_id}"
+            "Market ID not found for "
+            f"gameId={game_id}"
         )
 
-    market_id = str(market_id)
+    market_id = str(
+        market_id
+    )
 
-    cache_key = f"{game_id}:{market_id}"
+    cache_key = (
+        f"{game_id}:{market_id}"
+    )
 
     current = _now()
 
-    cached = _odds_cache.get(cache_key)
+    cached = _odds_cache.get(
+        cache_key
+    )
 
     if (
         not force_refresh
         and cached
-        and current - cached["timestamp"]
-        < ODDS_CACHE_TTL
+        and (
+            current
+            - cached["timestamp"]
+        ) < ODDS_CACHE_TTL
     ):
-
         return cached["data"]
 
     print(
-        f"[PROEXCH] odds request: "
-        f"gameId={game_id} marketId={market_id}"
+        "[PROEXCH] odds request: "
+        f"gameId={game_id} "
+        f"marketId={market_id}"
     )
 
     payload = _request(
@@ -467,7 +672,9 @@ def get_odds(
         },
     )
 
-    normalized = normalize_odds(payload)
+    normalized = normalize_odds(
+        payload
+    )
 
     _odds_cache[cache_key] = {
         "timestamp": current,
@@ -487,71 +694,117 @@ def parse_match_odds(
 
     result: List[Dict[str, Any]] = []
 
-    if not isinstance(markets, list):
+    if not isinstance(
+        markets,
+        list,
+    ):
         return result
 
     for market in markets:
 
-        if not isinstance(market, dict):
+        if not isinstance(
+            market,
+            dict,
+        ):
             continue
 
-        odd_datas = market.get("oddDatas")
+        odd_datas = market.get(
+            "oddDatas"
+        )
 
-        if not isinstance(odd_datas, list):
+        if not isinstance(
+            odd_datas,
+            list,
+        ):
             odd_datas = []
 
         runners = []
 
         for runner in odd_datas:
 
-            if not isinstance(runner, dict):
+            if not isinstance(
+                runner,
+                dict,
+            ):
                 continue
 
-            back1 = _safe_float(runner.get("b1"))
-            back2 = _safe_float(runner.get("b2"))
-            back3 = _safe_float(runner.get("b3"))
+            back1 = _safe_float(
+                runner.get("b1")
+            )
 
-            lay1 = _safe_float(runner.get("l1"))
-            lay2 = _safe_float(runner.get("l2"))
-            lay3 = _safe_float(runner.get("l3"))
+            back2 = _safe_float(
+                runner.get("b2")
+            )
+
+            back3 = _safe_float(
+                runner.get("b3")
+            )
+
+            lay1 = _safe_float(
+                runner.get("l1")
+            )
+
+            lay2 = _safe_float(
+                runner.get("l2")
+            )
+
+            lay3 = _safe_float(
+                runner.get("l3")
+            )
 
             normalized_runner = {
-                "id": runner.get("sid"),
-                "sid": runner.get("sid"),
+                "id": runner.get(
+                    "sid"
+                ),
+
+                "sid": runner.get(
+                    "sid"
+                ),
+
                 "name": (
                     runner.get("rname")
-                    or runner.get("runnerName")
+                    or runner.get(
+                        "runnerName"
+                    )
                     or "Runner"
                 ),
 
-                "status": runner.get("status"),
+                "status": runner.get(
+                    "status"
+                ),
 
                 "back": back1,
+
                 "back_size": _safe_float(
                     runner.get("bs1")
                 ),
 
                 "back2": back2,
+
                 "back2_size": _safe_float(
                     runner.get("bs2")
                 ),
 
                 "back3": back3,
+
                 "back3_size": _safe_float(
                     runner.get("bs3")
                 ),
 
                 "lay": lay1,
+
                 "lay_size": _safe_float(
                     runner.get("ls1")
                 ),
 
                 "lay2": lay2,
+
                 "lay2_size": _safe_float(
                     runner.get("ls2")
                 ),
 
                 "lay3": lay3,
+
                 "lay3_size": _safe_float(
                     runner.get("ls3")
                 ),
@@ -559,24 +812,37 @@ def parse_match_odds(
                 "raw": runner,
             }
 
-            runners.append(normalized_runner)
+            runners.append(
+                normalized_runner
+            )
 
         result.append(
             {
-                "id": market.get("mid"),
+                "id": (
+                    market.get("mid")
+                    or market.get(
+                        "marketId"
+                    )
+                ),
+
                 "name": (
                     market.get("market")
                     or market.get("mname")
                     or "Match Odds"
                 ),
+
                 "status": (
                     market.get("mstatus")
                     or market.get("status")
                     or "OPEN"
                 ),
+
                 "type": "match_odds",
+
                 "runners": runners,
+
                 "outcomes": runners,
+
                 "raw": market,
             }
         )
@@ -594,24 +860,38 @@ def parse_bookmaker_odds(
 
     result: List[Dict[str, Any]] = []
 
-    if not isinstance(markets, list):
+    if not isinstance(
+        markets,
+        list,
+    ):
         return result
 
     for market in markets:
 
-        if not isinstance(market, dict):
+        if not isinstance(
+            market,
+            dict,
+        ):
             continue
 
-        odd_datas = market.get("oddDatas")
+        odd_datas = market.get(
+            "oddDatas"
+        )
 
-        if not isinstance(odd_datas, list):
+        if not isinstance(
+            odd_datas,
+            list,
+        ):
             odd_datas = []
 
         runners = []
 
         for runner in odd_datas:
 
-            if not isinstance(runner, dict):
+            if not isinstance(
+                runner,
+                dict,
+            ):
                 continue
 
             back = _safe_float(
@@ -623,22 +903,34 @@ def parse_bookmaker_odds(
             )
 
             normalized_runner = {
-                "id": runner.get("sid"),
-                "sid": runner.get("sid"),
+                "id": runner.get(
+                    "sid"
+                ),
+
+                "sid": runner.get(
+                    "sid"
+                ),
+
                 "name": (
                     runner.get("rname")
-                    or runner.get("runnerName")
+                    or runner.get(
+                        "runnerName"
+                    )
                     or "Runner"
                 ),
 
-                "status": runner.get("status"),
+                "status": runner.get(
+                    "status"
+                ),
 
                 "back": back,
+
                 "back_size": _safe_float(
                     runner.get("bs1")
                 ),
 
                 "lay": lay,
+
                 "lay_size": _safe_float(
                     runner.get("ls1")
                 ),
@@ -646,27 +938,37 @@ def parse_bookmaker_odds(
                 "raw": runner,
             }
 
-            runners.append(normalized_runner)
+            runners.append(
+                normalized_runner
+            )
 
         result.append(
             {
                 "id": (
                     market.get("mid")
-                    or market.get("marketId")
+                    or market.get(
+                        "marketId"
+                    )
                 ),
+
                 "name": (
                     market.get("market")
                     or market.get("mname")
                     or "Bookmaker"
                 ),
+
                 "status": (
                     market.get("mstatus")
                     or market.get("status")
                     or "OPEN"
                 ),
+
                 "type": "bookmaker",
+
                 "runners": runners,
+
                 "outcomes": runners,
+
                 "raw": market,
             }
         )
@@ -684,24 +986,38 @@ def parse_fancy_odds(
 
     result: List[Dict[str, Any]] = []
 
-    if not isinstance(markets, list):
+    if not isinstance(
+        markets,
+        list,
+    ):
         return result
 
     for market in markets:
 
-        if not isinstance(market, dict):
+        if not isinstance(
+            market,
+            dict,
+        ):
             continue
 
-        odd_datas = market.get("oddDatas")
+        odd_datas = market.get(
+            "oddDatas"
+        )
 
-        if not isinstance(odd_datas, list):
+        if not isinstance(
+            odd_datas,
+            list,
+        ):
             odd_datas = []
 
         rows = []
 
         for runner in odd_datas:
 
-            if not isinstance(runner, dict):
+            if not isinstance(
+                runner,
+                dict,
+            ):
                 continue
 
             yes = _safe_float(
@@ -722,37 +1038,50 @@ def parse_fancy_odds(
 
             name = (
                 runner.get("rname")
-                or runner.get("runnerName")
+                or runner.get(
+                    "runnerName"
+                )
                 or runner.get("name")
                 or "Session"
             )
 
             row = {
-                "id": runner.get("sid"),
-                "sid": runner.get("sid"),
+                "id": runner.get(
+                    "sid"
+                ),
+
+                "sid": runner.get(
+                    "sid"
+                ),
 
                 "name": str(name),
 
-                "status": runner.get("status"),
+                "status": runner.get(
+                    "status"
+                ),
 
-                # Fancy-specific fields
                 "yes": yes,
+
                 "yes_size": yes_size,
 
                 "no": no,
+
                 "no_size": no_size,
 
-                # Frontend aliases
                 "back": yes,
+
                 "back_size": yes_size,
 
                 "lay": no,
+
                 "lay_size": no_size,
 
                 "raw": runner,
             }
 
-            rows.append(row)
+            rows.append(
+                row
+            )
 
         market_name = (
             market.get("market")
@@ -764,10 +1093,14 @@ def parse_fancy_odds(
         normalized_market = {
             "id": (
                 market.get("mid")
-                or market.get("marketId")
+                or market.get(
+                    "marketId"
+                )
             ),
 
-            "name": str(market_name),
+            "name": str(
+                market_name
+            ),
 
             "status": (
                 market.get("mstatus")
@@ -779,14 +1112,16 @@ def parse_fancy_odds(
 
             "rows": rows,
 
-            # Keep both names for frontend compatibility
             "runners": rows,
+
             "outcomes": rows,
 
             "raw": market,
         }
 
-        result.append(normalized_market)
+        result.append(
+            normalized_market
+        )
 
     return result
 
@@ -799,7 +1134,9 @@ def normalize_odds(
     payload: Any,
 ) -> Dict[str, Any]:
 
-    data = _unwrap_odds(payload)
+    data = _unwrap_odds(
+        payload
+    )
 
     match_markets = data.get(
         "matchOdds",
@@ -807,9 +1144,15 @@ def normalize_odds(
     )
 
     bookmaker_markets = (
-        data.get("bookMakerOdds")
-        or data.get("bookmakerOdds")
-        or data.get("bookmaker_odds")
+        data.get(
+            "bookMakerOdds"
+        )
+        or data.get(
+            "bookmakerOdds"
+        )
+        or data.get(
+            "bookmaker_odds"
+        )
         or []
     )
 
@@ -827,8 +1170,10 @@ def normalize_odds(
         match_markets
     )
 
-    bookmaker_odds = parse_bookmaker_odds(
-        bookmaker_markets
+    bookmaker_odds = (
+        parse_bookmaker_odds(
+            bookmaker_markets
+        )
     )
 
     fancy_odds = parse_fancy_odds(
@@ -837,33 +1182,76 @@ def normalize_odds(
 
     normalized = {
         "match_odds": match_odds,
-        "bookmaker_odds": bookmaker_odds,
-        "fancy_odds": fancy_odds,
+
+        "bookmaker_odds":
+            bookmaker_odds,
+
+        "fancy_odds":
+            fancy_odds,
+
         "other_market_odds": (
             other_markets
-            if isinstance(other_markets, list)
+            if isinstance(
+                other_markets,
+                list,
+            )
             else []
         ),
 
         "counts": {
-            "match_markets": len(match_odds),
-            "match_runners": sum(
-                len(x.get("runners", []))
-                for x in match_odds
-            ),
+            "match_markets":
+                len(match_odds),
 
-            "bookmaker_markets": len(
-                bookmaker_odds
-            ),
+            "match_runners":
+                sum(
+                    len(
+                        x.get(
+                            "runners",
+                            [],
+                        )
+                    )
+                    for x in match_odds
+                ),
 
-            "fancy_markets": len(
-                fancy_odds
-            ),
+            "bookmaker_markets":
+                len(
+                    bookmaker_odds
+                ),
 
-            "fancy_rows": sum(
-                len(x.get("rows", []))
-                for x in fancy_odds
-            ),
+            "bookmaker_runners":
+                sum(
+                    len(
+                        x.get(
+                            "runners",
+                            [],
+                        )
+                    )
+                    for x in bookmaker_odds
+                ),
+
+            "fancy_markets":
+                len(fancy_odds),
+
+            "fancy_rows":
+                sum(
+                    len(
+                        x.get(
+                            "rows",
+                            [],
+                        )
+                    )
+                    for x in fancy_odds
+                ),
+
+            "other_markets":
+                len(
+                    other_markets
+                    if isinstance(
+                        other_markets,
+                        list,
+                    )
+                    else []
+                ),
         },
 
         "raw": data,
@@ -887,7 +1275,9 @@ def clear_cache() -> None:
 
     _odds_cache.clear()
 
-    print("[PROEXCH] cache cleared")
+    print(
+        "[PROEXCH] cache cleared"
+    )
 
 
 def clear_odds_cache(
@@ -895,41 +1285,33 @@ def clear_odds_cache(
 ) -> None:
 
     if game_id is None:
+
         _odds_cache.clear()
+
         return
 
-    game_id = str(game_id)
+    game_id = str(
+        game_id
+    )
 
     keys = [
         key
         for key in _odds_cache
-        if key.startswith(f"{game_id}:")
+        if key.startswith(
+            f"{game_id}:"
+        )
     ]
 
     for key in keys:
-        _odds_cache.pop(key, None)
+
+        _odds_cache.pop(
+            key,
+            None
+        )
 
 
 # =========================================================
-# RESULT
-# =========================================================
-
-def get_result(
-    market_id: str,
-) -> Any:
-
-    return _request(
-        "/api/betfair-result",
-        params={
-            "sport": "cricket",
-            "type": "new_fancy",
-            "marketId": market_id,
-        },
-    )
-
-
-# =========================================================
-# VIDEO / CRICKETBZ HELPERS
+# PROEXCH CRICKETBZ DATA
 # =========================================================
 
 def get_cricketbz(
@@ -937,28 +1319,51 @@ def get_cricketbz(
 ) -> Any:
 
     try:
+
         return _request(
             "/api/cricket/cricketbz",
             params={
-                "gameId": str(game_id),
+                "gameId": str(
+                    game_id
+                ),
             },
         )
 
-    except Exception:
+    except Exception as exc:
+
+        print(
+            "[PROEXCH] cricketbz error:",
+            exc
+        )
+
         return None
 
+
+# =========================================================
+# PROEXCH VIDEO
+# =========================================================
 
 def get_video(
     game_id: str,
 ) -> Any:
 
     try:
+
         return _request(
             "/api/cricket/video",
             params={
-                "gameId": str(game_id),
+                "gameId": str(
+                    game_id
+                ),
             },
         )
 
-    except Exception:
+    except Exception as exc:
+
+        print(
+            "[PROEXCH] video error:",
+            exc
+        )
+
         return None
+
