@@ -307,6 +307,90 @@ def cricket_odds(
 
 
 # =========================================================
+# SCOREBOARD / RESULTS
+# =========================================================
+
+@router.get("/score/{score_id}")
+def cricket_score(
+    request: Request,
+    score_id: str,
+):
+    """Backend proxy for the cricket scoreboard."""
+    if not _is_logged_in(request):
+        return JSONResponse(
+            status_code=401,
+            content={"detail": "Login required"},
+        )
+
+    try:
+        data = proexch_api.get_score(score_id)
+        return {
+            "success": True,
+            "score_id": str(score_id),
+            "data": data,
+        }
+
+    except ValueError as exc:
+        return JSONResponse(
+            status_code=422,
+            content={
+                "success": False,
+                "detail": str(exc),
+            },
+        )
+
+    except Exception as exc:
+        print(f"[CRICKET] score error: {exc}")
+        return JSONResponse(
+            status_code=502,
+            content={
+                "success": False,
+                "detail": "Unable to load scoreboard",
+            },
+        )
+
+
+@router.get("/results/{result_id}")
+def cricket_results(
+    request: Request,
+    result_id: str,
+):
+    """Backend proxy for match/result data."""
+    if not _is_logged_in(request):
+        return JSONResponse(
+            status_code=401,
+            content={"detail": "Login required"},
+        )
+
+    try:
+        data = proexch_api.get_result(result_id)
+        return {
+            "success": True,
+            "result_id": str(result_id),
+            "data": data,
+        }
+
+    except ValueError as exc:
+        return JSONResponse(
+            status_code=422,
+            content={
+                "success": False,
+                "detail": str(exc),
+            },
+        )
+
+    except Exception as exc:
+        print(f"[CRICKET] result error: {exc}")
+        return JSONResponse(
+            status_code=502,
+            content={
+                "success": False,
+                "detail": "Unable to load match result",
+            },
+        )
+
+
+# =========================================================
 # SINGLE MATCH
 # =========================================================
 

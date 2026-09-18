@@ -20,6 +20,77 @@ ODDS_CACHE_TTL = 2.0
 # Leave empty when your server IP is whitelisted.
 PROXY = ""
 
+# =========================================================
+# CRICKET SCORE / RESULT PROVIDER
+# =========================================================
+# These endpoints are called by the backend only. The browser
+# never calls cricketbz.app directly.
+CRICKETBZ_BASE_URL = "https://cricketbz.app"
+
+
+def _request_external_json_or_text(url: str) -> Any:
+    """Fetch an external provider response and preserve its shape.
+
+    Some provider endpoints may return JSON while others may return
+    plain text/HTML. Keep both forms instead of assuming a schema
+    that has not been documented.
+    """
+    try:
+        response = session.get(
+            url,
+            timeout=REQUEST_TIMEOUT,
+            headers={
+                "Accept": "application/json,text/plain,*/*",
+                "User-Agent": "CrickBet/1.0",
+            },
+        )
+        response.raise_for_status()
+
+        content_type = (
+            response.headers.get("content-type", "")
+            .lower()
+        )
+
+        if "json" in content_type:
+            try:
+                return response.json()
+            except ValueError:
+                pass
+
+        try:
+            return response.json()
+        except ValueError:
+            return response.text
+
+    except Exception as exc:
+        raise RuntimeError(
+            f"External cricket provider request failed: {exc}"
+        ) from exc
+
+
+def get_score(score_id: str) -> Any:
+    """Get scoreboard data through the backend."""
+    score_id = str(score_id).strip()
+
+    if not score_id:
+        raise ValueError("score_id is required")
+
+    return _request_external_json_or_text(
+        f"{CRICKETBZ_BASE_URL}/getScore/{score_id}"
+    )
+
+
+def get_result(result_id: str) -> Any:
+    """Get match/result data through the backend."""
+    result_id = str(result_id).strip()
+
+    if not result_id:
+        raise ValueError("result_id is required")
+
+    return _request_external_json_or_text(
+        f"{CRICKETBZ_BASE_URL}/getResults/{result_id}"
+    )
+
 
 # =========================================================
 # HTTP SESSION
@@ -237,6 +308,18 @@ def get_matches(
 
         tv = item.get("tv")
 
+        # Optional IDs used by the scoreboard/result provider.
+        # If ProExch does not supply them, the frontend/backend can
+        # fall back to game_id.
+        score_id = (
+            item.get("scoreId")
+            or item.get("score_id")
+        )
+        result_id = (
+            item.get("resultId")
+            or item.get("result_id")
+        )
+
         normalized = {
             "game_id": str(game_id) if game_id is not None else "",
             "market_id": (
@@ -253,6 +336,16 @@ def get_matches(
             "event_time": event_time,
             "in_play": bool(in_play),
             "tv": tv,
+            "score_id": (
+                str(score_id)
+                if score_id is not None
+                else ""
+            ),
+            "result_id": (
+                str(result_id)
+                if result_id is not None
+                else ""
+            ),
             "team1": str(team1),
             "team2": str(team2),
             "team3": str(team3),
@@ -713,9 +806,11 @@ def normalize_odds(
         [],
     )
 
-    bookmaker_markets = data.get(
-        "bookMakerOdds",
-        [],
+    bookmaker_markets = (
+        data.get("bookMakerOdds")
+        or data.get("bookmakerOdds")
+        or data.get("bookmaker_odds")
+        or []
     )
 
     fancy_markets = data.get(

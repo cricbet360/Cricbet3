@@ -715,6 +715,101 @@
 
 <body>
 
+<!-- =========================================================
+     LIVE SCOREBOARD / RESULT
+     Data is loaded through our backend:
+       /api/cricket/score/{id}
+       /api/cricket/results/{id}
+========================================================= -->
+<section id="liveScoreboard" class="live-scoreboard">
+    <div class="scoreboard-head">
+        <div>
+            <div class="scoreboard-kicker">LIVE CRICKET</div>
+            <h2>Scoreboard</h2>
+        </div>
+        <div id="scoreboardStatus" class="scoreboard-status">Loading…</div>
+    </div>
+
+    <div id="scoreboardSummary" class="scoreboard-summary"></div>
+
+    <details class="scoreboard-details">
+        <summary>Match result / details</summary>
+        <pre id="resultData">Loading…</pre>
+    </details>
+</section>
+
+<style>
+.live-scoreboard {
+    margin: 14px 0 18px;
+    padding: 16px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #101827, #172338);
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+}
+.scoreboard-head {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+}
+.scoreboard-kicker {
+    font-size:11px;
+    letter-spacing:1.4px;
+    opacity:.65;
+}
+.live-scoreboard h2 {
+    margin:2px 0 0;
+    font-size:22px;
+}
+.scoreboard-status {
+    font-size:12px;
+    opacity:.75;
+}
+.scoreboard-summary {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:10px;
+    margin-top:14px;
+}
+.score-card {
+    padding:12px;
+    border-radius:10px;
+    background:rgba(255,255,255,.08);
+}
+.score-card .label {
+    font-size:12px;
+    opacity:.65;
+}
+.score-card .value {
+    margin-top:4px;
+    font-size:18px;
+    font-weight:700;
+}
+.scoreboard-details {
+    margin-top:12px;
+}
+.scoreboard-details summary {
+    cursor:pointer;
+    opacity:.85;
+}
+.scoreboard-details pre {
+    white-space:pre-wrap;
+    word-break:break-word;
+    max-height:280px;
+    overflow:auto;
+    margin:10px 0 0;
+    padding:10px;
+    border-radius:8px;
+    background:rgba(0,0,0,.25);
+    font-size:11px;
+}
+@media(max-width:600px) {
+    .live-scoreboard { margin-left:8px; margin-right:8px; }
+}
+</style>
+
+
 
 <div class="page">
 
@@ -3709,6 +3804,249 @@ function stopOddsPolling() {
 }
 
 
+
+/* =========================================================
+   SCOREBOARD / RESULT
+========================================================= */
+
+/*
+ * Keep scoreboard IDs out of JavaScript/Jinja interpolation.
+ * The match page URL is /match/<game_id>, so the game ID can
+ * be read safely by normal browser JavaScript.
+ */
+const MATCH_GAME_ID = decodeURIComponent(
+    window.location.pathname.split("/").filter(Boolean).pop() || ""
+);
+
+/*
+ * Backend scoreboard/result routes use the match game ID by default.
+ * If your backend later exposes separate score/result IDs, those can
+ * be assigned here without putting Jinja inside this script.
+ */
+const MATCH_SCORE_ID = MATCH_GAME_ID;
+const MATCH_RESULT_ID = MATCH_GAME_ID;
+
+
+function scoreboardValue(value) {
+    if (value === null || value === undefined || value === "") {
+        return "";
+    }
+
+    if (typeof value === "object") {
+        return JSON.stringify(value);
+    }
+
+    return String(value);
+}
+
+
+function collectScoreCards(data) {
+    const cards = [];
+
+    if (!data || typeof data !== "object") {
+        return cards;
+    }
+
+    const root =
+        data.data && typeof data.data === "object"
+            ? data.data
+            : data;
+
+    const candidateKeys = [
+        ["team1", "Team 1"],
+        ["team2", "Team 2"],
+        ["teamName1", "Team 1"],
+        ["teamName2", "Team 2"],
+        ["team1Name", "Team 1"],
+        ["team2Name", "Team 2"],
+        ["score1", "Score 1"],
+        ["score2", "Score 2"],
+        ["score", "Score"],
+        ["status", "Status"],
+        ["state", "Status"],
+        ["message", "Status"],
+    ];
+
+    candidateKeys.forEach(([key, label]) => {
+        if (
+            Object.prototype.hasOwnProperty.call(root, key) &&
+            root[key] !== null &&
+            root[key] !== ""
+        ) {
+            cards.push({
+                label,
+                value: scoreboardValue(root[key]),
+            });
+        }
+    });
+
+    return cards;
+}
+
+
+function renderScoreboard(data) {
+    const summary =
+        document.getElementById("scoreboardSummary");
+
+    const status =
+        document.getElementById("scoreboardStatus");
+
+    if (!summary || !status) {
+        return;
+    }
+
+    const root =
+        data && data.data !== undefined
+            ? data.data
+            : data;
+
+    const cards =
+        collectScoreCards(root);
+
+    if (cards.length) {
+        summary.innerHTML =
+            cards.map(
+                card =>
+                    '<div class="score-card">' +
+                        '<div class="label">' +
+                            escapeHtml(card.label) +
+                        '</div>' +
+                        '<div class="value">' +
+                            escapeHtml(card.value) +
+                        '</div>' +
+                    '</div>'
+            ).join("");
+    } else {
+        summary.innerHTML =
+            '<div class="score-card">' +
+                '<div class="label">Scoreboard data</div>' +
+                '<div class="value">Received</div>' +
+            '</div>';
+    }
+
+    status.textContent = "Updated";
+}
+
+
+function renderResult(data) {
+    const element =
+        document.getElementById("resultData");
+
+    if (!element) {
+        return;
+    }
+
+    const root =
+        data && data.data !== undefined
+            ? data.data
+            : data;
+
+    try {
+        element.textContent =
+            JSON.stringify(
+                root,
+                null,
+                2
+            );
+    } catch (error) {
+        element.textContent =
+            String(root);
+    }
+}
+
+
+async function loadScoreboard() {
+    const status =
+        document.getElementById("scoreboardStatus");
+
+    if (status) {
+        status.textContent =
+            "Loading…";
+    }
+
+    try {
+        const scoreResponse =
+            await fetch(
+                "/api/cricket/score/" +
+                encodeURIComponent(MATCH_SCORE_ID),
+                {
+                    credentials: "same-origin",
+                    cache: "no-store",
+                }
+            );
+
+        const scorePayload =
+            await scoreResponse.json();
+
+        if (!scoreResponse.ok || !scorePayload.success) {
+            throw new Error(
+                scorePayload.detail ||
+                "Scoreboard request failed"
+            );
+        }
+
+        renderScoreboard(
+            scorePayload.data
+        );
+
+    } catch (error) {
+        console.error(
+            "[SCOREBOARD] score error:",
+            error
+        );
+
+        if (status) {
+            status.textContent =
+                "Score unavailable";
+        }
+    }
+
+    try {
+        const resultResponse =
+            await fetch(
+                "/api/cricket/results/" +
+                encodeURIComponent(MATCH_RESULT_ID),
+                {
+                    credentials: "same-origin",
+                    cache: "no-store",
+                }
+            );
+
+        const resultPayload =
+            await resultResponse.json();
+
+        if (resultResponse.ok && resultPayload.success) {
+            renderResult(
+                resultPayload.data
+            );
+        }
+
+    } catch (error) {
+        console.error(
+            "[SCOREBOARD] result error:",
+            error
+        );
+    }
+}
+
+
+function startScoreboardPolling() {
+    loadScoreboard();
+
+    if (window.scoreboardTimer) {
+        clearInterval(
+            window.scoreboardTimer
+        );
+    }
+
+    window.scoreboardTimer =
+        setInterval(
+            loadScoreboard,
+            10000
+        );
+}
+
+
 /* =========================================================
    DOM READY
 ========================================================= */
@@ -3718,6 +4056,8 @@ document.addEventListener(
     () => {
 
         initializeMatch();
+
+        startScoreboardPolling();
 
         loadBetSlip();
 
