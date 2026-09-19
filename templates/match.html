@@ -2,20 +2,12 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>
-        {{ match.event_name if match else "CrickBet Match" }}
-    </title>
+    <title>{{ match.event_name if match else "CrickBet Match" }}</title>
 
     <style>
-
         * {
             box-sizing: border-box;
         }
@@ -33,9 +25,9 @@
             min-height: 100vh;
         }
 
-        /* =================================================
+        /* =========================================================
            ACCOUNT TOP BAR
-        ================================================= */
+        ========================================================= */
 
         .account-topbar {
             width: 100%;
@@ -85,7 +77,7 @@
             flex-direction: column;
             align-items: flex-end;
             justify-content: center;
-            min-width: 90px;
+            min-width: 95px;
             margin-right: 4px;
         }
 
@@ -166,37 +158,12 @@
             background: #321817;
         }
 
-        .account-back {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 9px 14px;
-            margin-bottom: 14px;
-            border-radius: 8px;
-            background: #123d28;
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 14px;
-        }
-
-        .account-back:hover {
-            background: #185234;
-        }
-
-        .page {
-            width: 100%;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 16px;
-        }
-
-        /* =================================================
-           TV / IPL STYLE SCOREBOARD
-        ================================================= */
+        /* =========================================================
+           SCOREBOARD
+        ========================================================= */
 
         .live-scoreboard {
             width: 100%;
-            margin: 0;
             padding: 14px 16px 16px;
             background:
                 linear-gradient(
@@ -205,8 +172,7 @@
                     #0a2819 100%
                 );
             border-bottom: 1px solid #1b4931;
-            box-shadow:
-                0 8px 25px rgba(0, 0, 0, .22);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .22);
         }
 
         .scoreboard-inner {
@@ -245,6 +211,13 @@
             white-space: nowrap;
         }
 
+        .scoreboard-status-row {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            flex-shrink: 0;
+        }
+
         .scoreboard-live {
             display: inline-flex;
             align-items: center;
@@ -265,6 +238,13 @@
             border-radius: 50%;
             background: #ff5555;
             box-shadow: 0 0 0 3px rgba(255, 85, 85, .12);
+        }
+
+        .scoreboard-status-text {
+            color: #79a993;
+            font-size: 9px;
+            font-weight: 700;
+            white-space: nowrap;
         }
 
         .scoreboard-main {
@@ -313,7 +293,7 @@
         }
 
         .score-team-name {
-            max-width: 230px;
+            max-width: 260px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -334,7 +314,7 @@
             color: #ffffff;
             font-size: 32px;
             line-height: 1;
-            font-weight: 950;
+            font-weight: 900;
             letter-spacing: -1px;
         }
 
@@ -391,7 +371,7 @@
 
         .scoreboard-stats {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             margin-top: 8px;
             border: 1px solid #1b4b32;
             border-radius: 7px;
@@ -434,11 +414,29 @@
             color: #f2d078;
             font-size: 12px;
             font-weight: 800;
+            line-height: 1.45;
+        }
+
+        .scoreboard-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .score-info-pill {
+            padding: 5px 8px;
+            border-radius: 5px;
+            background: #0d2c1d;
+            border: 1px solid #194b32;
+            color: #8eb19f;
+            font-size: 9px;
+            font-weight: 700;
         }
 
         .scoreboard-below {
             display: grid;
-            grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+            grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
             gap: 8px;
             margin-top: 8px;
         }
@@ -461,9 +459,24 @@
             text-transform: uppercase;
         }
 
+        .scoreboard-column-head {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 42px 42px 42px 52px;
+            gap: 5px;
+            padding: 6px 9px;
+            color: #5d866f;
+            font-size: 7px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .scoreboard-column-head > div:not(:first-child) {
+            text-align: center;
+        }
+
         .batter-row {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) 42px 42px 42px 50px;
+            grid-template-columns: minmax(0, 1fr) 42px 42px 42px 52px;
             gap: 5px;
             align-items: center;
             padding: 7px 9px;
@@ -491,6 +504,36 @@
             color: #ffffff;
             font-size: 12px;
             font-weight: 900;
+        }
+
+        .striker-star {
+            color: #57e69b;
+        }
+
+        .bowler-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 42px 42px 42px 52px;
+            gap: 5px;
+            align-items: center;
+            padding: 7px 9px;
+            border-top: 1px solid #143a27;
+        }
+
+        .bowler-name {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .bowler-stat {
+            text-align: center;
+            color: #b4cfc1;
+            font-size: 10px;
+            font-weight: 700;
         }
 
         .last-balls {
@@ -527,6 +570,12 @@
             color: #ffabab;
         }
 
+        .ball.extra {
+            background: #3f3114;
+            border-color: #735e24;
+            color: #f5d77d;
+        }
+
         .recent-overs {
             display: flex;
             flex-direction: column;
@@ -541,7 +590,7 @@
         }
 
         .recent-over-number {
-            width: 35px;
+            width: 40px;
             flex-shrink: 0;
             color: #6f9c85;
             font-size: 9px;
@@ -553,6 +602,7 @@
             flex-wrap: wrap;
             gap: 4px;
             flex: 1;
+            min-width: 0;
         }
 
         .recent-over-ball {
@@ -587,7 +637,7 @@
         }
 
         .scoreboard-details pre {
-            max-height: 250px;
+            max-height: 320px;
             overflow: auto;
             margin: 8px 0 0;
             padding: 10px;
@@ -599,23 +649,23 @@
             word-break: break-word;
         }
 
-        /* =================================================
-           MATCH HEADER
-        ================================================= */
+        /* =========================================================
+           PAGE / MATCH HEADER
+        ========================================================= */
 
-        .topbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 16px;
+        .page {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 16px;
         }
 
-        .back-btn {
+        .account-back {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             padding: 9px 14px;
+            margin-bottom: 14px;
             border-radius: 8px;
             background: #123d28;
             color: #ffffff;
@@ -623,14 +673,8 @@
             font-size: 14px;
         }
 
-        .back-btn:hover {
+        .account-back:hover {
             background: #185234;
-        }
-
-        .brand {
-            font-size: 20px;
-            font-weight: 800;
-            color: #38d996;
         }
 
         .match-header {
@@ -730,9 +774,9 @@
             font-size: 12px;
         }
 
-        /* =================================================
-           MARKET
-        ================================================= */
+        /* =========================================================
+           MARKETS
+        ========================================================= */
 
         .market {
             margin-bottom: 14px;
@@ -816,9 +860,7 @@
             flex-direction: column;
             cursor: pointer;
             user-select: none;
-            transition:
-                transform 0.08s ease,
-                filter 0.08s ease;
+            transition: transform .08s ease, filter .08s ease;
         }
 
         .odd-box:hover {
@@ -826,7 +868,7 @@
         }
 
         .odd-box:active {
-            transform: scale(0.97);
+            transform: scale(.97);
         }
 
         .back-box {
@@ -880,7 +922,7 @@
             border: 2px solid #214b37;
             border-top-color: #36d48d;
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            animation: spin .8s linear infinite;
         }
 
         @keyframes spin {
@@ -889,9 +931,9 @@
             }
         }
 
-        /* =================================================
+        /* =========================================================
            BET SLIP
-        ================================================= */
+        ========================================================= */
 
         .bet-slip {
             position: fixed;
@@ -902,8 +944,7 @@
             background: #0b2418;
             border: 1px solid #28734b;
             border-radius: 14px;
-            box-shadow:
-                0 18px 55px rgba(0, 0, 0, 0.55);
+            box-shadow: 0 18px 55px rgba(0, 0, 0, .55);
             z-index: 9999;
             overflow: hidden;
             display: none;
@@ -957,10 +998,6 @@
             font-size: 19px;
             line-height: 1;
             cursor: pointer;
-        }
-
-        .minimize-slip:hover {
-            background: #1d583b;
         }
 
         .bet-slip-body {
@@ -1027,10 +1064,6 @@
             padding: 0 2px;
         }
 
-        .remove-selection:hover {
-            color: #ff8585;
-        }
-
         .slip-market {
             margin-top: 4px;
             color: #759b88;
@@ -1045,20 +1078,17 @@
             margin-top: 8px;
         }
 
-        .slip-type {
-            padding: 4px 7px;
-            border-radius: 5px;
-            background: #153d2a;
-            color: #8fceb0;
-            font-size: 10px;
-            font-weight: 800;
-        }
-
+        .slip-type,
         .slip-side {
             padding: 4px 7px;
             border-radius: 5px;
             font-size: 10px;
             font-weight: 800;
+        }
+
+        .slip-type {
+            background: #153d2a;
+            color: #8fceb0;
         }
 
         .slip-side.back {
@@ -1145,12 +1175,8 @@
             cursor: pointer;
         }
 
-        .place-all-btn:hover {
-            background: #25bd78;
-        }
-
         .place-all-btn:disabled {
-            opacity: 0.55;
+            opacity: .55;
             cursor: not-allowed;
         }
 
@@ -1192,8 +1218,7 @@
             border-radius: 9px;
             background: #0d3020;
             color: #ffffff;
-            box-shadow:
-                0 10px 30px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .4);
             cursor: pointer;
             font-size: 12px;
             font-weight: 800;
@@ -1214,9 +1239,9 @@
             background: #1fa66a;
         }
 
-        /* =================================================
+        /* =========================================================
            MOBILE
-        ================================================= */
+        ========================================================= */
 
         @media (max-width: 700px) {
 
@@ -1243,7 +1268,7 @@
             .account-actions {
                 width: 100%;
                 display: grid;
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: 1fr 1fr 1fr;
                 gap: 6px;
             }
 
@@ -1251,7 +1276,6 @@
                 min-width: 0;
                 margin: 0;
                 align-items: center;
-                justify-content: center;
             }
 
             .account-balance-label {
@@ -1273,13 +1297,18 @@
                 font-size: 10px;
             }
 
-            .account-back {
-                width: 100%;
-                margin-bottom: 10px !important;
-            }
-
             .live-scoreboard {
                 padding: 10px;
+            }
+
+            .scoreboard-top {
+                align-items: flex-start;
+            }
+
+            .scoreboard-status-row {
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 3px;
             }
 
             .scoreboard-main {
@@ -1295,7 +1324,7 @@
             }
 
             .score-team-name {
-                max-width: 110px;
+                max-width: 115px;
                 font-size: 11px;
             }
 
@@ -1329,12 +1358,12 @@
             }
 
             .scoreboard-event {
-                max-width: 220px;
+                max-width: 230px;
                 font-size: 11px;
             }
 
             .scoreboard-stats {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(4, 1fr);
             }
 
             .score-stat {
@@ -1346,19 +1375,20 @@
             }
 
             .score-stat-value {
-                font-size: 12px;
+                font-size: 11px;
             }
 
             .scoreboard-chase {
                 font-size: 10px;
-                line-height: 1.4;
             }
 
             .scoreboard-below {
                 grid-template-columns: 1fr;
             }
 
-            .batter-row {
+            .scoreboard-column-head,
+            .batter-row,
+            .bowler-row {
                 grid-template-columns:
                     minmax(0, 1fr)
                     35px
@@ -1368,11 +1398,13 @@
                 gap: 3px;
             }
 
-            .batter-name {
+            .batter-name,
+            .bowler-name {
                 font-size: 10px;
             }
 
-            .batter-stat {
+            .batter-stat,
+            .bowler-stat {
                 font-size: 9px;
             }
 
@@ -1382,6 +1414,15 @@
 
             .page {
                 padding: 10px;
+            }
+
+            .account-back {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .event-name {
+                font-size: 17px;
             }
 
             .teams {
@@ -1421,36 +1462,22 @@
                 bottom: 10px;
             }
         }
-
     </style>
-
 </head>
 
 <body>
 
-<!-- =========================================================
-     CRICKBET ACCOUNT TOP BAR
-========================================================= -->
-
 <header class="account-topbar">
 
     <div class="account-brand">
-
         <span class="account-brand-icon">🏏</span>
-
-        <span>
-            CRIC<span class="account-brand-accent">BET</span>
-        </span>
-
+        <span>CRIC<span class="account-brand-accent">BET</span></span>
     </div>
 
     <div class="account-actions">
 
         <div class="account-balance">
-
-            <span class="account-balance-label">
-                Balance
-            </span>
+            <span class="account-balance-label">Balance</span>
 
             <span
                 id="matchPageBalance"
@@ -1458,7 +1485,6 @@
             >
                 ₹{{ "%.2f"|format(user.balance or 0) }}
             </span>
-
         </div>
 
         <button
@@ -1477,33 +1503,23 @@
             Withdraw
         </button>
 
-        <a
-            href="/profile"
-            class="account-profile"
-        >
+        <a href="/profile" class="account-profile">
             Profile
         </a>
 
-        <a
-            href="/logout"
-            class="account-logout"
-        >
+        <a href="/logout" class="account-logout">
             Logout
         </a>
 
     </div>
-
 </header>
 
 
 <!-- =========================================================
-     TV / IPL STYLE LIVE SCOREBOARD
+     LIVE SCOREBOARD
 ========================================================= -->
 
-<section
-    id="liveScoreboard"
-    class="live-scoreboard"
->
+<section id="liveScoreboard" class="live-scoreboard">
 
     <div class="scoreboard-inner">
 
@@ -1524,21 +1540,29 @@
 
             </div>
 
-            <div
-                id="scoreboardLiveBadge"
-                class="scoreboard-live"
-            >
-                <span class="scoreboard-live-dot"></span>
-                LIVE
+            <div class="scoreboard-status-row">
+
+                <div
+                    id="scoreboardStatusText"
+                    class="scoreboard-status-text"
+                >
+                    Loading score...
+                </div>
+
+                <div
+                    id="scoreboardLiveBadge"
+                    class="scoreboard-live"
+                >
+                    <span class="scoreboard-live-dot"></span>
+                    LIVE
+                </div>
+
             </div>
 
         </div>
 
 
-        <div
-            id="scoreboardMain"
-            class="scoreboard-main"
-        >
+        <div id="scoreboardMain" class="scoreboard-main">
 
             <div
                 id="scoreTeam1"
@@ -1576,7 +1600,7 @@
                         id="scoreTeam1Overs"
                         class="score-team-overs"
                     >
-                        -- overs
+                        -- OV
                     </div>
 
                     <div
@@ -1648,7 +1672,7 @@
                         id="scoreTeam2Overs"
                         class="score-team-overs"
                     >
-                        -- overs
+                        -- OV
                     </div>
 
                     <div
@@ -1669,7 +1693,6 @@
         <div class="scoreboard-stats">
 
             <div class="score-stat">
-
                 <div class="score-stat-label">
                     CRR
                 </div>
@@ -1680,12 +1703,10 @@
                 >
                     --
                 </div>
-
             </div>
 
 
             <div class="score-stat">
-
                 <div class="score-stat-label">
                     RRR
                 </div>
@@ -1696,12 +1717,10 @@
                 >
                     --
                 </div>
-
             </div>
 
 
             <div class="score-stat">
-
                 <div class="score-stat-label">
                     TARGET
                 </div>
@@ -1712,7 +1731,20 @@
                 >
                     --
                 </div>
+            </div>
 
+
+            <div class="score-stat">
+                <div class="score-stat-label">
+                    STATUS
+                </div>
+
+                <div
+                    id="scoreStatusValue"
+                    class="score-stat-value"
+                >
+                    --
+                </div>
             </div>
 
         </div>
@@ -1725,9 +1757,13 @@
         ></div>
 
 
-        <div class="scoreboard-below">
+        <div
+            id="scoreboardInfo"
+            class="scoreboard-info"
+        ></div>
 
-            <!-- BATTERS -->
+
+        <div class="scoreboard-below">
 
             <div class="scoreboard-section">
 
@@ -1735,9 +1771,15 @@
                     BATTERS
                 </div>
 
-                <div
-                    id="scoreBatters"
-                >
+                <div class="scoreboard-column-head">
+                    <div>BATTER</div>
+                    <div>R</div>
+                    <div>B</div>
+                    <div>4s</div>
+                    <div>SR</div>
+                </div>
+
+                <div id="scoreBatters">
                     <div class="scoreboard-loading">
                         Loading...
                     </div>
@@ -1745,8 +1787,6 @@
 
             </div>
 
-
-            <!-- LAST BALLS -->
 
             <div class="scoreboard-section">
 
@@ -1768,7 +1808,32 @@
         </div>
 
 
-        <!-- RECENT OVERS -->
+        <div
+            id="bowlerSection"
+            class="scoreboard-section"
+            style="margin-top:8px;"
+        >
+
+            <div class="scoreboard-section-title">
+                BOWLERS
+            </div>
+
+            <div class="scoreboard-column-head">
+                <div>BOWLER</div>
+                <div>O</div>
+                <div>M</div>
+                <div>R</div>
+                <div>W</div>
+            </div>
+
+            <div id="scoreBowlers">
+                <div class="scoreboard-loading">
+                    Bowling information unavailable
+                </div>
+            </div>
+
+        </div>
+
 
         <div
             id="recentOversSection"
@@ -1813,10 +1878,7 @@
 
 <div class="page">
 
-    <a
-        href="/dashboard"
-        class="account-back"
-    >
+    <a href="/dashboard" class="account-back">
         ← Back to Cricket
     </a>
 
@@ -1903,11 +1965,8 @@
     <main id="marketsContainer">
 
         <div class="loading">
-
             <div class="spinner"></div>
-
             Loading markets...
-
         </div>
 
     </main>
@@ -1922,6 +1981,8 @@
         data-game-id="{{ match.game_id if match else '' }}"
         data-event-id="{{ match.event_id if match else '' }}"
         data-market-id="{{ match.market_id if match else '' }}"
+        data-score-id="{{ match.score_id if match and match.score_id else (match.game_id if match else '') }}"
+        data-result-id="{{ match.result_id if match and match.result_id else (match.game_id if match else '') }}"
         data-event-name="{{ match.event_name if match else '' }}"
         data-team1="{{ match.team1 if match else '' }}"
         data-team2="{{ match.team2 if match else '' }}"
@@ -1974,11 +2035,9 @@
             class="bet-slip-body"
             id="betSlipBody"
         >
-
             <div class="slip-empty">
                 Select odds from a market to add a bet.
             </div>
-
         </div>
 
 
@@ -2040,16 +2099,11 @@
     </div>
 
 
-    <!-- =====================================================
-         REOPEN BET SLIP
-    ====================================================== -->
-
     <button
         type="button"
         class="bet-slip-reopen"
         id="reopenSlipButton"
     >
-
         BET SLIP
 
         <span
@@ -2058,7 +2112,6 @@
         >
             0
         </span>
-
     </button>
 
 </div>
@@ -2068,7 +2121,6 @@
 
 "use strict";
 
-
 /* =========================================================
    GLOBAL STATE
 ========================================================= */
@@ -2076,26 +2128,31 @@
 let gameId = "";
 let eventId = "";
 let marketId = "";
+let scoreId = "";
+let resultId = "";
 
 let oddsLoading = false;
 let refreshTimer = null;
 
 let betSlipItems = [];
 
-const BET_SLIP_STORAGE =
-    "crickbet_bet_slip";
+const BET_SLIP_STORAGE = "crickbet_bet_slip";
+
+const MATCH_GAME_ID =
+    decodeURIComponent(
+        window.location.pathname
+            .split("/")
+            .filter(Boolean)
+            .pop() || ""
+    );
 
 
 /* =========================================================
-   HELPERS
+   GENERAL HELPERS
 ========================================================= */
 
 function escapeHtml(value) {
-
-    if (
-        value === null ||
-        value === undefined
-    ) {
+    if (value === null || value === undefined) {
         return "";
     }
 
@@ -2114,50 +2171,184 @@ function escapeAttribute(value) {
 
 
 function numberValue(value) {
+    const number = Number(value);
+    return Number.isFinite(number) ? number : 0;
+}
 
-    const number =
-        Number(value);
 
-    return Number.isFinite(number)
-        ? number
-        : 0;
+function scoreText(value, fallback = "") {
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+        return fallback;
+    }
+
+    return String(value);
+}
+
+
+function isObject(value) {
+    return value &&
+        typeof value === "object" &&
+        !Array.isArray(value);
+}
+
+
+function firstValue(object, keys, fallback = "") {
+
+    if (!object || typeof object !== "object") {
+        return fallback;
+    }
+
+    for (const key of keys) {
+        if (
+            object[key] !== undefined &&
+            object[key] !== null &&
+            object[key] !== ""
+        ) {
+            return object[key];
+        }
+    }
+
+    const lowered = {};
+
+    Object.keys(object).forEach(key => {
+        lowered[key.toLowerCase()] = key;
+    });
+
+    for (const key of keys) {
+
+        const actualKey =
+            lowered[String(key).toLowerCase()];
+
+        if (
+            actualKey &&
+            object[actualKey] !== undefined &&
+            object[actualKey] !== null &&
+            object[actualKey] !== ""
+        ) {
+            return object[actualKey];
+        }
+    }
+
+    return fallback;
+}
+
+
+function firstArray(object, keys) {
+
+    if (!object || typeof object !== "object") {
+        return [];
+    }
+
+    for (const key of keys) {
+
+        if (Array.isArray(object[key])) {
+            return object[key];
+        }
+    }
+
+    const lowered = {};
+
+    Object.keys(object).forEach(key => {
+        lowered[key.toLowerCase()] = key;
+    });
+
+    for (const key of keys) {
+
+        const actualKey =
+            lowered[String(key).toLowerCase()];
+
+        if (
+            actualKey &&
+            Array.isArray(object[actualKey])
+        ) {
+            return object[actualKey];
+        }
+    }
+
+    return [];
+}
+
+
+function setText(id, value, fallback = "--") {
+
+    const element =
+        document.getElementById(id);
+
+    if (!element) {
+        return;
+    }
+
+    const text =
+        value === null ||
+        value === undefined ||
+        value === ""
+            ? fallback
+            : String(value);
+
+    element.textContent = text;
+}
+
+
+function toggleHidden(id, hidden) {
+
+    const element =
+        document.getElementById(id);
+
+    if (!element) {
+        return;
+    }
+
+    element.hidden = Boolean(hidden);
 }
 
 
 /* =========================================================
-   READ MATCH
+   MATCH DATA
 ========================================================= */
 
 function readServerMatch() {
 
     const element =
-        document.getElementById(
-            "matchData"
-        );
+        document.getElementById("matchData");
 
     if (!element) {
         return null;
     }
 
-    const data =
-        element.dataset;
+    const data = element.dataset;
 
-    if (!data.gameId) {
+    const resolvedGameId =
+        data.gameId ||
+        MATCH_GAME_ID;
+
+    if (!resolvedGameId) {
         return null;
     }
 
     return {
 
         game_id:
-            data.gameId,
+            resolvedGameId,
 
         event_id:
             data.eventId ||
-            data.gameId,
+            resolvedGameId,
 
         market_id:
             data.marketId ||
             "",
+
+        score_id:
+            data.scoreId ||
+            resolvedGameId,
+
+        result_id:
+            data.resultId ||
+            resolvedGameId,
 
         event_name:
             data.eventName ||
@@ -2181,10 +2372,6 @@ function readServerMatch() {
 }
 
 
-/* =========================================================
-   INITIALIZE
-========================================================= */
-
 function initializeMatch() {
 
     const match =
@@ -2195,25 +2382,21 @@ function initializeMatch() {
     }
 
     gameId =
-        String(
-            match.game_id
-        );
+        String(match.game_id);
 
     eventId =
-        String(
-            match.event_id ||
-            match.game_id
-        );
+        String(match.event_id || match.game_id);
 
     marketId =
-        String(
-            match.market_id ||
-            ""
-        );
+        String(match.market_id || "");
 
-    updateMatchHeader(
-        match
-    );
+    scoreId =
+        String(match.score_id || match.game_id);
+
+    resultId =
+        String(match.result_id || match.game_id);
+
+    updateMatchHeader(match);
 }
 
 
@@ -2242,30 +2425,23 @@ function updateMatchHeader(match) {
     const time =
         document.getElementById("matchTime");
 
-
     if (eventName) {
-
         eventName.textContent =
             match.event_name ||
             "Cricket Match";
     }
 
-
     if (team1) {
-
         team1.textContent =
             match.team1 ||
             "";
     }
 
-
     if (team2) {
-
         team2.textContent =
             match.team2 ||
             "";
     }
-
 
     if (status) {
 
@@ -2275,9 +2451,7 @@ function updateMatchHeader(match) {
             match.in_play === "true";
 
         status.textContent =
-            live
-                ? "LIVE"
-                : "UPCOMING";
+            live ? "LIVE" : "UPCOMING";
 
         status.classList.toggle(
             "live-badge",
@@ -2285,33 +2459,21 @@ function updateMatchHeader(match) {
         );
     }
 
-
     if (time) {
-
         time.textContent =
-            formatTime(
-                match.event_time
-            );
+            formatTime(match.event_time);
     }
 
-
     const scoreboardEvent =
-        document.getElementById(
-            "scoreboardEvent"
-        );
+        document.getElementById("scoreboardEvent");
 
     if (scoreboardEvent) {
-
         scoreboardEvent.textContent =
             match.event_name ||
             "Cricket Match";
     }
 }
 
-
-/* =========================================================
-   FORMAT TIME
-========================================================= */
 
 function formatTime(value) {
 
@@ -2322,11 +2484,7 @@ function formatTime(value) {
     const date =
         new Date(value);
 
-    if (
-        Number.isNaN(
-            date.getTime()
-        )
-    ) {
+    if (Number.isNaN(date.getTime())) {
         return String(value);
     }
 
@@ -2343,23 +2501,16 @@ function formatTime(value) {
 
 
 /* =========================================================
-   STATUS
+   ODDS STATUS
 ========================================================= */
 
-function setStatus(
-    state,
-    text
-) {
+function setStatus(state, text) {
 
     const dot =
-        document.getElementById(
-            "statusDot"
-        );
+        document.getElementById("statusDot");
 
     const status =
-        document.getElementById(
-            "statusText"
-        );
+        document.getElementById("statusText");
 
     if (dot) {
 
@@ -2367,22 +2518,15 @@ function setStatus(
             "status-dot";
 
         if (state === "online") {
-
-            dot.classList.add(
-                "online"
-            );
+            dot.classList.add("online");
         }
 
         if (state === "error") {
-
-            dot.classList.add(
-                "error"
-            );
+            dot.classList.add("error");
         }
     }
 
     if (status) {
-
         status.textContent =
             text;
     }
@@ -2390,16 +2534,12 @@ function setStatus(
 
 
 /* =========================================================
-   LOAD ODDS
+   ODDS
 ========================================================= */
 
 async function loadOdds() {
 
-    if (
-        oddsLoading ||
-        !gameId ||
-        !marketId
-    ) {
+    if (oddsLoading || !gameId) {
         return;
     }
 
@@ -2410,22 +2550,19 @@ async function loadOdds() {
         const query =
             new URLSearchParams();
 
-        query.set(
-            "gameId",
-            gameId
-        );
+        query.set("gameId", gameId);
 
-        query.set(
-            "eventId",
-            eventId ||
-            gameId
-        );
+        if (eventId) {
+            query.set("eventId", eventId);
+        }
 
-        query.set(
-            "marketId",
-            marketId
-        );
-
+        /*
+         * marketId is optional.
+         * Backend can resolve it from gameId/eventId.
+         */
+        if (marketId) {
+            query.set("marketId", marketId);
+        }
 
         const response =
             await fetch(
@@ -2433,28 +2570,26 @@ async function loadOdds() {
                 query.toString(),
                 {
                     method: "GET",
-                    credentials:
-                        "same-origin",
-                    cache: "no-store"
+                    credentials: "same-origin",
+                    cache: "no-store",
+                    headers: {
+                        Accept:
+                            "application/json"
+                    }
                 }
             );
 
-
         if (!response.ok) {
-
             throw new Error(
                 "HTTP " +
                 response.status
             );
         }
 
-
         const data =
             await response.json();
 
-
-        if (!data.success) {
-
+        if (data.success === false) {
             throw new Error(
                 data.message ||
                 data.detail ||
@@ -2462,27 +2597,20 @@ async function loadOdds() {
             );
         }
 
-
         renderMarkets(data);
-
 
         setStatus(
             "online",
             "Odds live"
         );
 
-
         const refreshText =
-            document.getElementById(
-                "refreshText"
-            );
+            document.getElementById("refreshText");
 
         if (refreshText) {
-
             refreshText.textContent =
                 "Updated just now";
         }
-
 
     } catch (error) {
 
@@ -2503,15 +2631,12 @@ async function loadOdds() {
 }
 
 
-/* =========================================================
-   GET ODDS ROOT
-========================================================= */
-
 function getOddsRoot(payload) {
 
     if (
         payload &&
-        payload.odds
+        payload.odds &&
+        typeof payload.odds === "object"
     ) {
         return payload.odds;
     }
@@ -2519,9 +2644,8 @@ function getOddsRoot(payload) {
     if (
         payload &&
         payload.data &&
-        !Array.isArray(
-            payload.data
-        )
+        typeof payload.data === "object" &&
+        !Array.isArray(payload.data)
     ) {
         return payload.data;
     }
@@ -2529,10 +2653,6 @@ function getOddsRoot(payload) {
     return payload || {};
 }
 
-
-/* =========================================================
-   RENDER MARKETS
-========================================================= */
 
 function renderMarkets(payload) {
 
@@ -2546,57 +2666,36 @@ function renderMarkets(payload) {
     }
 
     const root =
-        getOddsRoot(
-            payload
-        );
-
+        getOddsRoot(payload);
 
     const matchOdds =
-        Array.isArray(
-            root.match_odds
-        )
+        Array.isArray(root.match_odds)
             ? root.match_odds
             : [];
 
-
     const bookmakerOdds =
-        Array.isArray(
-            root.bookmaker_odds
-        )
+        Array.isArray(root.bookmaker_odds)
             ? root.bookmaker_odds
             : [];
 
-
     const fancyOdds =
-        Array.isArray(
-            root.fancy_odds
-        )
+        Array.isArray(root.fancy_odds)
             ? root.fancy_odds
             : [];
 
-
     const otherOdds =
-        Array.isArray(
-            root.other_market_odds
-        )
+        Array.isArray(root.other_market_odds)
             ? root.other_market_odds
             : [];
 
-
     let html = "";
-
 
     if (matchOdds.length) {
 
-        matchOdds.forEach(
-            market => {
-
-                html +=
-                    buildMatchMarket(
-                        market
-                    );
-            }
-        );
+        matchOdds.forEach(market => {
+            html +=
+                buildMatchMarket(market);
+        });
 
     } else {
 
@@ -2610,15 +2709,10 @@ function renderMarkets(payload) {
 
     if (bookmakerOdds.length) {
 
-        bookmakerOdds.forEach(
-            market => {
-
-                html +=
-                    buildBookmakerMarket(
-                        market
-                    );
-            }
-        );
+        bookmakerOdds.forEach(market => {
+            html +=
+                buildBookmakerMarket(market);
+        });
 
     } else {
 
@@ -2647,11 +2741,7 @@ function renderMarkets(payload) {
             '<div class="market-status">' +
             fancyOdds.length +
             " market" +
-            (
-                fancyOdds.length === 1
-                    ? ""
-                    : "s"
-            ) +
+            (fancyOdds.length === 1 ? "" : "s") +
             "</div>";
 
         html +=
@@ -2660,23 +2750,13 @@ function renderMarkets(payload) {
         html +=
             '<div class="market-body">';
 
+        fancyOdds.forEach(market => {
+            html +=
+                buildFancyMarket(market);
+        });
 
-        fancyOdds.forEach(
-            market => {
-
-                html +=
-                    buildFancyMarket(
-                        market
-                    );
-            }
-        );
-
-
-        html +=
-            "</div>";
-
-        html +=
-            "</section>";
+        html += "</div>";
+        html += "</section>";
 
     } else {
 
@@ -2688,74 +2768,97 @@ function renderMarkets(payload) {
     }
 
 
-    otherOdds.forEach(
-        market => {
+    otherOdds.forEach(market => {
 
-            html +=
-                buildGenericMarket(
-                    market
-                );
-        }
-    );
+        html +=
+            buildGenericMarket(market);
+
+    });
 
 
-    container.innerHTML =
-        html;
-
+    container.innerHTML = html;
 
     attachBetEvents();
 }
 
 
-/* =========================================================
-   MATCH MARKET
-========================================================= */
+function getRunners(market) {
+
+    if (!market) {
+        return [];
+    }
+
+    if (Array.isArray(market.runners)) {
+        return market.runners;
+    }
+
+    if (Array.isArray(market.rows)) {
+        return market.rows;
+    }
+
+    return [];
+}
+
+
+function getRunnerName(runner) {
+
+    return (
+        runner.name ||
+        runner.rname ||
+        runner.runner_name ||
+        runner.selection_name ||
+        runner.selectionName ||
+        "Runner"
+    );
+}
+
+
+function getSelectionId(runner) {
+
+    return (
+        runner.sid ||
+        runner.selection_id ||
+        runner.selectionId ||
+        runner.id ||
+        runner.selectionID ||
+        ""
+    );
+}
+
 
 function buildMatchMarket(market) {
 
     const runners =
-        Array.isArray(
-            market.runners
-        )
-            ? market.runners
-            : [];
-
+        getRunners(market);
 
     let html =
         '<section class="market">';
 
     html +=
-        '<div class="market-header">';
-
-    html +=
-        '<div class="market-title">' +
-        escapeHtml(
-            market.name ||
-            "Match Odds"
-        ) +
-        "</div>";
-
-    html +=
-        '<div class="market-status">' +
-        escapeHtml(
-            market.status ||
-            "OPEN"
-        ) +
-        "</div>";
-
-    html +=
-        "</div>";
+        '<div class="market-header">' +
+            '<div class="market-title">' +
+                escapeHtml(
+                    market.name ||
+                    "Match Odds"
+                ) +
+            '</div>' +
+            '<div class="market-status">' +
+                escapeHtml(
+                    market.status ||
+                    "OPEN"
+                ) +
+            '</div>' +
+        '</div>';
 
     html +=
         '<div class="market-body">';
 
     html +=
         '<div class="market-columns">' +
-        "<div>Runner</div>" +
-        "<div>Back</div>" +
-        "<div>Lay</div>" +
+            "<div>Runner</div>" +
+            "<div>Back</div>" +
+            "<div>Lay</div>" +
         "</div>";
-
 
     if (!runners.length) {
 
@@ -2766,228 +2869,164 @@ function buildMatchMarket(market) {
 
     } else {
 
-        runners.forEach(
-            runner => {
+        runners.forEach(runner => {
 
-                const name =
-                    runner.name ||
-                    runner.rname ||
-                    "Runner";
+            const name =
+                getRunnerName(runner);
 
-                const selectionId =
-                    runner.sid ||
-                    runner.selection_id ||
-                    runner.selectionId ||
-                    runner.id ||
-                    "";
+            const selectionId =
+                getSelectionId(runner);
 
+            html +=
+                '<div class="runner">';
 
-                html +=
-                    '<div class="runner">';
-
-                html +=
-                    '<div class="runner-name">' +
+            html +=
+                '<div class="runner-name">' +
                     escapeHtml(name) +
-                    "</div>";
+                "</div>";
 
+            html +=
+                createOddBox(
+                    runner.back,
+                    runner.back_size,
+                    "back-box",
+                    "MATCH_ODDS",
+                    market.name || "Match Odds",
+                    name,
+                    selectionId,
+                    "BACK"
+                );
 
-                html +=
-                    createOddBox(
-                        runner.back,
-                        runner.back_size,
-                        "back-box",
-                        "MATCH_ODDS",
-                        market.name ||
-                            "Match Odds",
-                        name,
-                        selectionId,
-                        "BACK"
-                    );
+            html +=
+                createOddBox(
+                    runner.lay,
+                    runner.lay_size,
+                    "lay-box",
+                    "MATCH_ODDS",
+                    market.name || "Match Odds",
+                    name,
+                    selectionId,
+                    "LAY"
+                );
 
-
-                html +=
-                    createOddBox(
-                        runner.lay,
-                        runner.lay_size,
-                        "lay-box",
-                        "MATCH_ODDS",
-                        market.name ||
-                            "Match Odds",
-                        name,
-                        selectionId,
-                        "LAY"
-                    );
-
-
-                html +=
-                    "</div>";
-            }
-        );
+            html += "</div>";
+        });
     }
 
-
-    html +=
-        "</div>";
-
-    html +=
-        "</section>";
+    html += "</div>";
+    html += "</section>";
 
     return html;
 }
 
 
-/* =========================================================
-   BOOKMAKER
-========================================================= */
-
 function buildBookmakerMarket(market) {
 
     const runners =
-        Array.isArray(
-            market.runners
-        )
-            ? market.runners
-            : [];
-
+        getRunners(market);
 
     let html =
         '<section class="market">';
 
     html +=
-        '<div class="market-header">';
-
-    html +=
-        '<div class="market-title">' +
-        "🏏 Bookmaker" +
-        "</div>";
-
-    html +=
-        '<div class="market-status">' +
-        escapeHtml(
-            market.status ||
-            "OPEN"
-        ) +
-        "</div>";
-
-    html +=
-        "</div>";
+        '<div class="market-header">' +
+            '<div class="market-title">' +
+                "🏏 Bookmaker" +
+            '</div>' +
+            '<div class="market-status">' +
+                escapeHtml(
+                    market.status ||
+                    "OPEN"
+                ) +
+            '</div>' +
+        '</div>';
 
     html +=
         '<div class="market-body">';
 
     html +=
         '<div class="market-columns">' +
-        "<div>Runner</div>" +
-        "<div>Back</div>" +
-        "<div>Lay</div>" +
+            "<div>Runner</div>" +
+            "<div>Back</div>" +
+            "<div>Lay</div>" +
         "</div>";
-
 
     if (!runners.length) {
 
         html +=
             '<div class="empty">' +
-            "ProExch returned this bookmaker market without runners." +
+            "Bookmaker market has no runners." +
             "</div>";
 
     } else {
 
-        runners.forEach(
-            runner => {
+        runners.forEach(runner => {
 
-                const name =
-                    runner.name ||
-                    runner.rname ||
-                    "Runner";
+            const name =
+                getRunnerName(runner);
 
-                const selectionId =
-                    runner.sid ||
-                    runner.selection_id ||
-                    runner.selectionId ||
-                    runner.id ||
-                    "";
+            const selectionId =
+                getSelectionId(runner);
 
+            html +=
+                '<div class="runner">';
 
-                html +=
-                    '<div class="runner">';
-
-                html +=
-                    '<div class="runner-name">' +
+            html +=
+                '<div class="runner-name">' +
                     escapeHtml(name) +
-                    "</div>";
+                "</div>";
 
+            html +=
+                createOddBox(
+                    runner.back,
+                    runner.back_size,
+                    "back-box",
+                    "BOOKMAKER",
+                    market.name || "Bookmaker",
+                    name,
+                    selectionId,
+                    "BACK"
+                );
 
-                html +=
-                    createOddBox(
-                        runner.back,
-                        runner.back_size,
-                        "back-box",
-                        "BOOKMAKER",
-                        market.name ||
-                            "Bookmaker",
-                        name,
-                        selectionId,
-                        "BACK"
-                    );
+            html +=
+                createOddBox(
+                    runner.lay,
+                    runner.lay_size,
+                    "lay-box",
+                    "BOOKMAKER",
+                    market.name || "Bookmaker",
+                    name,
+                    selectionId,
+                    "LAY"
+                );
 
-
-                html +=
-                    createOddBox(
-                        runner.lay,
-                        runner.lay_size,
-                        "lay-box",
-                        "BOOKMAKER",
-                        market.name ||
-                            "Bookmaker",
-                        name,
-                        selectionId,
-                        "LAY"
-                    );
-
-
-                html +=
-                    "</div>";
-            }
-        );
+            html += "</div>";
+        });
     }
 
-
-    html +=
-        "</div>";
-
-    html +=
-        "</section>";
+    html += "</div>";
+    html += "</section>";
 
     return html;
 }
 
 
-/* =========================================================
-   FANCY MARKET
-========================================================= */
-
 function buildFancyMarket(market) {
 
     const rows =
-        Array.isArray(
-            market.rows
-        )
+        Array.isArray(market.rows)
             ? market.rows
             : (
-                Array.isArray(
-                    market.runners
-                )
+                Array.isArray(market.runners)
                     ? market.runners
                     : []
             );
-
 
     const rawName =
         market.name ||
         market.market_name ||
         market.mname ||
         "Fancy";
-
 
     const rawType =
         String(
@@ -2997,69 +3036,45 @@ function buildFancyMarket(market) {
             ""
         ).toUpperCase();
 
-
     const isSession =
-        rawType.includes(
-            "SESSION"
-        ) ||
-        rawType.includes(
-            "SESSION_ODDS"
-        );
-
+        rawType.includes("SESSION") ||
+        rawType.includes("SESSION_ODDS");
 
     const marketType =
-        isSession
-            ? "SESSION"
-            : "FANCY";
-
+        isSession ? "SESSION" : "FANCY";
 
     const marketTitle =
         marketType === "SESSION"
             ? "Session"
             : "Fancy";
 
-
     let html =
         '<div class="fancy-market-block">';
 
-
     html +=
-        '<div class="market-header">';
-
-    html +=
-        '<div class="market-title">' +
-        escapeHtml(
-            rawName
-        ) +
-        "</div>";
-
-    html +=
-        '<div class="market-status">' +
-        escapeHtml(
-            market.status ||
-            "OPEN"
-        ) +
-        "</div>";
-
-    html +=
-        "</div>";
-
+        '<div class="market-header">' +
+            '<div class="market-title">' +
+                escapeHtml(rawName) +
+            '</div>' +
+            '<div class="market-status">' +
+                escapeHtml(
+                    market.status ||
+                    "OPEN"
+                ) +
+            '</div>' +
+        '</div>';
 
     html +=
         '<div class="market-body">';
 
-
     html +=
         '<div class="market-columns">' +
-        "<div>" +
-        escapeHtml(
-            marketTitle
-        ) +
-        "</div>" +
-        "<div>Yes</div>" +
-        "<div>No</div>" +
+            "<div>" +
+                escapeHtml(marketTitle) +
+            "</div>" +
+            "<div>Yes</div>" +
+            "<div>No</div>" +
         "</div>";
-
 
     if (!rows.length) {
 
@@ -3070,248 +3085,178 @@ function buildFancyMarket(market) {
 
     } else {
 
-        rows.forEach(
-            row => {
-
-                const name =
-                    row.name ||
-                    row.rname ||
-                    row.session ||
-                    row.runner_name ||
-                    "Session";
-
-
-                const selectionId =
-                    row.sid ||
-                    row.selection_id ||
-                    row.selectionId ||
-                    row.id ||
-                    "";
-
-
-                const yes =
-                    row.yes ??
-                    row.back;
-
-
-                const yesSize =
-                    row.yes_size ??
-                    row.back_size;
-
-
-                const no =
-                    row.no ??
-                    row.lay;
-
-
-                const noSize =
-                    row.no_size ??
-                    row.lay_size;
-
-
-                html +=
-                    '<div class="runner">';
-
-
-                html +=
-                    '<div class="runner-name">' +
-                    escapeHtml(name) +
-                    "</div>";
-
-
-                html +=
-                    createOddBox(
-                        yes,
-                        yesSize,
-                        "fancy-yes",
-                        marketType,
-                        rawName,
-                        name,
-                        selectionId,
-                        "BACK"
-                    );
-
-
-                html +=
-                    createOddBox(
-                        no,
-                        noSize,
-                        "fancy-no",
-                        marketType,
-                        rawName,
-                        name,
-                        selectionId,
-                        "LAY"
-                    );
-
-
-                html +=
-                    "</div>";
-            }
-        );
-    }
-
-
-    html +=
-        "</div>";
-
-    html +=
-        "</div>";
-
-    return html;
-}
-
-
-/* =========================================================
-   GENERIC MARKET
-========================================================= */
-
-function buildGenericMarket(market) {
-
-    const runners =
-        Array.isArray(
-            market.runners
-        )
-            ? market.runners
-            : [];
-
-
-    if (!runners.length) {
-        return "";
-    }
-
-
-    let html =
-        '<section class="market">';
-
-    html +=
-        '<div class="market-header">';
-
-    html +=
-        '<div class="market-title">' +
-        escapeHtml(
-            market.name ||
-            "Other Market"
-        ) +
-        "</div>";
-
-    html +=
-        '<div class="market-status">' +
-        escapeHtml(
-            market.status ||
-            "OPEN"
-        ) +
-        "</div>";
-
-    html +=
-        "</div>";
-
-    html +=
-        '<div class="market-body">';
-
-
-    runners.forEach(
-        runner => {
+        rows.forEach(row => {
 
             const name =
-                runner.name ||
-                runner.rname ||
-                "Runner";
+                row.name ||
+                row.rname ||
+                row.session ||
+                row.runner_name ||
+                "Session";
 
             const selectionId =
-                runner.sid ||
-                runner.selection_id ||
-                runner.selectionId ||
-                runner.id ||
-                "";
+                getSelectionId(row);
 
+            const yes =
+                row.yes ??
+                row.back ??
+                row.b1;
+
+            const yesSize =
+                row.yes_size ??
+                row.back_size ??
+                row.bs1;
+
+            const no =
+                row.no ??
+                row.lay ??
+                row.l1;
+
+            const noSize =
+                row.no_size ??
+                row.lay_size ??
+                row.ls1;
 
             html +=
                 '<div class="runner">';
 
             html +=
                 '<div class="runner-name">' +
-                escapeHtml(name) +
+                    escapeHtml(name) +
                 "</div>";
-
 
             html +=
                 createOddBox(
-                    runner.back,
-                    runner.back_size,
-                    "back-box",
-                    "MATCH_ODDS",
-                    market.name ||
-                        "Other Market",
+                    yes,
+                    yesSize,
+                    "fancy-yes",
+                    marketType,
+                    rawName,
                     name,
                     selectionId,
                     "BACK"
                 );
 
-
             html +=
                 createOddBox(
-                    runner.lay,
-                    runner.lay_size,
-                    "lay-box",
-                    "MATCH_ODDS",
-                    market.name ||
-                        "Other Market",
+                    no,
+                    noSize,
+                    "fancy-no",
+                    marketType,
+                    rawName,
                     name,
                     selectionId,
                     "LAY"
                 );
 
+            html += "</div>";
+        });
+    }
 
-            html +=
-                "</div>";
-        }
-    );
-
-
-    html +=
-        "</div>";
-
-    html +=
-        "</section>";
+    html += "</div>";
+    html += "</div>";
 
     return html;
 }
 
 
-/* =========================================================
-   EMPTY MARKET
-========================================================= */
+function buildGenericMarket(market) {
 
-function buildEmptyMarket(
-    title,
-    message
-) {
+    const runners =
+        getRunners(market);
+
+    if (!runners.length) {
+        return "";
+    }
+
+    let html =
+        '<section class="market">';
+
+    html +=
+        '<div class="market-header">' +
+            '<div class="market-title">' +
+                escapeHtml(
+                    market.name ||
+                    "Other Market"
+                ) +
+            '</div>' +
+            '<div class="market-status">' +
+                escapeHtml(
+                    market.status ||
+                    "OPEN"
+                ) +
+            '</div>' +
+        '</div>';
+
+    html +=
+        '<div class="market-body">';
+
+    runners.forEach(runner => {
+
+        const name =
+            getRunnerName(runner);
+
+        const selectionId =
+            getSelectionId(runner);
+
+        html +=
+            '<div class="runner">';
+
+        html +=
+            '<div class="runner-name">' +
+                escapeHtml(name) +
+            "</div>";
+
+        html +=
+            createOddBox(
+                runner.back,
+                runner.back_size,
+                "back-box",
+                "MATCH_ODDS",
+                market.name || "Other Market",
+                name,
+                selectionId,
+                "BACK"
+            );
+
+        html +=
+            createOddBox(
+                runner.lay,
+                runner.lay_size,
+                "lay-box",
+                "MATCH_ODDS",
+                market.name || "Other Market",
+                name,
+                selectionId,
+                "LAY"
+            );
+
+        html += "</div>";
+    });
+
+    html += "</div>";
+    html += "</section>";
+
+    return html;
+}
+
+
+function buildEmptyMarket(title, message) {
 
     return (
-
         '<section class="market">' +
-
             '<div class="market-header">' +
-
                 '<div class="market-title">' +
                     escapeHtml(title) +
                 "</div>" +
-
             "</div>" +
-
             '<div class="empty">' +
                 escapeHtml(message) +
             "</div>" +
-
         "</section>"
     );
 }
 
-
-/* =========================================================
-   ODD BOX
-========================================================= */
 
 function createOddBox(
     price,
@@ -3327,100 +3272,70 @@ function createOddBox(
     const numericPrice =
         Number(price);
 
-
     const valid =
-        Number.isFinite(
-            numericPrice
-        ) &&
+        Number.isFinite(numericPrice) &&
         numericPrice > 1;
-
 
     if (!valid) {
 
         return (
-
             '<div class="odd-box ' +
             cssClass +
             '">' +
-
-                '<div class="odd-price">' +
-                    "-" +
-                "</div>" +
-
+                '<div class="odd-price">-</div>' +
             "</div>"
         );
     }
 
-
     const numericSize =
         Number(size);
 
-
     const sizeText =
-        Number.isFinite(
-            numericSize
-        ) &&
+        Number.isFinite(numericSize) &&
         numericSize > 0
             ? numericSize.toFixed(2)
             : "";
-
 
     let html =
         '<div class="odd-box ' +
         cssClass + '"' +
 
         ' data-bet-market-type="' +
-        escapeAttribute(
-            marketType
-        ) +
+        escapeAttribute(marketType) +
         '"' +
 
         ' data-bet-market-name="' +
-        escapeAttribute(
-            marketName
-        ) +
+        escapeAttribute(marketName) +
         '"' +
 
         ' data-bet-selection="' +
-        escapeAttribute(
-            selection
-        ) +
+        escapeAttribute(selection) +
         '"' +
 
         ' data-bet-selection-id="' +
-        escapeAttribute(
-            selectionId
-        ) +
+        escapeAttribute(selectionId) +
         '"' +
 
         ' data-bet-side="' +
-        escapeAttribute(
-            side
-        ) +
+        escapeAttribute(side) +
         '"' +
 
         ' data-bet-odds="' +
-        escapeAttribute(
-            numericPrice
-        ) +
+        escapeAttribute(numericPrice) +
         '">';
-
 
     html +=
         '<div class="odd-price">';
-
 
     if (
         marketType === "FANCY" ||
         marketType === "SESSION"
     ) {
-
         html +=
             side === "BACK"
                 ? "YES "
                 : "NO ";
     }
-
 
     html +=
         numericPrice.toFixed(2);
@@ -3428,19 +3343,15 @@ function createOddBox(
     html +=
         "</div>";
 
-
     if (sizeText) {
 
         html +=
             '<div class="odd-size">' +
-            sizeText +
+                sizeText +
             "</div>";
     }
 
-
-    html +=
-        "</div>";
-
+    html += "</div>";
 
     return html;
 }
@@ -3456,118 +3367,102 @@ function attachBetEvents() {
         .querySelectorAll(
             "[data-bet-market-type]"
         )
-        .forEach(
-            box => {
+        .forEach(box => {
 
-                box.addEventListener(
-                    "click",
-                    function() {
+            box.addEventListener(
+                "click",
+                function() {
 
-                        const odds =
-                            Number(
-                                box.dataset.betOdds
-                            );
+                    const odds =
+                        Number(
+                            box.dataset.betOdds
+                        );
 
+                    const selectionId =
+                        box.dataset.betSelectionId;
 
-                        const selectionId =
-                            box.dataset
-                                .betSelectionId;
-
-
-                        if (
-                            !Number.isFinite(
-                                odds
-                            ) ||
-                            odds <= 1
-                        ) {
-                            return;
-                        }
-
-
-                        if (!selectionId) {
-
-                            showBetMessage(
-                                "Selection ID is unavailable. Refresh the odds and try again.",
-                                "error"
-                            );
-
-                            return;
-                        }
-
-
-                        addToBetSlip({
-
-                            gameId:
-                                String(
-                                    gameId
-                                ),
-
-                            eventId:
-                                String(
-                                    eventId ||
-                                    gameId
-                                ),
-
-                            marketId:
-                                String(
-                                    marketId
-                                ),
-
-                            marketType:
-                                String(
-                                    box.dataset
-                                        .betMarketType
-                                ).toUpperCase(),
-
-                            marketName:
-                                String(
-                                    box.dataset
-                                        .betMarketName ||
-                                    ""
-                                ),
-
-                            selectionId:
-                                String(
-                                    selectionId
-                                ),
-
-                            selectionName:
-                                String(
-                                    box.dataset
-                                        .betSelection ||
-                                    ""
-                                ),
-
-                            side:
-                                String(
-                                    box.dataset
-                                        .betSide
-                                ).toUpperCase(),
-
-                            odds:
-                                odds,
-
-                            stake:
-                                0,
-
-                            eventName:
-                                document
-                                    .getElementById(
-                                        "eventName"
-                                    )
-                                    ?.textContent
-                                    ?.trim() ||
-                                "Cricket Match"
-                        });
+                    if (
+                        !Number.isFinite(odds) ||
+                        odds <= 1
+                    ) {
+                        return;
                     }
-                );
-            }
-        );
+
+                    if (!selectionId) {
+
+                        showBetMessage(
+                            "Selection ID is unavailable. Refresh the odds and try again.",
+                            "error"
+                        );
+
+                        return;
+                    }
+
+                    addToBetSlip({
+
+                        gameId:
+                            String(gameId),
+
+                        eventId:
+                            String(
+                                eventId ||
+                                gameId
+                            ),
+
+                        marketId:
+                            String(
+                                marketId ||
+                                ""
+                            ),
+
+                        marketType:
+                            String(
+                                box.dataset.betMarketType
+                            ).toUpperCase(),
+
+                        marketName:
+                            String(
+                                box.dataset.betMarketName ||
+                                ""
+                            ),
+
+                        selectionId:
+                            String(
+                                selectionId
+                            ),
+
+                        selectionName:
+                            String(
+                                box.dataset.betSelection ||
+                                ""
+                            ),
+
+                        side:
+                            String(
+                                box.dataset.betSide
+                            ).toUpperCase(),
+
+                        odds:
+                            odds,
+
+                        stake:
+                            0,
+
+                        eventName:
+                            document
+                                .getElementById("eventName")
+                                ?.textContent
+                                ?.trim() ||
+                            "Cricket Match"
+                    });
+                }
+            );
+        });
 }
 
 
 /* =========================================================
-   LOCAL STORAGE
+   BET SLIP STORAGE
 ========================================================= */
 
 function loadBetSlip() {
@@ -3580,9 +3475,7 @@ function loadBetSlip() {
             );
 
         if (!raw) {
-
             betSlipItems = [];
-
             return;
         }
 
@@ -3628,7 +3521,7 @@ function saveBetSlip() {
 
 
 /* =========================================================
-   ADD BET
+   ADD / REMOVE / STAKE
 ========================================================= */
 
 function addToBetSlip(item) {
@@ -3642,24 +3535,20 @@ function addToBetSlip(item) {
             item.side
         ].join("|");
 
-
     const existingIndex =
-        betSlipItems.findIndex(
-            current => {
+        betSlipItems.findIndex(current => {
 
-                const currentKey =
-                    [
-                        current.gameId,
-                        current.marketId,
-                        current.marketType,
-                        current.selectionId,
-                        current.side
-                    ].join("|");
+            const currentKey =
+                [
+                    current.gameId,
+                    current.marketId,
+                    current.marketType,
+                    current.selectionId,
+                    current.side
+                ].join("|");
 
-                return currentKey === key;
-            }
-        );
-
+            return currentKey === key;
+        });
 
     if (existingIndex >= 0) {
 
@@ -3671,52 +3560,28 @@ function addToBetSlip(item) {
     } else {
 
         betSlipItems =
-            betSlipItems.filter(
-                current => !(
-                    String(
-                        current.gameId
-                    ) === String(
-                        item.gameId
-                    ) &&
+            betSlipItems.filter(current => !(
+                String(current.gameId) ===
+                String(item.gameId) &&
 
-                    String(
-                        current.marketId
-                    ) === String(
-                        item.marketId
-                    ) &&
+                String(current.marketId) ===
+                String(item.marketId) &&
 
-                    String(
-                        current.marketType
-                    ) === String(
-                        item.marketType
-                    ) &&
+                String(current.marketType) ===
+                String(item.marketType) &&
 
-                    String(
-                        current.selectionId
-                    ) === String(
-                        item.selectionId
-                    )
-                )
-            );
+                String(current.selectionId) ===
+                String(item.selectionId)
+            ));
 
-
-        betSlipItems.push(
-            item
-        );
+        betSlipItems.push(item);
     }
 
-
     saveBetSlip();
-
     renderBetSlip();
-
     openBetSlip();
 }
 
-
-/* =========================================================
-   REMOVE BET
-========================================================= */
 
 function removeBetFromSlip(index) {
 
@@ -3727,27 +3592,14 @@ function removeBetFromSlip(index) {
         return;
     }
 
-
-    betSlipItems.splice(
-        index,
-        1
-    );
-
+    betSlipItems.splice(index, 1);
 
     saveBetSlip();
-
     renderBetSlip();
 }
 
 
-/* =========================================================
-   UPDATE STAKE
-========================================================= */
-
-function updateStake(
-    index,
-    value
-) {
+function updateStake(index, value) {
 
     if (
         index < 0 ||
@@ -3756,10 +3608,8 @@ function updateStake(
         return;
     }
 
-
     const stake =
         Number(value);
-
 
     betSlipItems[index].stake =
         Number.isFinite(stake) &&
@@ -3767,9 +3617,7 @@ function updateStake(
             ? stake
             : 0;
 
-
     saveBetSlip();
-
     updateSlipSummary();
 }
 
@@ -3800,29 +3648,23 @@ function renderBetSlip() {
             "placeAllButton"
         );
 
-
     if (count) {
-
         count.textContent =
             String(
                 betSlipItems.length
             );
     }
 
-
     if (reopenCount) {
-
         reopenCount.textContent =
             String(
                 betSlipItems.length
             );
     }
 
-
     if (!body) {
         return;
     }
-
 
     if (!betSlipItems.length) {
 
@@ -3836,13 +3678,10 @@ function renderBetSlip() {
         }
 
         updateSlipSummary();
-
         return;
     }
 
-
     const groups = new Map();
-
 
     betSlipItems.forEach(
         (item, index) => {
@@ -3854,286 +3693,208 @@ function renderBetSlip() {
                     "event"
                 );
 
-
-            if (!groups.has(
-                eventKey
-            )) {
-
-                groups.set(
-                    eventKey,
-                    []
-                );
+            if (!groups.has(eventKey)) {
+                groups.set(eventKey, []);
             }
 
-
-            groups.get(
-                eventKey
-            ).push({
-                item,
-                index
-            });
+            groups
+                .get(eventKey)
+                .push({
+                    item,
+                    index
+                });
         }
     );
-
 
     let html = "";
 
+    groups.forEach(items => {
 
-    groups.forEach(
-        items => {
+        const eventName =
+            items[0].item.eventName ||
+            "Cricket Match";
 
-            const eventName =
-                items[0].item.eventName ||
-                "Cricket Match";
+        html +=
+            '<div class="slip-event">';
 
+        html +=
+            '<div class="slip-event-title">' +
+                escapeHtml(eventName) +
+            "</div>";
+
+        items.forEach(entry => {
+
+            const item =
+                entry.item;
+
+            const index =
+                entry.index;
+
+            const isFancy =
+                item.marketType === "FANCY" ||
+                item.marketType === "SESSION";
+
+            const displaySide =
+                isFancy
+                    ? (
+                        item.side === "BACK"
+                            ? "YES"
+                            : "NO"
+                    )
+                    : item.side;
+
+            const sideClass =
+                item.side === "BACK"
+                    ? "back"
+                    : "lay";
+
+            const marketLabel =
+                item.marketType === "SESSION"
+                    ? "Session"
+                    : item.marketType === "FANCY"
+                        ? "Fancy"
+                        : item.marketType === "BOOKMAKER"
+                            ? "Bookmaker"
+                            : "Match Odds";
 
             html +=
-                '<div class="slip-event">';
-
+                '<div class="slip-selection">';
 
             html +=
-                '<div class="slip-event-title">' +
-                escapeHtml(
-                    eventName
-                ) +
+                '<div class="slip-selection-top">';
+
+            html +=
+                '<div class="slip-selection-name">' +
+                    escapeHtml(
+                        item.selectionName
+                    ) +
                 "</div>";
 
+            html +=
+                '<button ' +
+                'type="button" ' +
+                'class="remove-selection" ' +
+                'data-remove-index="' +
+                    index +
+                '">' +
+                    "×" +
+                "</button>";
 
-            items.forEach(
-                entry => {
-
-                    const item =
-                        entry.item;
-
-                    const index =
-                        entry.index;
-
-
-                    const isFancy =
-                        item.marketType ===
-                            "FANCY" ||
-                        item.marketType ===
-                            "SESSION";
-
-
-                    const displaySide =
-                        isFancy
-                            ? (
-                                item.side ===
-                                    "BACK"
-                                    ? "YES"
-                                    : "NO"
-                            )
-                            : item.side;
-
-
-                    const sideClass =
-                        item.side ===
-                            "BACK"
-                            ? "back"
-                            : "lay";
-
-
-                    const marketLabel =
-                        item.marketType ===
-                            "SESSION"
-                            ? "Session"
-                            : item.marketType ===
-                                "FANCY"
-                                ? "Fancy"
-                                : item.marketType ===
-                                    "BOOKMAKER"
-                                    ? "Bookmaker"
-                                    : "Match Odds";
-
-
-                    html +=
-                        '<div class="slip-selection">';
-
-
-                    html +=
-                        '<div class="slip-selection-top">';
-
-
-                    html +=
-                        '<div class="slip-selection-name">' +
-                        escapeHtml(
-                            item.selectionName
-                        ) +
-                        "</div>";
-
-
-                    html +=
-                        '<button ' +
-                        'type="button" ' +
-                        'class="remove-selection" ' +
-                        'data-remove-index="' +
-                        index +
-                        '">' +
-                        "×" +
-                        "</button>";
-
-
-                    html +=
-                        "</div>";
-
-
-                    html +=
-                        '<div class="slip-market">' +
-                        escapeHtml(
-                            marketLabel
-                        ) +
-                        " • " +
-                        escapeHtml(
-                            item.marketName
-                        ) +
-                        "</div>";
-
-
-                    html +=
-                        '<div class="slip-meta">';
-
-
-                    html +=
-                        '<span class="slip-type">' +
-                        escapeHtml(
-                            marketLabel
-                        ) +
-                        "</span>";
-
-
-                    html +=
-                        '<span class="slip-side ' +
-                        sideClass +
-                        '">' +
-                        escapeHtml(
-                            displaySide
-                        ) +
-                        "</span>";
-
-
-                    html +=
-                        '<span class="slip-odds">' +
-                        numberValue(
-                            item.odds
-                        ).toFixed(2) +
-                        "</span>";
-
-
-                    html +=
-                        "</div>";
-
-
-                    html +=
-                        '<div class="slip-stake-row">';
-
-
-                    html +=
-                        '<span class="slip-stake-label">' +
-                        "Stake" +
-                        "</span>";
-
-
-                    html +=
-                        '<input ' +
-                        'type="number" ' +
-                        'class="stake-input" ' +
-                        'min="1" ' +
-                        'step="0.01" ' +
-                        'value="' +
-                        (
-                            item.stake > 0
-                                ? item.stake
-                                : ""
-                        ) +
-                        '" ' +
-                        'placeholder="Enter stake" ' +
-                        'data-stake-index="' +
-                        index +
-                        '">';
-
-
-                    html +=
-                        "</div>";
-
-
-                    html +=
-                        "</div>";
-                }
-            );
-
+            html += "</div>";
 
             html +=
+                '<div class="slip-market">' +
+                    escapeHtml(marketLabel) +
+                    " • " +
+                    escapeHtml(item.marketName) +
                 "</div>";
-        }
-    );
 
+            html +=
+                '<div class="slip-meta">';
 
-    body.innerHTML =
-        html;
+            html +=
+                '<span class="slip-type">' +
+                    escapeHtml(marketLabel) +
+                "</span>";
 
+            html +=
+                '<span class="slip-side ' +
+                    sideClass +
+                '">' +
+                    escapeHtml(displaySide) +
+                "</span>";
+
+            html +=
+                '<span class="slip-odds">' +
+                    numberValue(item.odds).toFixed(2) +
+                "</span>";
+
+            html += "</div>";
+
+            html +=
+                '<div class="slip-stake-row">';
+
+            html +=
+                '<span class="slip-stake-label">' +
+                    "Stake" +
+                "</span>";
+
+            html +=
+                '<input ' +
+                'type="number" ' +
+                'class="stake-input" ' +
+                'min="1" ' +
+                'step="0.01" ' +
+                'value="' +
+                    (
+                        item.stake > 0
+                            ? item.stake
+                            : ""
+                    ) +
+                '" ' +
+                'placeholder="Enter stake" ' +
+                'data-stake-index="' +
+                    index +
+                '">';
+
+            html += "</div>";
+            html += "</div>";
+        });
+
+        html += "</div>";
+    });
+
+    body.innerHTML = html;
 
     body
         .querySelectorAll(
             "[data-remove-index]"
         )
-        .forEach(
-            button => {
+        .forEach(button => {
 
-                button.addEventListener(
-                    "click",
-                    () => {
+            button.addEventListener(
+                "click",
+                () => {
 
-                        removeBetFromSlip(
-                            Number(
-                                button.dataset
-                                    .removeIndex
-                            )
-                        );
-                    }
-                );
-            }
-        );
-
+                    removeBetFromSlip(
+                        Number(
+                            button.dataset
+                                .removeIndex
+                        )
+                    );
+                }
+            );
+        });
 
     body
         .querySelectorAll(
             "[data-stake-index]"
         )
-        .forEach(
-            input => {
+        .forEach(input => {
 
-                input.addEventListener(
-                    "input",
-                    () => {
+            input.addEventListener(
+                "input",
+                () => {
 
-                        updateStake(
-                            Number(
-                                input.dataset
-                                    .stakeIndex
-                            ),
-                            input.value
-                        );
-                    }
-                );
-            }
-        );
-
+                    updateStake(
+                        Number(
+                            input.dataset
+                                .stakeIndex
+                        ),
+                        input.value
+                    );
+                }
+            );
+        });
 
     if (placeButton) {
-
         placeButton.disabled =
             betSlipItems.length === 0;
     }
 
-
     updateSlipSummary();
 }
 
-
-/* =========================================================
-   SUMMARY
-========================================================= */
 
 function updateSlipSummary() {
 
@@ -4147,33 +3908,21 @@ function updateSlipSummary() {
             "potentialReturn"
         );
 
-
     let totalStake = 0;
     let totalReturn = 0;
 
+    betSlipItems.forEach(item => {
 
-    betSlipItems.forEach(
-        item => {
+        const stake =
+            numberValue(item.stake);
 
-            const stake =
-                numberValue(
-                    item.stake
-                );
+        const odds =
+            numberValue(item.odds);
 
-            const odds =
-                numberValue(
-                    item.odds
-                );
-
-
-            totalStake +=
-                stake;
-
-            totalReturn +=
-                stake * odds;
-        }
-    );
-
+        totalStake += stake;
+        totalReturn +=
+            stake * odds;
+    });
 
     if (totalStakeElement) {
 
@@ -4181,7 +3930,6 @@ function updateSlipSummary() {
             "₹" +
             totalStake.toFixed(2);
     }
-
 
     if (returnElement) {
 
@@ -4193,7 +3941,7 @@ function updateSlipSummary() {
 
 
 /* =========================================================
-   BET SLIP OPEN / MINIMIZE
+   BET SLIP OPEN / CLOSE
 ========================================================= */
 
 function openBetSlip() {
@@ -4208,20 +3956,12 @@ function openBetSlip() {
             "reopenSlipButton"
         );
 
-
     if (slip) {
-
-        slip.classList.add(
-            "open"
-        );
+        slip.classList.add("open");
     }
 
-
     if (reopen) {
-
-        reopen.classList.remove(
-            "show"
-        );
+        reopen.classList.remove("show");
     }
 }
 
@@ -4238,14 +3978,9 @@ function minimizeBetSlip() {
             "reopenSlipButton"
         );
 
-
     if (slip) {
-
-        slip.classList.remove(
-            "open"
-        );
+        slip.classList.remove("open");
     }
-
 
     if (reopen) {
 
@@ -4261,10 +3996,7 @@ function minimizeBetSlip() {
    BET MESSAGE
 ========================================================= */
 
-function showBetMessage(
-    message,
-    type
-) {
+function showBetMessage(message, type) {
 
     const element =
         document.getElementById(
@@ -4275,10 +4007,8 @@ function showBetMessage(
         return;
     }
 
-
     element.textContent =
         message;
-
 
     element.className =
         "bet-message show " +
@@ -4301,7 +4031,6 @@ function hideBetMessage() {
         return;
     }
 
-
     element.textContent =
         "";
 
@@ -4311,13 +4040,12 @@ function hideBetMessage() {
 
 
 /* =========================================================
-   PLACE ALL BETS
+   PLACE BET
 ========================================================= */
 
 async function placeAllBets() {
 
     hideBetMessage();
-
 
     if (!betSlipItems.length) {
 
@@ -4329,7 +4057,6 @@ async function placeAllBets() {
         return;
     }
 
-
     const invalid =
         betSlipItems.find(
             item =>
@@ -4338,7 +4065,6 @@ async function placeAllBets() {
                 ) ||
                 Number(item.stake) <= 0
         );
-
 
     if (invalid) {
 
@@ -4350,25 +4076,18 @@ async function placeAllBets() {
         return;
     }
 
-
     const button =
         document.getElementById(
             "placeAllButton"
         );
 
-
     if (button) {
 
-        button.disabled =
-            true;
-
-        button.textContent =
-            "Placing...";
+        button.disabled = true;
+        button.textContent = "Placing...";
     }
 
-
     let placedCount = 0;
-
 
     try {
 
@@ -4380,7 +4099,6 @@ async function placeAllBets() {
 
             const item =
                 betSlipItems[index];
-
 
             const requestBody = {
 
@@ -4397,7 +4115,8 @@ async function placeAllBets() {
 
                 market_id:
                     String(
-                        item.marketId
+                        item.marketId ||
+                        ""
                     ),
 
                 market_type:
@@ -4437,12 +4156,10 @@ async function placeAllBets() {
                     )
             };
 
-
             console.log(
                 "[BET] placing:",
                 requestBody
             );
-
 
             const response =
                 await fetch(
@@ -4468,22 +4185,17 @@ async function placeAllBets() {
                     }
                 );
 
-
             let data = {};
 
             try {
-
                 data =
                     await response.json();
-
             } catch (error) {
-
                 console.error(
                     "[BET] JSON error:",
                     error
                 );
             }
-
 
             if (!response.ok) {
 
@@ -4494,8 +4206,7 @@ async function placeAllBets() {
                 );
             }
 
-
-            if (!data.success) {
+            if (data.success === false) {
 
                 throw new Error(
                     data.message ||
@@ -4503,37 +4214,26 @@ async function placeAllBets() {
                 );
             }
 
-
             placedCount++;
-
 
             betSlipItems =
                 betSlipItems.filter(
                     (_, itemIndex) =>
-                        itemIndex !==
-                        index
+                        itemIndex !== index
                 );
-
 
             index--;
 
-
             saveBetSlip();
-
             renderBetSlip();
 
-
-            if (
-                data.balance !==
-                undefined
-            ) {
+            if (data.balance !== undefined) {
 
                 updateDisplayedBalance(
                     data.balance
                 );
             }
         }
-
 
         showBetMessage(
             placedCount +
@@ -4544,7 +4244,6 @@ async function placeAllBets() {
             ),
             "success"
         );
-
 
         setTimeout(
             () => {
@@ -4559,12 +4258,10 @@ async function placeAllBets() {
                         );
 
                     if (slip) {
-
                         slip.classList.remove(
                             "open"
                         );
                     }
-
 
                     const reopen =
                         document.getElementById(
@@ -4572,7 +4269,6 @@ async function placeAllBets() {
                         );
 
                     if (reopen) {
-
                         reopen.classList.remove(
                             "show"
                         );
@@ -4583,14 +4279,12 @@ async function placeAllBets() {
             1600
         );
 
-
     } catch (error) {
 
         console.error(
             "[BET] placement error:",
             error
         );
-
 
         showBetMessage(
             error.message ||
@@ -4613,7 +4307,7 @@ async function placeAllBets() {
 
 
 /* =========================================================
-   UPDATE BALANCE
+   BALANCE
 ========================================================= */
 
 function updateDisplayedBalance(balance) {
@@ -4641,19 +4335,70 @@ function updateDisplayedBalance(balance) {
         );
 
     if (topBalance) {
-        topBalance.textContent = formatted;
+        topBalance.textContent =
+            formatted;
     }
 
     document
-        .querySelectorAll(
-            ".balance"
-        )
-        .forEach(
-            element => {
-                element.textContent =
-                    formatted;
-            }
+        .querySelectorAll(".balance")
+        .forEach(element => {
+            element.textContent =
+                formatted;
+        });
+}
+
+
+async function loadMatchPageBalance() {
+
+    const balanceElement =
+        document.getElementById(
+            "matchPageBalance"
         );
+
+    if (!balanceElement) {
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/user/balance",
+                {
+                    method: "GET",
+                    credentials: "same-origin",
+                    cache: "no-store",
+                    headers: {
+                        Accept:
+                            "application/json"
+                    }
+                }
+            );
+
+        if (!response.ok) {
+            return;
+        }
+
+        const data =
+            await response.json();
+
+        if (
+            data.balance === undefined
+        ) {
+            return;
+        }
+
+        updateDisplayedBalance(
+            data.balance
+        );
+
+    } catch (error) {
+
+        console.error(
+            "[ACCOUNT] Balance loading failed:",
+            error
+        );
+    }
 }
 
 
@@ -4664,15 +4409,10 @@ function updateDisplayedBalance(balance) {
 function startOddsPolling() {
 
     if (refreshTimer) {
-
-        clearInterval(
-            refreshTimer
-        );
+        clearInterval(refreshTimer);
     }
 
-
     loadOdds();
-
 
     refreshTimer =
         setInterval(
@@ -4706,406 +4446,1326 @@ function stopOddsPolling() {
 
 
 /* =========================================================
-   SCOREBOARD
+   SCOREBOARD DATA UNWRAPPING
 ========================================================= */
 
-const MATCH_GAME_ID =
-    decodeURIComponent(
-        window.location.pathname
-            .split("/")
-            .filter(Boolean)
-            .pop() || ""
-    );
-
-
-const MATCH_SCORE_ID =
-    MATCH_GAME_ID;
-
-
-const MATCH_RESULT_ID =
-    MATCH_GAME_ID;
-
-
-/*
- * Convert values safely.
- */
-
-function scoreText(value, fallback = "") {
-
-    if (
-        value === null ||
-        value === undefined ||
-        value === ""
-    ) {
-        return fallback;
-    }
-
-    return String(value);
-}
-
-
-/*
- * Convert a score such as:
- *
- * 335-7
- * 335/7
- * 335-7 (50.0)
- *
- * into a clean 335/7 display.
- */
-
-function formatScoreValue(
-    scoreOnly,
-    fullScore
-) {
-
-    let value =
-        scoreText(
-            scoreOnly,
-            ""
-        ).trim();
-
-
-    if (!value) {
-
-        value =
-            scoreText(
-                fullScore,
-                ""
-            ).trim();
-    }
-
-
-    if (!value) {
-        return "--/--";
-    }
-
-
-    const match =
-        value.match(
-            /(\d+)\s*[-/]\s*(\d+)/
-        );
-
-
-    if (match) {
-
-        return (
-            match[1] +
-            "/" +
-            match[2]
-        );
-    }
-
-
-    return value;
-}
-
-
-/*
- * Remove the trailing * from player name,
- * while returning striker state separately.
- */
-
-function parsePlayerName(name) {
-
-    const raw =
-        scoreText(
-            name,
-            ""
-        ).trim();
-
-
-    const striker =
-        raw.endsWith("*");
-
-
-    return {
-
-        name:
-            striker
-                ? raw.slice(0, -1).trim()
-                : raw,
-
-        striker
-    };
-}
-
-
-/*
- * The API can return either:
- *
- * success -> data -> Data -> Score
- *
- * or an already-normalized response.
- */
-
-function extractScoreRecord(payload) {
+function unwrapScorePayload(payload) {
 
     if (
         !payload ||
         typeof payload !== "object"
     ) {
-        return null;
+        return {};
     }
-
 
     let root = payload;
 
+    const wrappers = [
+        "data",
+        "Data",
+        "result",
+        "Result",
+        "response",
+        "Response"
+    ];
 
-    if (
-        root.data &&
-        typeof root.data === "object"
-    ) {
-        root = root.data;
+    for (let round = 0; round < 6; round++) {
+
+        let changed = false;
+
+        for (const key of wrappers) {
+
+            if (
+                root &&
+                root[key] &&
+                typeof root[key] === "object"
+            ) {
+
+                root = root[key];
+                changed = true;
+                break;
+            }
+        }
+
+        if (!changed) {
+            break;
+        }
     }
 
-
-    if (
-        root.Data &&
-        typeof root.Data === "object"
-    ) {
-        root = root.Data;
-    }
-
-
-    if (
-        Array.isArray(
-            root.Score
-        ) &&
-        root.Score.length
-    ) {
-
-        return root.Score[0];
-    }
-
-
-    if (
-        Array.isArray(
-            root.score
-        ) &&
-        root.score.length
-    ) {
-
-        return root.score[0];
-    }
-
-
-    if (
-        root.score &&
-        typeof root.score === "object"
-    ) {
-
-        return root.score;
-    }
-
-
-    if (
-        root.team1Name ||
-        root.Team1Name ||
-        root.team1
-    ) {
-
-        return root;
-    }
-
-
-    return null;
+    return root || {};
 }
 
 
-/*
- * Render scoreboard.
- */
+function findScoreRecord(root) {
 
-function renderScoreboard(
-    payload
+    if (
+        !root ||
+        typeof root !== "object"
+    ) {
+        return {};
+    }
+
+    if (
+        Array.isArray(root.Score) &&
+        root.Score.length
+    ) {
+        return root.Score[0];
+    }
+
+    if (
+        Array.isArray(root.score) &&
+        root.score.length
+    ) {
+        return root.score[0];
+    }
+
+    if (
+        Array.isArray(root.scores) &&
+        root.scores.length &&
+        isObject(root.scores[0])
+    ) {
+        return root.scores[0];
+    }
+
+    if (
+        root.Score &&
+        typeof root.Score === "object" &&
+        !Array.isArray(root.Score)
+    ) {
+        return root.Score;
+    }
+
+    if (
+        root.score &&
+        typeof root.score === "object" &&
+        !Array.isArray(root.score)
+    ) {
+        return root.score;
+    }
+
+    return root;
+}
+
+
+/* =========================================================
+   SCORE PARSING
+========================================================= */
+
+function parseScoreString(value) {
+
+    const text =
+        scoreText(value, "").trim();
+
+    if (!text) {
+        return {
+            runs: "",
+            wickets: "",
+            overs: ""
+        };
+    }
+
+    const result = {
+        runs: "",
+        wickets: "",
+        overs: ""
+    };
+
+    const scoreMatch =
+        text.match(
+            /(\d+)\s*[-/]\s*(\d+)/
+        );
+
+    if (scoreMatch) {
+        result.runs =
+            scoreMatch[1];
+
+        result.wickets =
+            scoreMatch[2];
+    }
+
+    const oversMatch =
+        text.match(
+            /\(\s*(\d+(?:\.\d+)?)\s*\)/
+        );
+
+    if (oversMatch) {
+        result.overs =
+            oversMatch[1];
+    }
+
+    if (
+        !result.runs &&
+        /^\d+$/.test(text)
+    ) {
+        result.runs = text;
+    }
+
+    return result;
+}
+
+
+function formatDisplayScore(
+    runs,
+    wickets,
+    score
 ) {
 
-    const score =
-        extractScoreRecord(
-            payload
+    const directScore =
+        scoreText(
+            score,
+            ""
+        ).trim();
+
+    if (directScore) {
+
+        const parsed =
+            parseScoreString(
+                directScore
+            );
+
+        if (
+            parsed.runs !== "" &&
+            parsed.wickets !== ""
+        ) {
+            return (
+                parsed.runs +
+                "/" +
+                parsed.wickets
+            );
+        }
+
+        if (directScore) {
+            return directScore;
+        }
+    }
+
+    if (
+        runs !== null &&
+        runs !== undefined &&
+        runs !== ""
+    ) {
+
+        const runText =
+            String(runs);
+
+        if (
+            wickets !== null &&
+            wickets !== undefined &&
+            wickets !== ""
+        ) {
+
+            return (
+                runText +
+                "/" +
+                String(wickets)
+            );
+        }
+
+        return runText;
+    }
+
+    return "--/--";
+}
+
+
+function extractOversFromValues(...values) {
+
+    for (const value of values) {
+
+        if (
+            value !== null &&
+            value !== undefined &&
+            value !== ""
+        ) {
+
+            const text =
+                String(value);
+
+            const parsed =
+                parseScoreString(text);
+
+            if (parsed.overs) {
+                return parsed.overs;
+            }
+
+            if (
+                /^\d+(?:\.\d+)?$/.test(text)
+            ) {
+                return text;
+            }
+        }
+    }
+
+    return "";
+}
+
+
+function ordinalInning(number) {
+
+    const n =
+        Number(number);
+
+    if (!Number.isFinite(n)) {
+        return "--";
+    }
+
+    if (n % 100 >= 11 && n % 100 <= 13) {
+        return n + "th";
+    }
+
+    switch (n % 10) {
+        case 1:
+            return n + "st";
+
+        case 2:
+            return n + "nd";
+
+        case 3:
+            return n + "rd";
+
+        default:
+            return n + "th";
+    }
+}
+
+
+function normalizeInnings(
+    root,
+    score
+) {
+
+    const candidates = [
+        firstArray(root, [
+            "innings",
+            "Innings"
+        ]),
+
+        firstArray(score, [
+            "innings",
+            "Innings"
+        ]),
+
+        firstArray(root, [
+            "scores",
+            "Scores",
+            "scorecard",
+            "Scorecard"
+        ]),
+
+        firstArray(score, [
+            "scores",
+            "Scores",
+            "scorecard",
+            "Scorecard"
+        ])
+    ];
+
+    let innings = [];
+
+    for (const candidate of candidates) {
+
+        if (
+            Array.isArray(candidate) &&
+            candidate.length
+        ) {
+            innings = candidate;
+            break;
+        }
+    }
+
+    if (innings.length) {
+
+        return innings.map(
+            (item, index) => {
+
+                if (
+                    typeof item === "string" ||
+                    typeof item === "number"
+                ) {
+
+                    const parsed =
+                        parseScoreString(item);
+
+                    return {
+                        team:
+                            index === 0
+                                ? getTeamFallback(1)
+                                : getTeamFallback(2),
+
+                        runs:
+                            parsed.runs,
+
+                        wickets:
+                            parsed.wickets,
+
+                        overs:
+                            parsed.overs,
+
+                        score:
+                            String(item),
+
+                        is_current:
+                            false,
+
+                        raw:
+                            item
+                    };
+                }
+
+                const runs =
+                    firstValue(
+                        item,
+                        [
+                            "runs",
+                            "run",
+                            "score_runs",
+                            "total_runs",
+                            "r"
+                        ],
+                        ""
+                    );
+
+                const wickets =
+                    firstValue(
+                        item,
+                        [
+                            "wickets",
+                            "wicket",
+                            "score_wickets",
+                            "total_wickets",
+                            "w"
+                        ],
+                        ""
+                    );
+
+                const scoreTextValue =
+                    firstValue(
+                        item,
+                        [
+                            "score",
+                            "score_text",
+                            "scoreText",
+                            "total"
+                        ],
+                        ""
+                    );
+
+                const parsed =
+                    parseScoreString(
+                        scoreTextValue
+                    );
+
+                return {
+
+                    team:
+                        firstValue(
+                            item,
+                            [
+                                "team",
+                                "team_name",
+                                "teamName",
+                                "name",
+                                "batting_team",
+                                "battingTeam"
+                            ],
+                            index === 0
+                                ? getTeamFallback(1)
+                                : getTeamFallback(2)
+                        ),
+
+                    runs:
+                        runs !== ""
+                            ? runs
+                            : parsed.runs,
+
+                    wickets:
+                        wickets !== ""
+                            ? wickets
+                            : parsed.wickets,
+
+                    overs:
+                        firstValue(
+                            item,
+                            [
+                                "overs",
+                                "over",
+                                "ovs",
+                                "over_count"
+                            ],
+                            parsed.overs
+                        ),
+
+                    score:
+                        scoreTextValue,
+
+                    run_rate:
+                        firstValue(
+                            item,
+                            [
+                                "run_rate",
+                                "runRate",
+                                "rr",
+                                "crr",
+                                "current_run_rate"
+                            ],
+                            ""
+                        ),
+
+                    target:
+                        firstValue(
+                            item,
+                            [
+                                "target",
+                                "Target"
+                            ],
+                            ""
+                        ),
+
+                    required_runs:
+                        firstValue(
+                            item,
+                            [
+                                "required_runs",
+                                "requiredRuns",
+                                "runs_required",
+                                "to_get"
+                            ],
+                            ""
+                        ),
+
+                    required_balls:
+                        firstValue(
+                            item,
+                            [
+                                "required_balls",
+                                "requiredBalls",
+                                "balls_remaining"
+                            ],
+                            ""
+                        ),
+
+                    required_run_rate:
+                        firstValue(
+                            item,
+                            [
+                                "required_run_rate",
+                                "requiredRunRate",
+                                "rrr"
+                            ],
+                            ""
+                        ),
+
+                    is_current:
+                        item.is_current === true ||
+                        item.isCurrent === true,
+
+                    raw:
+                        item
+                };
+            }
         );
-
-
-    if (!score) {
-
-        showScoreboardEmpty(
-            "Live score is currently unavailable."
-        );
-
-        return;
     }
 
 
-    const team1Name =
-        score.Team1Name ||
-        score.team1Name ||
-        score.team1 ||
-        score.team_1 ||
-        "Team 1";
+    /*
+     * Build innings from classic CricketBZ
+     * Team1Score / Team2Score fields.
+     */
 
+    const team1Name =
+        firstValue(
+            score,
+            [
+                "Team1Name",
+                "team1Name",
+                "team1",
+                "team_1"
+            ],
+            getTeamFallback(1)
+        );
 
     const team2Name =
-        score.Team2Name ||
-        score.team2Name ||
-        score.team2 ||
-        score.team_2 ||
-        "Team 2";
-
-
-    const team1Short =
-        score.Team1Name_Short ||
-        score.team1Short ||
-        "";
-
-
-    const team2Short =
-        score.Team2Name_Short ||
-        score.team2Short ||
-        "";
-
-
-    const team1Score =
-        formatScoreValue(
-            score.Team1ScoreOnly,
-            score.Team1OnlyScore ||
-            score.Team1Score
+        firstValue(
+            score,
+            [
+                "Team2Name",
+                "team2Name",
+                "team2",
+                "team_2"
+            ],
+            getTeamFallback(2)
         );
 
 
-    const team2Score =
-        formatScoreValue(
-            score.Team2ScoreOnly,
-            score.Team2OnlyScore ||
-            score.Team2Score
+    const team1Raw =
+        firstValue(
+            score,
+            [
+                "Team1OnlyScore",
+                "Team1Score",
+                "team1Score"
+            ],
+            ""
         );
 
 
-    const team1Overs =
-        score.Team1Overs ||
-        extractOvers(
-            score.Team1OnlyScore ||
-            score.Team1Score
+    const team2Raw =
+        firstValue(
+            score,
+            [
+                "Team2OnlyScore",
+                "Team2Score",
+                "team2Score"
+            ],
+            ""
         );
 
 
-    const team2Overs =
-        score.Team2Overs ||
-        extractOvers(
-            score.Team2OnlyScore ||
-            score.Team2Score
+    const team1Runs =
+        firstValue(
+            score,
+            [
+                "Team1Runs",
+                "Team1Run",
+                "team1Runs"
+            ],
+            ""
+        );
+
+
+    const team2Runs =
+        firstValue(
+            score,
+            [
+                "Team2Runs",
+                "Team2Run",
+                "team2Runs"
+            ],
+            ""
+        );
+
+
+    const team1Wickets =
+        firstValue(
+            score,
+            [
+                "Team1Wickets",
+                "Team1Wicket",
+                "team1Wickets"
+            ],
+            ""
+        );
+
+
+    const team2Wickets =
+        firstValue(
+            score,
+            [
+                "Team2Wickets",
+                "Team2Wicket",
+                "team2Wickets"
+            ],
+            ""
+        );
+
+
+    const p1 =
+        parseScoreString(team1Raw);
+
+    const p2 =
+        parseScoreString(team2Raw);
+
+
+    const result = [];
+
+
+    if (
+        team1Name ||
+        team1Raw ||
+        team1Runs !== ""
+    ) {
+
+        result.push({
+
+            team:
+                team1Name,
+
+            runs:
+                team1Runs !== ""
+                    ? team1Runs
+                    : p1.runs,
+
+            wickets:
+                team1Wickets !== ""
+                    ? team1Wickets
+                    : p1.wickets,
+
+            overs:
+                firstValue(
+                    score,
+                    [
+                        "Team1Overs",
+                        "team1Overs"
+                    ],
+                    p1.overs
+                ),
+
+            score:
+                team1Raw,
+
+            is_current:
+                Number(
+                    firstValue(
+                        score,
+                        [
+                            "CurrentInning"
+                        ],
+                        ""
+                    )
+                ) === 1
+        });
+    }
+
+
+    if (
+        team2Name ||
+        team2Raw ||
+        team2Runs !== ""
+    ) {
+
+        result.push({
+
+            team:
+                team2Name,
+
+            runs:
+                team2Runs !== ""
+                    ? team2Runs
+                    : p2.runs,
+
+            wickets:
+                team2Wickets !== ""
+                    ? team2Wickets
+                    : p2.wickets,
+
+            overs:
+                firstValue(
+                    score,
+                    [
+                        "Team2Overs",
+                        "team2Overs"
+                    ],
+                    p2.overs
+                ),
+
+            score:
+                team2Raw,
+
+            is_current:
+                Number(
+                    firstValue(
+                        score,
+                        [
+                            "CurrentInning"
+                        ],
+                        ""
+                    )
+                ) === 2
+        });
+    }
+
+
+    return result;
+}
+
+
+function getTeamFallback(number) {
+
+    const element =
+        document.getElementById(
+            number === 1
+                ? "team1"
+                : "team2"
+        );
+
+    return element?.textContent?.trim() ||
+        (
+            number === 1
+                ? "Team 1"
+                : "Team 2"
+        );
+}
+
+
+/* =========================================================
+   TEAM / INNINGS RENDER
+========================================================= */
+
+function renderTeamScore(
+    teamNumber,
+    inning
+) {
+
+    if (!inning) {
+        return;
+    }
+
+    const parsed =
+        parseScoreString(
+            inning.score
+        );
+
+    const runs =
+        inning.runs !== undefined &&
+        inning.runs !== ""
+            ? inning.runs
+            : parsed.runs;
+
+    const wickets =
+        inning.wickets !== undefined &&
+        inning.wickets !== ""
+            ? inning.wickets
+            : parsed.wickets;
+
+    const score =
+        formatDisplayScore(
+            runs,
+            wickets,
+            inning.score
+        );
+
+    const overs =
+        inning.overs ||
+        parsed.overs ||
+        "--";
+
+    const teamName =
+        inning.team ||
+        getTeamFallback(teamNumber);
+
+    setText(
+        "scoreTeam" +
+        teamNumber +
+        "Name",
+        teamName
+    );
+
+    setText(
+        "scoreTeam" +
+        teamNumber +
+        "Value",
+        score
+    );
+
+    setText(
+        "scoreTeam" +
+        teamNumber +
+        "Overs",
+        overs +
+        " OV"
+    );
+
+    const batting =
+        Boolean(
+            inning.is_current
+        );
+
+    toggleHidden(
+        "scoreTeam" +
+        teamNumber +
+        "Batting",
+        !batting
+    );
+}
+
+
+/* =========================================================
+   SCOREBOARD CLASSIC / NORMALIZED RENDERER
+========================================================= */
+
+function renderScoreboard(payload) {
+
+    const root =
+        unwrapScorePayload(payload);
+
+    const score =
+        findScoreRecord(root);
+
+
+    /*
+     * Update match name from whichever response
+     * supplied it.
+     */
+
+    const eventName =
+        firstValue(
+            score,
+            [
+                "event_name",
+                "eventName",
+                "match_name",
+                "matchName",
+                "name",
+                "EventName"
+            ],
+            ""
+        );
+
+    if (eventName) {
+
+        setText(
+            "scoreboardEvent",
+            eventName
+        );
+
+        setText(
+            "eventName",
+            eventName
+        );
+    }
+
+
+    /*
+     * Get innings from normalized backend first,
+     * then classic CricketBZ fields.
+     */
+
+    const innings =
+        normalizeInnings(
+            root,
+            score
         );
 
 
     const currentInning =
         Number(
-            score.CurrentInning
+            firstValue(
+                score,
+                [
+                    "CurrentInning",
+                    "current_inning",
+                    "currentInning",
+                    "inning"
+                ],
+                ""
+            )
         );
 
 
-    const team1Batting =
-        currentInning === 1;
+    /*
+     * If backend says a batting team explicitly,
+     * mark the matching innings current.
+     */
+
+    const battingTeam =
+        firstValue(
+            root,
+            [
+                "batting_team",
+                "battingTeam",
+                "current_batting_team"
+            ],
+            firstValue(
+                score,
+                [
+                    "batting_team",
+                    "BattingTeam",
+                    "BattingTeamName"
+                ],
+                ""
+            )
+        );
 
 
-    const team2Batting =
-        currentInning === 2;
+    if (battingTeam) {
+
+        innings.forEach(inning => {
+
+            inning.is_current =
+                String(
+                    inning.team || ""
+                ).trim().toLowerCase() ===
+                String(
+                    battingTeam
+                ).trim().toLowerCase();
+        });
+    }
 
 
-    setText(
-        "scoreTeam1Name",
-        team1Name
-    );
+    if (
+        currentInning === 1 ||
+        currentInning === 2
+    ) {
+
+        innings.forEach(
+            (inning, index) => {
+
+                if (
+                    index ===
+                    currentInning - 1
+                ) {
+
+                    inning.is_current =
+                        true;
+                }
+            }
+        );
+    }
+
+
+    const team1 =
+        innings[0] || null;
+
+    const team2 =
+        innings[1] || null;
+
+
+    /*
+     * Fallback classic score values directly
+     * from Score object.
+     */
+
+    if (team1) {
+
+        renderTeamScore(
+            1,
+            team1
+        );
+
+    } else {
+
+        renderTeamScore(
+            1,
+            {
+                team:
+                    firstValue(
+                        score,
+                        [
+                            "Team1Name",
+                            "team1Name",
+                            "team1"
+                        ],
+                        getTeamFallback(1)
+                    ),
+
+                score:
+                    firstValue(
+                        score,
+                        [
+                            "Team1ScoreOnly",
+                            "Team1OnlyScore",
+                            "Team1Score"
+                        ],
+                        ""
+                    ),
+
+                overs:
+                    firstValue(
+                        score,
+                        [
+                            "Team1Overs"
+                        ],
+                        ""
+                    )
+            }
+        );
+    }
+
+
+    if (team2) {
+
+        renderTeamScore(
+            2,
+            team2
+        );
+
+    } else {
+
+        renderTeamScore(
+            2,
+            {
+                team:
+                    firstValue(
+                        score,
+                        [
+                            "Team2Name",
+                            "team2Name",
+                            "team2"
+                        ],
+                        getTeamFallback(2)
+                    ),
+
+                score:
+                    firstValue(
+                        score,
+                        [
+                            "Team2ScoreOnly",
+                            "Team2OnlyScore",
+                            "Team2Score"
+                        ],
+                        ""
+                    ),
+
+                overs:
+                    firstValue(
+                        score,
+                        [
+                            "Team2Overs"
+                        ],
+                        ""
+                    )
+            }
+        );
+    }
+
+
+    const team1Short =
+        firstValue(
+            score,
+            [
+                "Team1Name_Short",
+                "team1Short",
+                "team1_short"
+            ],
+            ""
+        );
+
+
+    const team2Short =
+        firstValue(
+            score,
+            [
+                "Team2Name_Short",
+                "team2Short",
+                "team2_short"
+            ],
+            ""
+        );
+
 
     setText(
         "scoreTeam1Short",
-        team1Short
-    );
-
-    setText(
-        "scoreTeam1Value",
-        team1Score
-    );
-
-    setText(
-        "scoreTeam1Overs",
-        team1Overs
-            ? team1Overs + " OV"
-            : "-- OV"
-    );
-
-
-    setText(
-        "scoreTeam2Name",
-        team2Name
+        team1Short,
+        ""
     );
 
     setText(
         "scoreTeam2Short",
-        team2Short
-    );
-
-    setText(
-        "scoreTeam2Value",
-        team2Score
-    );
-
-    setText(
-        "scoreTeam2Overs",
-        team2Overs
-            ? team2Overs + " OV"
-            : "-- OV"
+        team2Short,
+        ""
     );
 
 
-    toggleHidden(
-        "scoreTeam1Batting",
-        !team1Batting
-    );
+    /*
+     * Innings number.
+     */
 
-    toggleHidden(
-        "scoreTeam2Batting",
-        !team2Batting
-    );
+    const detectedCurrent =
+        currentInning ||
+        innings.findIndex(
+            inning =>
+                inning.is_current === true
+        ) + 1;
 
 
     setText(
         "scoreCurrentInning",
-        currentInning
-            ? currentInning + "nd"
+        detectedCurrent
+            ? ordinalInning(
+                detectedCurrent
+            )
             : "--"
     );
 
 
+    /*
+     * Rates / target.
+     */
+
+    const crr =
+        firstValue(
+            root,
+            [
+                "crr",
+                "CRR",
+                "current_run_rate",
+                "currentRunRate"
+            ],
+            firstValue(
+                score,
+                [
+                    "CRR",
+                    "crr",
+                    "CurrentRunRate"
+                ],
+                team1?.run_rate ||
+                team2?.run_rate ||
+                ""
+            )
+        );
+
+
+    const rrr =
+        firstValue(
+            root,
+            [
+                "rrr",
+                "RRR",
+                "required_run_rate",
+                "requiredRunRate"
+            ],
+            firstValue(
+                score,
+                [
+                    "RRR",
+                    "rrr",
+                    "RequiredRunRate"
+                ],
+                team1?.required_run_rate ||
+                team2?.required_run_rate ||
+                ""
+            )
+        );
+
+
+    const target =
+        firstValue(
+            root,
+            [
+                "target",
+                "Target"
+            ],
+            firstValue(
+                score,
+                [
+                    "Target",
+                    "target"
+                ],
+                team1?.target ||
+                team2?.target ||
+                ""
+            )
+        );
+
+
     setText(
         "scoreCRR",
-        score.CRR ||
-        score.crr ||
+        crr,
         "--"
     );
-
 
     setText(
         "scoreRRR",
-        score.RRR ||
-        score.rrr ||
+        rrr,
         "--"
     );
-
 
     setText(
         "scoreTargetValue",
-        score.Target ||
-        score.target ||
+        target,
         "--"
     );
 
 
+    /*
+     * Status.
+     */
+
+    const status =
+        firstValue(
+            root,
+            [
+                "status",
+                "Status",
+                "match_status",
+                "matchStatus"
+            ],
+            firstValue(
+                score,
+                [
+                    "Status",
+                    "status",
+                    "MatchStatus"
+                ],
+                ""
+            )
+        );
+
+
+    setText(
+        "scoreStatusValue",
+        status,
+        "LIVE"
+    );
+
+
+    /*
+     * Chase / result message.
+     */
+
     const chase =
-        score.ScoreStatus ||
-        score.NRMsg ||
-        score.score_status ||
-        score.message ||
-        "";
+        firstValue(
+            root,
+            [
+                "message",
+                "Message",
+                "score_status",
+                "scoreStatus",
+                "score_status_text",
+                "status_text"
+            ],
+            firstValue(
+                score,
+                [
+                    "ScoreStatus",
+                    "NRMsg",
+                    "score_status",
+                    "message"
+                ],
+                ""
+            )
+        );
+
+
+    const requiredRuns =
+        firstValue(
+            root,
+            [
+                "required_runs",
+                "requiredRuns",
+                "runs_required"
+            ],
+            team1?.required_runs ||
+            team2?.required_runs ||
+            ""
+        );
+
+
+    const requiredBalls =
+        firstValue(
+            root,
+            [
+                "required_balls",
+                "requiredBalls",
+                "balls_remaining"
+            ],
+            team1?.required_balls ||
+            team2?.required_balls ||
+            ""
+        );
+
+
+    const requiredRate =
+        firstValue(
+            root,
+            [
+                "required_run_rate",
+                "requiredRunRate"
+            ],
+            team1?.required_run_rate ||
+            team2?.required_run_rate ||
+            rrr
+        );
 
 
     const chaseElement =
@@ -5114,40 +5774,124 @@ function renderScoreboard(
         );
 
 
+    let chaseParts = [];
+
+
     if (
-        chaseElement &&
-        chase
+        chase &&
+        String(chase).trim()
     ) {
 
-        chaseElement.textContent =
-            formatChaseMessage(
-                chase
-            );
-
-        chaseElement.hidden =
-            false;
-
-    } else if (chaseElement) {
-
-        chaseElement.hidden =
-            true;
+        chaseParts.push(
+            String(chase).trim()
+        );
     }
 
 
+    if (
+        target !== "" &&
+        target !== null &&
+        target !== undefined
+    ) {
+
+        chaseParts.push(
+            "Target " +
+            String(target)
+        );
+    }
+
+
+    if (
+        requiredRuns !== "" &&
+        requiredRuns !== null &&
+        requiredRuns !== undefined
+    ) {
+
+        let requiredText =
+            "Need " +
+            String(requiredRuns) +
+            " runs";
+
+        if (
+            requiredBalls !== "" &&
+            requiredBalls !== null &&
+            requiredBalls !== undefined
+        ) {
+
+            requiredText +=
+                " from " +
+                String(requiredBalls) +
+                " balls";
+        }
+
+        chaseParts.push(
+            requiredText
+        );
+    }
+
+
+    if (chaseElement) {
+
+        if (chaseParts.length) {
+
+            chaseElement.hidden =
+                false;
+
+            chaseElement.textContent =
+                chaseParts.join(
+                    " • "
+                );
+
+        } else {
+
+            chaseElement.hidden =
+                true;
+
+            chaseElement.textContent =
+                "";
+        }
+    }
+
+
+    /*
+     * Match metadata.
+     */
+
+    renderScoreInfo(
+        root,
+        score,
+        battingTeam
+    );
+
+
+    /*
+     * Detailed components.
+     */
+
     renderBatters(
+        root,
         score
     );
 
+    renderBowlers(
+        root,
+        score
+    );
 
     renderLastBalls(
+        root,
         score
     );
-
 
     renderRecentOvers(
+        root,
         score
     );
 
+
+    /*
+     * Live badge.
+     */
 
     const scoreboardBadge =
         document.getElementById(
@@ -5155,21 +5899,47 @@ function renderScoreboard(
         );
 
 
+    const liveFlag =
+        firstValue(
+            root,
+            [
+                "live",
+                "is_live",
+                "isLive",
+                "in_play",
+                "inPlay"
+            ],
+            firstValue(
+                score,
+                [
+                    "LiveCommentary",
+                    "live",
+                    "isLive"
+                ],
+                false
+            )
+        );
+
+
+    const live =
+        liveFlag === true ||
+        liveFlag === 1 ||
+        liveFlag === "1" ||
+        liveFlag === "true" ||
+        Boolean(
+            innings.find(
+                inning =>
+                    inning.is_current === true
+            )
+        );
+
+
     if (scoreboardBadge) {
-
-        const live =
-            score.LiveCommentary === "1" ||
-            score.LiveCommentary === 1 ||
-            score.live === true ||
-            team1Batting ||
-            team2Batting;
-
 
         scoreboardBadge.innerHTML =
             live
                 ? '<span class="scoreboard-live-dot"></span> LIVE'
                 : "SCORE";
-
 
         scoreboardBadge.style.background =
             live
@@ -5183,15 +5953,12 @@ function renderScoreboard(
     }
 
 
-    const status =
-        document.getElementById(
-            "scoreboardStatus"
-        );
-
-    if (status) {
-        status.textContent =
-            "Updated";
-    }
+    setText(
+        "scoreboardStatusText",
+        status ||
+        (live ? "Live" : "Updated"),
+        live ? "Live" : "Updated"
+    );
 
 
     const scoreboardMain =
@@ -5200,82 +5967,216 @@ function renderScoreboard(
         );
 
     if (scoreboardMain) {
-
         scoreboardMain.style.display =
             "grid";
     }
 }
 
 
-/*
- * Extract overs from:
- *
- * 335-7 (50.0)
- */
+/* =========================================================
+   SCORE INFO
+========================================================= */
 
-function extractOvers(value) {
-
-    const text =
-        scoreText(
-            value,
-            ""
-        );
-
-
-    const match =
-        text.match(
-            /\(([^)]+)\)/
-        );
-
-
-    return match
-        ? match[1]
-        : "";
-}
-
-
-/*
- * Format chase message to make it TV-like.
- */
-
-function formatChaseMessage(
-    message
+function renderScoreInfo(
+    root,
+    score,
+    battingTeam
 ) {
 
-    let text =
-        scoreText(
-            message,
-            ""
-        ).trim();
+    const container =
+        document.getElementById(
+            "scoreboardInfo"
+        );
+
+    if (!container) {
+        return;
+    }
+
+    const pills = [];
 
 
-    if (!text) {
-        return "";
+    const status =
+        firstValue(
+            root,
+            [
+                "status",
+                "Status",
+                "match_status"
+            ],
+            firstValue(
+                score,
+                [
+                    "Status",
+                    "status"
+                ],
+                ""
+            )
+        );
+
+
+    const bowlingTeam =
+        firstValue(
+            root,
+            [
+                "bowling_team",
+                "bowlingTeam"
+            ],
+            firstValue(
+                score,
+                [
+                    "BowlingTeam",
+                    "bowling_team"
+                ],
+                ""
+            )
+        );
+
+
+    const toss =
+        firstValue(
+            root,
+            [
+                "toss",
+                "Toss"
+            ],
+            firstValue(
+                score,
+                [
+                    "Toss",
+                    "toss"
+                ],
+                ""
+            )
+        );
+
+
+    const venue =
+        firstValue(
+            root,
+            [
+                "venue",
+                "Venue",
+                "ground",
+                "Ground"
+            ],
+            firstValue(
+                score,
+                [
+                    "Venue",
+                    "venue"
+                ],
+                ""
+            )
+        );
+
+
+    if (status) {
+        pills.push(
+            "Status: " +
+            String(status)
+        );
     }
 
 
-    text =
-        text.replace(
-            /In\s+/i,
-            "in "
+    if (battingTeam) {
+        pills.push(
+            "Batting: " +
+            String(battingTeam)
+        );
+    }
+
+
+    if (bowlingTeam) {
+        pills.push(
+            "Bowling: " +
+            String(bowlingTeam)
+        );
+    }
+
+
+    if (toss) {
+        pills.push(
+            "Toss: " +
+            String(toss)
+        );
+    }
+
+
+    if (venue) {
+        pills.push(
+            "Venue: " +
+            String(venue)
+        );
+    }
+
+
+    container.innerHTML =
+        pills.map(
+            value =>
+                '<div class="score-info-pill">' +
+                    escapeHtml(value) +
+                "</div>"
+        ).join("");
+}
+
+
+/* =========================================================
+   GENERIC ARRAY SEARCH
+========================================================= */
+
+function findArrayDeep(
+    object,
+    possibleKeys,
+    depth = 0
+) {
+
+    if (
+        !object ||
+        typeof object !== "object" ||
+        depth > 5
+    ) {
+        return [];
+    }
+
+
+    const direct =
+        firstArray(
+            object,
+            possibleKeys
         );
 
-
-    text =
-        text.replace(
-            /Overs/i,
-            "overs"
-        );
+    if (direct.length) {
+        return direct;
+    }
 
 
-    text =
-        text.replace(
-            /\s+To\s+Win/i,
-            " to win"
-        );
+    for (
+        const key of Object.keys(object)
+    ) {
+
+        const value =
+            object[key];
+
+        if (
+            value &&
+            typeof value === "object"
+        ) {
+
+            const found =
+                findArrayDeep(
+                    value,
+                    possibleKeys,
+                    depth + 1
+                );
+
+            if (found.length) {
+                return found;
+            }
+        }
+    }
 
 
-    return text;
+    return [];
 }
 
 
@@ -5283,28 +6184,45 @@ function formatChaseMessage(
    BATTERS
 ========================================================= */
 
-function renderBatters(score) {
+function parseClassicBatters(
+    score
+) {
 
-    const container =
-        document.getElementById(
-            "scoreBatters"
+    const player1Name =
+        firstValue(
+            score,
+            [
+                "Player1",
+                "player1",
+                "Batsman1",
+                "Batter1"
+            ],
+            ""
         );
 
 
-    if (!container) {
-        return;
-    }
+    const player2Name =
+        firstValue(
+            score,
+            [
+                "Player2",
+                "player2",
+                "Batsman2",
+                "Batter2"
+            ],
+            ""
+        );
 
 
     const player1 =
         parsePlayerName(
-            score.Player1
+            player1Name
         );
 
 
     const player2 =
         parsePlayerName(
-            score.Player2
+            player2Name
         );
 
 
@@ -5322,19 +6240,56 @@ function renderBatters(score) {
                 player1.striker,
 
             runs:
-                score.Player1Run,
+                firstValue(
+                    score,
+                    [
+                        "Player1Run",
+                        "Player1Runs",
+                        "Batter1Runs"
+                    ],
+                    0
+                ),
 
             balls:
-                score.Player1Balls,
+                firstValue(
+                    score,
+                    [
+                        "Player1Balls",
+                        "Player1Ball"
+                    ],
+                    0
+                ),
 
             fours:
-                score.Player1Fours,
+                firstValue(
+                    score,
+                    [
+                        "Player1Fours",
+                        "Player1Four"
+                    ],
+                    0
+                ),
 
             sixes:
-                score.Player1Sixes,
+                firstValue(
+                    score,
+                    [
+                        "Player1Sixes",
+                        "Player1Six"
+                    ],
+                    0
+                ),
 
             sr:
-                score.Player1StrikeRate
+                firstValue(
+                    score,
+                    [
+                        "Player1StrikeRate",
+                        "Player1SR",
+                        "Batter1StrikeRate"
+                    ],
+                    0
+                )
         });
     }
 
@@ -5350,24 +6305,263 @@ function renderBatters(score) {
                 player2.striker,
 
             runs:
-                score.Player2Run,
+                firstValue(
+                    score,
+                    [
+                        "Player2Run",
+                        "Player2Runs",
+                        "Batter2Runs"
+                    ],
+                    0
+                ),
 
             balls:
-                score.Player2Balls,
+                firstValue(
+                    score,
+                    [
+                        "Player2Balls",
+                        "Player2Ball"
+                    ],
+                    0
+                ),
 
             fours:
-                score.Player2Fours,
+                firstValue(
+                    score,
+                    [
+                        "Player2Fours",
+                        "Player2Four"
+                    ],
+                    0
+                ),
 
             sixes:
-                score.Player2Sixes,
+                firstValue(
+                    score,
+                    [
+                        "Player2Sixes",
+                        "Player2Six"
+                    ],
+                    0
+                ),
 
             sr:
-                score.Player2StrikeRate
+                firstValue(
+                    score,
+                    [
+                        "Player2StrikeRate",
+                        "Player2SR",
+                        "Batter2StrikeRate"
+                    ],
+                    0
+                )
         });
     }
 
 
-    if (!players.length) {
+    return players;
+}
+
+
+function parsePlayerName(name) {
+
+    const raw =
+        scoreText(
+            name,
+            ""
+        ).trim();
+
+    const striker =
+        raw.endsWith("*");
+
+    return {
+
+        name:
+            striker
+                ? raw.slice(
+                    0,
+                    -1
+                ).trim()
+                : raw,
+
+        striker
+    };
+}
+
+
+function normalizeBatterArray(
+    list
+) {
+
+    return list.map(player => {
+
+        const nameValue =
+            firstValue(
+                player,
+                [
+                    "name",
+                    "player",
+                    "player_name",
+                    "playerName",
+                    "batter",
+                    "batsman",
+                    "rname"
+                ],
+                ""
+            );
+
+        const parsed =
+            parsePlayerName(
+                nameValue
+            );
+
+
+        return {
+
+            name:
+                parsed.name ||
+                "Batter",
+
+            striker:
+                parsed.striker ||
+                player.striker === true ||
+                player.is_striker === true,
+
+            runs:
+                firstValue(
+                    player,
+                    [
+                        "runs",
+                        "run",
+                        "r"
+                    ],
+                    0
+                ),
+
+            balls:
+                firstValue(
+                    player,
+                    [
+                        "balls",
+                        "ball",
+                        "b"
+                    ],
+                    0
+                ),
+
+            fours:
+                firstValue(
+                    player,
+                    [
+                        "fours",
+                        "four",
+                        "4s",
+                        "boundaries"
+                    ],
+                    0
+                ),
+
+            sixes:
+                firstValue(
+                    player,
+                    [
+                        "sixes",
+                        "six",
+                        "6s"
+                    ],
+                    0
+                ),
+
+            sr:
+                firstValue(
+                    player,
+                    [
+                        "strike_rate",
+                        "strikeRate",
+                        "sr",
+                        "strikerate"
+                    ],
+                    0
+                )
+        };
+    });
+}
+
+
+function renderBatters(
+    root,
+    score
+) {
+
+    const container =
+        document.getElementById(
+            "scoreBatters"
+        );
+
+    if (!container) {
+        return;
+    }
+
+
+    let players =
+        findArrayDeep(
+            root,
+            [
+                "batters",
+                "batter",
+                "batsmen",
+                "batsman",
+                "current_batters",
+                "currentBatsmen"
+            ]
+        );
+
+
+    if (
+        !players.length &&
+        score !== root
+    ) {
+
+        players =
+            findArrayDeep(
+                score,
+                [
+                    "batters",
+                    "batter",
+                    "batsmen",
+                    "batsman"
+                ]
+            );
+    }
+
+
+    let normalized = [];
+
+
+    if (players.length) {
+
+        normalized =
+            normalizeBatterArray(
+                players
+            );
+
+    } else {
+
+        normalized =
+            parseClassicBatters(
+                score
+            );
+    }
+
+
+    normalized =
+        normalized.filter(
+            player =>
+                player.name
+        );
+
+
+    if (!normalized.length) {
 
         container.innerHTML =
             '<div class="scoreboard-empty">' +
@@ -5381,62 +6575,55 @@ function renderBatters(score) {
     let html = "";
 
 
-    players.forEach(
-        player => {
+    normalized
+        .slice(0, 6)
+        .forEach(player => {
 
             html +=
                 '<div class="batter-row">';
 
-
             html +=
                 '<div class="batter-name">' +
-                escapeHtml(
-                    player.name
-                ) +
-                (
-                    player.striker
-                        ? " *"
-                        : ""
-                ) +
+                    escapeHtml(
+                        player.name
+                    ) +
+                    (
+                        player.striker
+                            ? ' <span class="striker-star">*</span>'
+                            : ""
+                    ) +
                 "</div>";
-
 
             html +=
                 '<div class="batter-stat main">' +
-                escapeHtml(
-                    player.runs || "0"
-                ) +
+                    escapeHtml(
+                        player.runs ?? 0
+                    ) +
                 "</div>";
-
 
             html +=
                 '<div class="batter-stat">' +
-                escapeHtml(
-                    player.balls || "0"
-                ) +
+                    escapeHtml(
+                        player.balls ?? 0
+                    ) +
                 "</div>";
-
 
             html +=
                 '<div class="batter-stat">' +
-                escapeHtml(
-                    player.fours || "0"
-                ) +
+                    escapeHtml(
+                        player.fours ?? 0
+                    ) +
                 "</div>";
-
 
             html +=
                 '<div class="batter-stat">' +
-                escapeHtml(
-                    player.sr || "0"
-                ) +
+                    escapeHtml(
+                        player.sr ?? 0
+                    ) +
                 "</div>";
 
-
-            html +=
-                "</div>";
-        }
-    );
+            html += "</div>";
+        });
 
 
     container.innerHTML =
@@ -5445,16 +6632,314 @@ function renderBatters(score) {
 
 
 /* =========================================================
-   LAST 6 BALLS
+   BOWLERS
 ========================================================= */
 
-function renderLastBalls(score) {
+function normalizeBowlerArray(
+    list
+) {
+
+    return list.map(bowler => {
+
+        return {
+
+            name:
+                firstValue(
+                    bowler,
+                    [
+                        "name",
+                        "player",
+                        "player_name",
+                        "playerName",
+                        "bowler",
+                        "rname"
+                    ],
+                    "Bowler"
+                ),
+
+            overs:
+                firstValue(
+                    bowler,
+                    [
+                        "overs",
+                        "over",
+                        "o"
+                    ],
+                    0
+                ),
+
+            maidens:
+                firstValue(
+                    bowler,
+                    [
+                        "maidens",
+                        "maiden",
+                        "m"
+                    ],
+                    0
+                ),
+
+            runs:
+                firstValue(
+                    bowler,
+                    [
+                        "runs",
+                        "run",
+                        "conceded",
+                        "r"
+                    ],
+                    0
+                ),
+
+            wickets:
+                firstValue(
+                    bowler,
+                    [
+                        "wickets",
+                        "wicket",
+                        "w"
+                    ],
+                    0
+                )
+        };
+    });
+}
+
+
+function parseClassicBowlers(
+    score
+) {
+
+    const result = [];
+
+
+    for (
+        let i = 1;
+        i <= 6;
+        i++
+    ) {
+
+        const name =
+            firstValue(
+                score,
+                [
+                    "Bowler" + i,
+                    "Bowler" + i + "Name",
+                    "PlayerBowler" + i
+                ],
+                ""
+            );
+
+
+        if (!name) {
+            continue;
+        }
+
+
+        result.push({
+
+            name:
+                String(name)
+                    .replace(/\*$/, "")
+                    .trim(),
+
+            overs:
+                firstValue(
+                    score,
+                    [
+                        "Bowler" + i + "Overs",
+                        "Bowler" + i + "Over"
+                    ],
+                    0
+                ),
+
+            maidens:
+                firstValue(
+                    score,
+                    [
+                        "Bowler" + i + "Maidens",
+                        "Bowler" + i + "Maiden"
+                    ],
+                    0
+                ),
+
+            runs:
+                firstValue(
+                    score,
+                    [
+                        "Bowler" + i + "Runs",
+                        "Bowler" + i + "Run"
+                    ],
+                    0
+                ),
+
+            wickets:
+                firstValue(
+                    score,
+                    [
+                        "Bowler" + i + "Wickets",
+                        "Bowler" + i + "Wicket"
+                    ],
+                    0
+                )
+        });
+    }
+
+
+    return result;
+}
+
+
+function renderBowlers(
+    root,
+    score
+) {
+
+    const container =
+        document.getElementById(
+            "scoreBowlers"
+        );
+
+    if (!container) {
+        return;
+    }
+
+
+    let bowlers =
+        findArrayDeep(
+            root,
+            [
+                "bowlers",
+                "bowler",
+                "current_bowlers",
+                "currentBowlers"
+            ]
+        );
+
+
+    if (
+        !bowlers.length &&
+        score !== root
+    ) {
+
+        bowlers =
+            findArrayDeep(
+                score,
+                [
+                    "bowlers",
+                    "bowler"
+                ]
+            );
+    }
+
+
+    let normalized =
+        bowlers.length
+            ? normalizeBowlerArray(bowlers)
+            : parseClassicBowlers(score);
+
+
+    if (!normalized.length) {
+
+        container.innerHTML =
+            '<div class="scoreboard-empty">' +
+            "Bowling information unavailable" +
+            "</div>";
+
+        return;
+    }
+
+
+    let html = "";
+
+
+    normalized
+        .slice(0, 6)
+        .forEach(bowler => {
+
+            html +=
+                '<div class="bowler-row">';
+
+            html +=
+                '<div class="bowler-name">' +
+                    escapeHtml(
+                        bowler.name
+                    ) +
+                "</div>";
+
+            html +=
+                '<div class="bowler-stat">' +
+                    escapeHtml(
+                        bowler.overs
+                    ) +
+                "</div>";
+
+            html +=
+                '<div class="bowler-stat">' +
+                    escapeHtml(
+                        bowler.maidens
+                    ) +
+                "</div>";
+
+            html +=
+                '<div class="bowler-stat">' +
+                    escapeHtml(
+                        bowler.runs
+                    ) +
+                "</div>";
+
+            html +=
+                '<div class="bowler-stat">' +
+                    escapeHtml(
+                        bowler.wickets
+                    ) +
+                "</div>";
+
+            html += "</div>";
+        });
+
+
+    container.innerHTML =
+        html;
+}
+
+
+/* =========================================================
+   LAST BALLS
+========================================================= */
+
+function normalizeBalls(value) {
+
+    if (Array.isArray(value)) {
+        return value;
+    }
+
+    if (
+        typeof value === "string" &&
+        value.trim()
+    ) {
+
+        return value
+            .split(
+                /[,| ]+/
+            )
+            .map(value => value.trim())
+            .filter(Boolean);
+    }
+
+    return [];
+}
+
+
+function renderLastBalls(
+    root,
+    score
+) {
 
     const container =
         document.getElementById(
             "scoreLastBalls"
         );
-
 
     if (!container) {
         return;
@@ -5464,16 +6949,54 @@ function renderLastBalls(score) {
     let balls = [];
 
 
-    if (
-        Array.isArray(
-            score.Last6Balls
+    const candidates = [
+
+        firstValue(
+            root,
+            [
+                "last6balls",
+                "Last6Balls",
+                "last_balls",
+                "lastBalls"
+            ],
+            ""
+        ),
+
+        firstValue(
+            score,
+            [
+                "Last6Balls",
+                "last6balls",
+                "last_balls",
+                "lastBalls"
+            ],
+            ""
         )
-    ) {
+    ];
 
-        balls =
-            score.Last6Balls;
 
-    } else {
+    for (const candidate of candidates) {
+
+        const normalized =
+            normalizeBalls(
+                candidate
+            );
+
+        if (normalized.length) {
+
+            balls =
+                normalized;
+
+            break;
+        }
+    }
+
+
+    /*
+     * Classic Last6Balls1 ... Last6Balls6.
+     */
+
+    if (!balls.length) {
 
         for (
             let i = 1;
@@ -5482,22 +7005,18 @@ function renderLastBalls(score) {
         ) {
 
             const value =
-                score[
-                    "Last6Balls" +
-                    i
-                ];
-
-
-            if (
-                value !==
-                undefined &&
-                value !== null &&
-                value !== ""
-            ) {
-
-                balls.push(
-                    value
+                firstValue(
+                    score,
+                    [
+                        "Last6Balls" + i,
+                        "last6balls" + i,
+                        "LastBall" + i
+                    ],
+                    ""
                 );
+
+            if (value !== "") {
+                balls.push(value);
             }
         }
     }
@@ -5514,44 +7033,64 @@ function renderLastBalls(score) {
     }
 
 
+    /*
+     * Last six only.
+     */
+
+    balls =
+        balls.slice(
+            Math.max(
+                balls.length - 6,
+                0
+            )
+        );
+
+
     container.innerHTML =
-        balls.map(
-            ball => {
+        balls.map(ball => {
 
-                const value =
-                    String(ball);
+            const value =
+                String(ball);
 
+            const upper =
+                value.toUpperCase();
 
-                const wicket =
-                    value
-                        .toUpperCase()
-                        .includes("W");
+            const wicket =
+                upper.includes("W") ||
+                upper.includes("OUT");
 
+            const boundary =
+                value === "4" ||
+                value === "6";
 
-                const boundary =
-                    value === "4" ||
-                    value === "6";
-
-
-                const css =
-                    wicket
-                        ? "wicket"
-                        : boundary
-                            ? "boundary"
-                            : "";
-
-
-                return (
-                    '<span class="ball ' +
-                    css +
-                    '">' +
-                    escapeHtml(
-                        value
-                    ) +
-                    "</span>"
+            const extra =
+                !wicket &&
+                (
+                    upper.includes("WD") ||
+                    upper.includes("NB") ||
+                    upper.includes("LB") ||
+                    upper.includes("B")
                 );
+
+            let css = "";
+
+            if (wicket) {
+                css = "wicket";
+            } else if (boundary) {
+                css = "boundary";
+            } else if (extra) {
+                css = "extra";
             }
-        ).join("");
+
+            return (
+                '<span class="ball ' +
+                css +
+                '">' +
+                    escapeHtml(value) +
+                "</span>"
+            );
+
+        }).join("");
 }
 
 
@@ -5559,13 +7098,53 @@ function renderLastBalls(score) {
    RECENT OVERS
 ========================================================= */
 
-function renderRecentOvers(score) {
+function normalizeRecentOvers(
+    root,
+    score
+) {
+
+    let overs =
+        firstArray(
+            root,
+            [
+                "Last4Overs",
+                "last4overs",
+                "recent_overs",
+                "recentOvers",
+                "overs"
+            ]
+        );
+
+
+    if (!overs.length) {
+
+        overs =
+            firstArray(
+                score,
+                [
+                    "Last4Overs",
+                    "last4overs",
+                    "recent_overs",
+                    "recentOvers",
+                    "overs"
+                ]
+            );
+    }
+
+
+    return overs;
+}
+
+
+function renderRecentOvers(
+    root,
+    score
+) {
 
     const container =
         document.getElementById(
             "scoreRecentOvers"
         );
-
 
     if (!container) {
         return;
@@ -5573,11 +7152,10 @@ function renderRecentOvers(score) {
 
 
     const overs =
-        Array.isArray(
-            score.Last4Overs
-        )
-            ? score.Last4Overs
-            : [];
+        normalizeRecentOvers(
+            root,
+            score
+        );
 
 
     if (!overs.length) {
@@ -5592,98 +7170,151 @@ function renderRecentOvers(score) {
 
 
     container.innerHTML =
-        overs.map(
-            over => {
+        overs
+            .slice(
+                Math.max(
+                    overs.length - 6,
+                    0
+                )
+            )
+            .map(
+                (over, index) => {
 
-                const balls =
-                    Array.isArray(
-                        over.balls
-                    )
-                        ? over.balls
-                        : [];
+                    if (
+                        typeof over ===
+                            "string" ||
+                        typeof over ===
+                            "number"
+                    ) {
 
-
-                return (
-                    '<div class="recent-over">' +
-
-                        '<div class="recent-over-number">' +
-                            "OV " +
-                            escapeHtml(
-                                over.over
-                            ) +
-                        "</div>" +
-
-                        '<div class="recent-over-balls">' +
-
-                            balls.map(
-                                ball =>
-                                    '<span class="recent-over-ball">' +
+                        return (
+                            '<div class="recent-over">' +
+                                '<div class="recent-over-number">' +
+                                    "OV " +
                                     escapeHtml(
-                                        ball
+                                        index + 1
                                     ) +
-                                    "</span>"
-                            ).join(" ") +
+                                "</div>" +
 
-                        "</div>" +
+                                '<div class="recent-over-balls">' +
+                                    escapeHtml(
+                                        String(over)
+                                    ) +
+                                "</div>" +
+                            "</div>"
+                        );
+                    }
 
-                        '<div class="recent-over-runs">' +
-                            escapeHtml(
-                                over.runs ??
+
+                    const overNumber =
+                        firstValue(
+                            over,
+                            [
+                                "over",
+                                "over_no",
+                                "overNumber",
+                                "number"
+                            ],
+                            index + 1
+                        );
+
+
+                    let balls =
+                        firstArray(
+                            over,
+                            [
+                                "balls",
+                                "deliveries"
+                            ]
+                        );
+
+
+                    if (!balls.length) {
+
+                        const ballText =
+                            firstValue(
+                                over,
+                                [
+                                    "ball",
+                                    "ball_text",
+                                    "score"
+                                ],
                                 ""
-                            ) +
-                        "</div>" +
+                            );
 
-                    "</div>"
-                );
-            }
-        ).join("");
+                        balls =
+                            normalizeBalls(
+                                ballText
+                            );
+                    }
+
+
+                    const runs =
+                        firstValue(
+                            over,
+                            [
+                                "runs",
+                                "run",
+                                "total",
+                                "score"
+                            ],
+                            ""
+                        );
+
+
+                    return (
+                        '<div class="recent-over">' +
+
+                            '<div class="recent-over-number">' +
+                                "OV " +
+                                escapeHtml(
+                                    overNumber
+                                ) +
+                            "</div>" +
+
+                            '<div class="recent-over-balls">' +
+
+                                balls
+                                    .map(
+                                        ball =>
+                                            '<span class="recent-over-ball">' +
+                                                escapeHtml(
+                                                    typeof ball === "object"
+                                                        ? firstValue(
+                                                            ball,
+                                                            [
+                                                                "text",
+                                                                "value",
+                                                                "score",
+                                                                "runs"
+                                                            ],
+                                                            ""
+                                                        )
+                                                        : ball
+                                                ) +
+                                            "</span>"
+                                    )
+                                    .join(" ") +
+
+                            "</div>" +
+
+                            '<div class="recent-over-runs">' +
+                                escapeHtml(
+                                    runs
+                                ) +
+                            "</div>" +
+
+                        "</div>"
+                    );
+                }
+            )
+            .join("");
 }
 
 
 /* =========================================================
-   SCOREBOARD HELPERS
+   SCOREBOARD EMPTY STATE
 ========================================================= */
-
-function setText(
-    id,
-    value
-) {
-
-    const element =
-        document.getElementById(
-            id
-        );
-
-    if (!element) {
-        return;
-    }
-
-    element.textContent =
-        scoreText(
-            value,
-            "--"
-        );
-}
-
-
-function toggleHidden(
-    id,
-    hidden
-) {
-
-    const element =
-        document.getElementById(
-            id
-        );
-
-    if (!element) {
-        return;
-    }
-
-    element.hidden =
-        Boolean(hidden);
-}
-
 
 function showScoreboardEmpty(
     message
@@ -5695,9 +7326,7 @@ function showScoreboardEmpty(
         );
 
     if (main) {
-
-        main.style.display =
-            "none";
+        main.style.display = "none";
     }
 
 
@@ -5707,10 +7336,19 @@ function showScoreboardEmpty(
         );
 
     if (status) {
-
-        status.innerHTML =
-            "SCORE";
+        status.innerHTML = "SCORE";
+        status.style.background =
+            "#123d28";
+        status.style.color =
+            "#9ee7bc";
     }
+
+
+    setText(
+        "scoreboardStatusText",
+        "Score unavailable",
+        "Score unavailable"
+    );
 
 
     const chase =
@@ -5720,11 +7358,23 @@ function showScoreboardEmpty(
 
     if (chase) {
 
-        chase.hidden =
-            false;
-
+        chase.hidden = false;
         chase.textContent =
             message;
+    }
+
+
+    const batters =
+        document.getElementById(
+            "scoreBatters"
+        );
+
+    if (batters) {
+
+        batters.innerHTML =
+            '<div class="scoreboard-empty">' +
+            "Batting information unavailable" +
+            "</div>";
     }
 }
 
@@ -5734,6 +7384,25 @@ function showScoreboardEmpty(
 ========================================================= */
 
 async function loadScoreboard() {
+
+    const resolvedScoreId =
+        String(
+            scoreId ||
+            MATCH_GAME_ID ||
+            gameId ||
+            ""
+        );
+
+
+    if (!resolvedScoreId) {
+
+        showScoreboardEmpty(
+            "Score ID unavailable."
+        );
+
+        return;
+    }
+
 
     const status =
         document.getElementById(
@@ -5754,12 +7423,11 @@ async function loadScoreboard() {
             await fetch(
                 "/api/cricket/score/" +
                 encodeURIComponent(
-                    MATCH_SCORE_ID
+                    resolvedScoreId
                 ),
                 {
                     method: "GET",
-                    credentials:
-                        "same-origin",
+                    credentials: "same-origin",
                     cache: "no-store",
                     headers: {
                         Accept:
@@ -5769,13 +7437,25 @@ async function loadScoreboard() {
             );
 
 
-        const scorePayload =
-            await scoreResponse.json();
+        let scorePayload = {};
+
+
+        try {
+
+            scorePayload =
+                await scoreResponse.json();
+
+        } catch (jsonError) {
+
+            throw new Error(
+                "Score endpoint returned invalid JSON."
+            );
+        }
 
 
         if (
             !scoreResponse.ok ||
-            !scorePayload.success
+            scorePayload.success === false
         ) {
 
             throw new Error(
@@ -5786,23 +7466,11 @@ async function loadScoreboard() {
         }
 
 
-        /*
-         * The backend may return:
-         *
-         * {
-         *   success: true,
-         *   data: {
-         *      Status: "Success",
-         *      Data: {
-         *         Score: [...]
-         *      }
-         *   }
-         * }
-         *
-         * OR a normalized score object.
-         *
-         * renderScoreboard() handles both.
-         */
+        console.log(
+            "[SCOREBOARD] response:",
+            scorePayload
+        );
+
 
         renderScoreboard(
             scorePayload
@@ -5824,8 +7492,22 @@ async function loadScoreboard() {
 
 
     /*
-     * Result endpoint is kept separate.
+     * Result endpoint stays separate.
      */
+
+    const resolvedResultId =
+        String(
+            resultId ||
+            MATCH_GAME_ID ||
+            gameId ||
+            ""
+        );
+
+
+    if (!resolvedResultId) {
+        return;
+    }
+
 
     try {
 
@@ -5833,12 +7515,11 @@ async function loadScoreboard() {
             await fetch(
                 "/api/cricket/results/" +
                 encodeURIComponent(
-                    MATCH_RESULT_ID
+                    resolvedResultId
                 ),
                 {
                     method: "GET",
-                    credentials:
-                        "same-origin",
+                    credentials: "same-origin",
                     cache: "no-store",
                     headers: {
                         Accept:
@@ -5848,17 +7529,26 @@ async function loadScoreboard() {
             );
 
 
-        const resultPayload =
-            await resultResponse.json();
+        let resultPayload = {};
+
+        try {
+
+            resultPayload =
+                await resultResponse.json();
+
+        } catch (jsonError) {
+            return;
+        }
 
 
         if (
             resultResponse.ok &&
-            resultPayload.success
+            resultPayload.success !== false
         ) {
 
             renderResult(
-                resultPayload.data
+                resultPayload.data ??
+                resultPayload
             );
         }
 
@@ -5884,11 +7574,9 @@ function renderResult(data) {
             "resultData"
         );
 
-
     if (!element) {
         return;
     }
-
 
     try {
 
@@ -5915,19 +7603,11 @@ function startScoreboardPolling() {
 
     loadScoreboard();
 
-
     if (window.scoreboardTimer) {
-
         clearInterval(
             window.scoreboardTimer
         );
     }
-
-
-    /*
-     * Score updates every 3 seconds
-     * for a near-live TV scoreboard.
-     */
 
     window.scoreboardTimer =
         setInterval(
@@ -5955,9 +7635,7 @@ const MATCH_PAGE_WHATSAPP_NUMBER =
     "919289461279";
 
 
-function matchPageOpenWhatsApp(
-    message
-) {
+function matchPageOpenWhatsApp(message) {
 
     if (!MATCH_PAGE_WHATSAPP_NUMBER) {
         return;
@@ -5965,7 +7643,6 @@ function matchPageOpenWhatsApp(
 
     const url =
         `https://wa.me/${MATCH_PAGE_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-
 
     window.open(
         url,
@@ -5991,97 +7668,12 @@ function matchPageWithdraw() {
 }
 
 
-async function loadMatchPageBalance() {
-
-    const balanceElement =
-        document.getElementById(
-            "matchPageBalance"
-        );
-
-
-    if (!balanceElement) {
-        return;
-    }
-
-
-    try {
-
-        const response =
-            await fetch(
-                "/api/user/balance",
-                {
-                    method: "GET",
-                    credentials:
-                        "same-origin",
-                    cache: "no-store",
-                    headers: {
-                        Accept:
-                            "application/json"
-                    }
-                }
-            );
-
-
-        if (!response.ok) {
-            return;
-        }
-
-
-        const data =
-            await response.json();
-
-
-        if (
-            data.balance ===
-            undefined
-        ) {
-            return;
-        }
-
-
-        const balance =
-            Number(
-                data.balance
-            );
-
-
-        if (!Number.isFinite(balance)) {
-            return;
-        }
-
-
-        const formatted =
-            "₹" +
-            balance.toLocaleString(
-                "en-IN",
-                {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                }
-            );
-
-
-        balanceElement.textContent =
-            formatted;
-
-
-    } catch (error) {
-
-        console.error(
-            "[ACCOUNT] Balance loading failed:",
-            error
-        );
-    }
-}
-
-
 function setupMatchPageAccountBar() {
 
     const depositButton =
         document.getElementById(
             "matchDepositBtn"
         );
-
 
     if (depositButton) {
 
@@ -6096,7 +7688,6 @@ function setupMatchPageAccountBar() {
         document.getElementById(
             "matchWithdrawBtn"
         );
-
 
     if (withdrawButton) {
 
@@ -6141,7 +7732,6 @@ document.addEventListener(
                 "minimizeSlipButton"
             );
 
-
         if (minimize) {
 
             minimize.addEventListener(
@@ -6155,7 +7745,6 @@ document.addEventListener(
             document.getElementById(
                 "reopenSlipButton"
             );
-
 
         if (reopen) {
 
@@ -6171,7 +7760,6 @@ document.addEventListener(
                 "placeAllButton"
             );
 
-
         if (place) {
 
             place.addEventListener(
@@ -6186,12 +7774,8 @@ document.addEventListener(
                 "betSlip"
             );
 
-
         if (slip) {
-
-            slip.classList.remove(
-                "open"
-            );
+            slip.classList.remove("open");
         }
 
 
@@ -6199,7 +7783,6 @@ document.addEventListener(
             document.getElementById(
                 "reopenSlipButton"
             );
-
 
         if (reopenButton) {
 
@@ -6235,6 +7818,8 @@ document.addEventListener(
             startOddsPolling();
 
             loadScoreboard();
+
+            loadMatchPageBalance();
         }
     }
 );
@@ -6242,5 +7827,4 @@ document.addEventListener(
 </script>
 
 </body>
-
 </html>
