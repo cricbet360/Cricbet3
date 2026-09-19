@@ -5,7 +5,7 @@
    CONFIGURATION
 ========================================================= */
 
-const WHATSAPP_NUMBER = "918895898319";
+const WHATSAPP_NUMBER = "919289461279";
 
 const MATCH_REFRESH_MS = 30000;
 const ODDS_REFRESH_MS = 5000;
