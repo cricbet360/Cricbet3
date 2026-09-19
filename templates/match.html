@@ -36,6 +36,151 @@
             min-height: 100vh;
         }
 
+        /* =================================================
+           ACCOUNT TOP BAR
+           Same balance / deposit / withdraw bar as dashboard
+        ================================================= */
+
+        .account-topbar {
+            width: 100%;
+            min-height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 10px 24px;
+            background: #0a2117;
+            border-bottom: 1px solid #173c2a;
+            position: sticky;
+            top: 0;
+            z-index: 10000;
+        }
+
+        .account-brand {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #ffffff;
+            font-size: 21px;
+            font-weight: 900;
+            letter-spacing: 1.2px;
+            white-space: nowrap;
+        }
+
+        .account-brand-icon {
+            font-size: 25px;
+            line-height: 1;
+        }
+
+        .account-brand-accent {
+            color: #22b56b;
+        }
+
+        .account-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .account-balance {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            margin-right: 6px;
+            min-width: 82px;
+        }
+
+        .account-balance-label {
+            color: #8da99b;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+        }
+
+        .account-balance-value {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .account-action,
+        .account-profile,
+        .account-logout {
+            min-height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 13px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 800;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .account-action {
+            border: 0;
+            cursor: pointer;
+        }
+
+        .account-deposit {
+            background: #138653;
+            color: #ffffff;
+        }
+
+        .account-deposit:hover {
+            background: #17a565;
+        }
+
+        .account-withdraw {
+            background: #132d21;
+            color: #dce9e3;
+            border: 1px solid #28533e;
+        }
+
+        .account-withdraw:hover {
+            background: #1a3a2a;
+            border-color: #397357;
+        }
+
+        .account-profile {
+            color: #b9cdc3;
+        }
+
+        .account-profile:hover {
+            color: #ffffff;
+            background: #112d20;
+        }
+
+        .account-logout {
+            color: #d59b9b;
+        }
+
+        .account-logout:hover {
+            color: #ffb1b1;
+            background: #321817;
+        }
+
+        .account-back {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 9px 14px;
+            border-radius: 8px;
+            background: #123d28;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .account-back:hover {
+            background: #185234;
+        }
+
         .page {
             width: 100%;
             max-width: 1100px;
@@ -666,6 +811,53 @@
 
         @media (max-width: 650px) {
 
+            .account-topbar {
+                position: sticky;
+                top: 0;
+                padding: 9px 10px;
+                gap: 8px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .account-brand {
+                justify-content: center;
+                font-size: 19px;
+            }
+
+            .account-actions {
+                width: 100%;
+                justify-content: center;
+                gap: 6px;
+            }
+
+            .account-balance {
+                min-width: 70px;
+                margin-right: 0;
+                align-items: center;
+            }
+
+            .account-balance-label {
+                font-size: 9px;
+            }
+
+            .account-balance-value {
+                font-size: 13px;
+            }
+
+            .account-action,
+            .account-profile,
+            .account-logout {
+                min-height: 34px;
+                padding: 0 9px;
+                font-size: 11px;
+            }
+
+            .account-back {
+                width: 100%;
+                margin-bottom: 10px !important;
+            }
+
             .page {
                 padding: 10px;
             }
@@ -814,20 +1006,65 @@
 <div class="page">
 
 
-    <div class="topbar">
+<header class="account-topbar">
 
-        <a
-            href="/dashboard"
-            class="back-btn"
-        >
-            ← Back
-        </a>
+    <div class="account-brand">
+        <span class="account-brand-icon">🏏</span>
+        <span>
+            CRIC<span class="account-brand-accent">BET</span>
+        </span>
+    </div>
 
-        <div class="brand">
-            CrickBet
+    <div class="account-actions">
+
+        <div class="account-balance">
+            <span class="account-balance-label">Balance</span>
+            <span id="matchPageBalance" class="account-balance-value">₹0.00</span>
         </div>
 
+        <button
+            type="button"
+            id="matchDepositBtn"
+            class="account-action account-deposit"
+        >
+            Deposit
+        </button>
+
+        <button
+            type="button"
+            id="matchWithdrawBtn"
+            class="account-action account-withdraw"
+        >
+            Withdraw
+        </button>
+
+        <a
+            href="/profile"
+            class="account-profile"
+        >
+            Profile
+        </a>
+
+        <a
+            href="/logout"
+            class="account-logout"
+        >
+            Logout
+        </a>
+
     </div>
+
+</header>
+
+<div class="page">
+
+    <a
+        href="/dashboard"
+        class="account-back"
+        style="margin-bottom: 14px;"
+    >
+        ← Back to Cricket
+    </a>
 
 
     <!-- =====================================================
