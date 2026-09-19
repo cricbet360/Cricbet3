@@ -1,6 +1,5 @@
 import re
 import time
-from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import requests
@@ -15,7 +14,6 @@ BASE_URL = "https://apidata.proexch.in"
 REQUEST_TIMEOUT = 8
 MAX_RETRIES = 2
 
-# Cache durations
 MATCH_CACHE_TTL = 15.0
 ODDS_CACHE_TTL = 2.0
 SCORE_CACHE_TTL = 3.0
@@ -125,18 +123,6 @@ def _clean_text(value: Any) -> str:
 
 
 def _as_bool(value: Any) -> bool:
-    """
-    Correctly handle:
-        true
-        false
-        1
-        0
-        "true"
-        "false"
-        "1"
-        "0"
-    """
-
     if isinstance(value, bool):
         return value
 
@@ -164,7 +150,9 @@ def _first_value(
 ) -> Any:
 
     for key in keys:
+
         if key in data:
+
             value = data.get(key)
 
             if value is not None and value != "":
@@ -208,15 +196,6 @@ def _format_score(
 # =========================================================
 
 def _parse_overs(value: Any) -> Optional[float]:
-    """
-    Cricket overs are not normal decimal numbers.
-
-    18.2 means:
-        18 overs + 2 balls
-
-    Therefore:
-        18.2 = 18 + 2/6
-    """
 
     if value is None:
         return None
@@ -253,6 +232,7 @@ def _parse_overs(value: Any) -> Optional[float]:
 
 
 def _overs_display(value: Any) -> str:
+
     if value is None:
         return ""
 
@@ -267,6 +247,7 @@ def _overs_display(value: Any) -> str:
     )
 
     if match:
+
         overs = match.group(1)
         balls = match.group(2)
 
@@ -328,7 +309,9 @@ def _request(
 # CRICKETBZ REQUEST
 # =========================================================
 
-def _request_cricketbz(url: str) -> Any:
+def _request_cricketbz(
+    url: str,
+) -> Any:
 
     last_error = None
 
@@ -353,13 +336,15 @@ def _request_cricketbz(url: str) -> Any:
             content_type = (
                 response.headers.get(
                     "content-type",
-                    ""
+                    "",
                 ).lower()
             )
 
             if (
-                "application/json" in content_type
-                or "text/json" in content_type
+                "application/json"
+                in content_type
+                or "text/json"
+                in content_type
             ):
                 return response.json()
 
@@ -388,7 +373,9 @@ def _request_cricketbz(url: str) -> Any:
 # GENERIC UNWRAP
 # =========================================================
 
-def _unwrap_generic(payload: Any) -> Any:
+def _unwrap_generic(
+    payload: Any,
+) -> Any:
 
     current = payload
 
@@ -462,7 +449,7 @@ def _unwrap_matches(
 
 
 # =========================================================
-# FIND VALUE RECURSIVELY
+# RECURSIVE VALUE FINDER
 # =========================================================
 
 def _find_value(
@@ -532,7 +519,6 @@ def get_matches(
         )
         <= MATCH_CACHE_TTL
     ):
-
         return _matches_cache["data"]
 
     payload = _request(
@@ -601,6 +587,10 @@ def get_matches(
             "TV",
         )
 
+        # -------------------------------------------------
+        # SCORE ID
+        # -------------------------------------------------
+
         score_id = _first_value(
             item,
             "scoreId",
@@ -614,6 +604,10 @@ def get_matches(
             "eventID",
             "event_id",
         )
+
+        # -------------------------------------------------
+        # RESULT ID
+        # -------------------------------------------------
 
         result_id = _first_value(
             item,
@@ -655,21 +649,25 @@ def get_matches(
         matches.append(
             {
                 "game_id": str(game_id),
+
                 "market_id": (
                     str(market_id)
                     if market_id is not None
                     else ""
                 ),
+
                 "event_id": (
                     str(event_id)
                     if event_id is not None
                     else ""
                 ),
+
                 "event_name": (
                     str(event_name)
                     if event_name is not None
                     else ""
                 ),
+
                 "event_time": (
                     str(event_time)
                     if event_time is not None
@@ -736,7 +734,9 @@ def find_match(
     game_id: Any,
 ) -> Optional[Dict[str, Any]]:
 
-    game_id = str(game_id or "").strip()
+    game_id = str(
+        game_id or ""
+    ).strip()
 
     if not game_id:
         return None
@@ -745,10 +745,15 @@ def find_match(
 
     for match in matches:
 
-        if str(
-            match.get("game_id", "")
-        ) == game_id:
-
+        if (
+            str(
+                match.get(
+                    "game_id",
+                    "",
+                )
+            )
+            == game_id
+        ):
             return match
 
     return None
@@ -762,26 +767,44 @@ def get_match_ids(
     game_id: Any,
 ) -> Dict[str, str]:
 
-    game_id = str(game_id or "").strip()
+    game_id = str(
+        game_id or ""
+    ).strip()
 
-    match = find_match(game_id)
+    match = find_match(
+        game_id
+    )
 
     if match:
 
         return {
             "game_id": game_id,
+
             "event_id": str(
-                match.get("event_id", "")
+                match.get(
+                    "event_id",
+                    "",
+                )
             ),
+
             "market_id": str(
-                match.get("market_id", "")
+                match.get(
+                    "market_id",
+                    "",
+                )
             ),
+
             "score_id": str(
-                match.get("score_id")
+                match.get(
+                    "score_id"
+                )
                 or game_id
             ),
+
             "result_id": str(
-                match.get("result_id")
+                match.get(
+                    "result_id"
+                )
                 or game_id
             ),
         }
@@ -796,7 +819,7 @@ def get_match_ids(
 
 
 # =========================================================
-# ODDS HELPERS
+# ODDS UNWRAPPER
 # =========================================================
 
 def _unwrap_odds(
@@ -842,6 +865,10 @@ def _unwrap_odds(
     return current
 
 
+# =========================================================
+# MATCH ODDS
+# =========================================================
+
 def parse_match_odds(
     data: Any,
 ) -> List[Dict[str, Any]]:
@@ -858,17 +885,28 @@ def parse_match_odds(
             "match_odds"
         )
 
-    if isinstance(match_odds, dict):
-        match_odds = [match_odds]
+    if isinstance(
+        match_odds,
+        dict,
+    ):
+        match_odds = [
+            match_odds
+        ]
 
-    if not isinstance(match_odds, list):
+    if not isinstance(
+        match_odds,
+        list,
+    ):
         return []
 
     result = []
 
     for market in match_odds:
 
-        if not isinstance(market, dict):
+        if not isinstance(
+            market,
+            dict,
+        ):
             continue
 
         odd_datas = market.get(
@@ -880,10 +918,18 @@ def parse_match_odds(
                 "runners"
             )
 
-        if isinstance(odd_datas, dict):
-            odd_datas = [odd_datas]
+        if isinstance(
+            odd_datas,
+            dict,
+        ):
+            odd_datas = [
+                odd_datas
+            ]
 
-        if not isinstance(odd_datas, list):
+        if not isinstance(
+            odd_datas,
+            list,
+        ):
             odd_datas = []
 
         runners = []
@@ -907,6 +953,7 @@ def parse_match_odds(
                             default="",
                         )
                     ),
+
                     "name": str(
                         _first_value(
                             runner,
@@ -916,6 +963,7 @@ def parse_match_odds(
                             default="",
                         )
                     ),
+
                     "back": _safe_float(
                         _first_value(
                             runner,
@@ -924,6 +972,7 @@ def parse_match_odds(
                             "backPrice",
                         )
                     ),
+
                     "back_size": _safe_float(
                         _first_value(
                             runner,
@@ -932,6 +981,7 @@ def parse_match_odds(
                             "back_volume",
                         )
                     ),
+
                     "lay": _safe_float(
                         _first_value(
                             runner,
@@ -940,6 +990,7 @@ def parse_match_odds(
                             "layPrice",
                         )
                     ),
+
                     "lay_size": _safe_float(
                         _first_value(
                             runner,
@@ -948,6 +999,7 @@ def parse_match_odds(
                             "lay_volume",
                         )
                     ),
+
                     "raw": runner,
                 }
             )
@@ -962,6 +1014,7 @@ def parse_match_odds(
                         default="",
                     )
                 ),
+
                 "name": str(
                     _first_value(
                         market,
@@ -970,6 +1023,7 @@ def parse_match_odds(
                         default="Match Odds",
                     )
                 ),
+
                 "status": str(
                     _first_value(
                         market,
@@ -977,8 +1031,11 @@ def parse_match_odds(
                         default="OPEN",
                     )
                 ),
+
                 "type": "match_odds",
+
                 "runners": runners,
+
                 "raw": market,
             }
         )
@@ -986,40 +1043,72 @@ def parse_match_odds(
     return result
 
 
+# =========================================================
+# BOOKMAKER ODDS
+# =========================================================
+
 def parse_bookmaker_odds(
     data: Any,
 ) -> List[Dict[str, Any]]:
 
-    if not isinstance(data, dict):
+    if not isinstance(
+        data,
+        dict,
+    ):
         return []
 
     bookmaker = (
-        data.get("bookmakerOdds")
-        or data.get("bookmaker_odds")
-        or data.get("bookMakerOdds")
+        data.get(
+            "bookmakerOdds"
+        )
+        or data.get(
+            "bookmaker_odds"
+        )
+        or data.get(
+            "bookMakerOdds"
+        )
     )
 
-    if isinstance(bookmaker, dict):
-        bookmaker = [bookmaker]
+    if isinstance(
+        bookmaker,
+        dict,
+    ):
+        bookmaker = [
+            bookmaker
+        ]
 
-    if not isinstance(bookmaker, list):
+    if not isinstance(
+        bookmaker,
+        list,
+    ):
         return []
 
     result = []
 
     for market in bookmaker:
 
-        if not isinstance(market, dict):
+        if not isinstance(
+            market,
+            dict,
+        ):
             continue
 
         odd_datas = market.get(
             "oddDatas"
         )
 
-        if isinstance(odd_datas, dict):
-            odd_datas = [odd_datas]
+        if isinstance(
+            odd_datas,
+            dict,
+        ):
+            odd_datas = [
+                odd_datas
+            ]
 
-        if not isinstance(odd_datas, list):
+        if not isinstance(
+            odd_datas,
+            list,
+        ):
             odd_datas = []
 
         runners = []
@@ -1042,6 +1131,7 @@ def parse_bookmaker_odds(
                             default="",
                         )
                     ),
+
                     "name": str(
                         _first_value(
                             runner,
@@ -1051,6 +1141,7 @@ def parse_bookmaker_odds(
                             default="",
                         )
                     ),
+
                     "back": _safe_float(
                         _first_value(
                             runner,
@@ -1058,6 +1149,7 @@ def parse_bookmaker_odds(
                             "back",
                         )
                     ),
+
                     "back_size": _safe_float(
                         _first_value(
                             runner,
@@ -1065,6 +1157,7 @@ def parse_bookmaker_odds(
                             "backSize",
                         )
                     ),
+
                     "lay": _safe_float(
                         _first_value(
                             runner,
@@ -1072,6 +1165,7 @@ def parse_bookmaker_odds(
                             "lay",
                         )
                     ),
+
                     "lay_size": _safe_float(
                         _first_value(
                             runner,
@@ -1079,6 +1173,7 @@ def parse_bookmaker_odds(
                             "laySize",
                         )
                     ),
+
                     "raw": runner,
                 }
             )
@@ -1093,6 +1188,7 @@ def parse_bookmaker_odds(
                         default="",
                     )
                 ),
+
                 "name": str(
                     _first_value(
                         market,
@@ -1101,6 +1197,7 @@ def parse_bookmaker_odds(
                         default="Bookmaker",
                     )
                 ),
+
                 "status": str(
                     _first_value(
                         market,
@@ -1108,8 +1205,11 @@ def parse_bookmaker_odds(
                         default="OPEN",
                     )
                 ),
+
                 "type": "bookmaker",
+
                 "runners": runners,
+
                 "raw": market,
             }
         )
@@ -1117,40 +1217,72 @@ def parse_bookmaker_odds(
     return result
 
 
+# =========================================================
+# FANCY ODDS
+# =========================================================
+
 def parse_fancy_odds(
     data: Any,
 ) -> List[Dict[str, Any]]:
 
-    if not isinstance(data, dict):
+    if not isinstance(
+        data,
+        dict,
+    ):
         return []
 
     fancy = (
-        data.get("fancyOdds")
-        or data.get("fancy_odds")
-        or data.get("fancy")
+        data.get(
+            "fancyOdds"
+        )
+        or data.get(
+            "fancy_odds"
+        )
+        or data.get(
+            "fancy"
+        )
     )
 
-    if isinstance(fancy, dict):
-        fancy = [fancy]
+    if isinstance(
+        fancy,
+        dict,
+    ):
+        fancy = [
+            fancy
+        ]
 
-    if not isinstance(fancy, list):
+    if not isinstance(
+        fancy,
+        list,
+    ):
         return []
 
     result = []
 
     for market in fancy:
 
-        if not isinstance(market, dict):
+        if not isinstance(
+            market,
+            dict,
+        ):
             continue
 
         odd_datas = market.get(
             "oddDatas"
         )
 
-        if isinstance(odd_datas, dict):
-            odd_datas = [odd_datas]
+        if isinstance(
+            odd_datas,
+            dict,
+        ):
+            odd_datas = [
+                odd_datas
+            ]
 
-        if not isinstance(odd_datas, list):
+        if not isinstance(
+            odd_datas,
+            list,
+        ):
             odd_datas = []
 
         runners = []
@@ -1173,6 +1305,7 @@ def parse_fancy_odds(
                             default="",
                         )
                     ),
+
                     "name": str(
                         _first_value(
                             runner,
@@ -1182,6 +1315,7 @@ def parse_fancy_odds(
                             default="",
                         )
                     ),
+
                     "back": _safe_float(
                         _first_value(
                             runner,
@@ -1189,6 +1323,7 @@ def parse_fancy_odds(
                             "back",
                         )
                     ),
+
                     "back_size": _safe_float(
                         _first_value(
                             runner,
@@ -1196,6 +1331,7 @@ def parse_fancy_odds(
                             "backSize",
                         )
                     ),
+
                     "lay": _safe_float(
                         _first_value(
                             runner,
@@ -1203,6 +1339,7 @@ def parse_fancy_odds(
                             "lay",
                         )
                     ),
+
                     "lay_size": _safe_float(
                         _first_value(
                             runner,
@@ -1210,6 +1347,7 @@ def parse_fancy_odds(
                             "laySize",
                         )
                     ),
+
                     "raw": runner,
                 }
             )
@@ -1224,6 +1362,7 @@ def parse_fancy_odds(
                         default="",
                     )
                 ),
+
                 "name": str(
                     _first_value(
                         market,
@@ -1232,6 +1371,7 @@ def parse_fancy_odds(
                         default="Fancy",
                     )
                 ),
+
                 "status": str(
                     _first_value(
                         market,
@@ -1239,8 +1379,11 @@ def parse_fancy_odds(
                         default="OPEN",
                     )
                 ),
+
                 "type": "fancy",
+
                 "runners": runners,
+
                 "raw": market,
             }
         )
@@ -1248,13 +1391,23 @@ def parse_fancy_odds(
     return result
 
 
+# =========================================================
+# NORMALIZE ODDS
+# =========================================================
+
 def normalize_odds(
     payload: Any,
 ) -> Dict[str, Any]:
 
-    data = _unwrap_odds(payload)
+    data = _unwrap_odds(
+        payload
+    )
 
-    if not isinstance(data, dict):
+    if not isinstance(
+        data,
+        dict,
+    ):
+
         return {
             "success": False,
             "match_odds": [],
@@ -1266,10 +1419,21 @@ def normalize_odds(
 
     return {
         "success": True,
-        "match_odds": parse_match_odds(data),
-        "bookmaker_odds": parse_bookmaker_odds(data),
-        "fancy_odds": parse_fancy_odds(data),
+
+        "match_odds": parse_match_odds(
+            data
+        ),
+
+        "bookmaker_odds": parse_bookmaker_odds(
+            data
+        ),
+
+        "fancy_odds": parse_fancy_odds(
+            data
+        ),
+
         "other_market_odds": [],
+
         "raw": payload,
     }
 
@@ -1285,9 +1449,12 @@ def get_odds(
     force_refresh: bool = False,
 ) -> Dict[str, Any]:
 
-    game_id = str(game_id or "").strip()
+    game_id = str(
+        game_id or ""
+    ).strip()
 
     if not game_id:
+
         return {
             "success": False,
             "match_odds": [],
@@ -1321,6 +1488,7 @@ def get_odds(
     ).strip()
 
     if not market_id:
+
         return {
             "success": False,
             "message": "Market ID is missing",
@@ -1340,23 +1508,22 @@ def get_odds(
         cache_key
     )
 
-    if (
-        cached
-        and not force_refresh
-        and (
+    if cached and not force_refresh:
+
+        age = (
             now
             - cached.get(
                 "timestamp",
                 0.0,
             )
         )
-        <= ODDS_CACHE_TTL
-    ):
 
-        return cached.get(
-            "data",
-            {},
-        )
+        if age <= ODDS_CACHE_TTL:
+
+            return cached.get(
+                "data",
+                {},
+            )
 
     payload = _request(
         "/api/cricket/odds",
@@ -1451,7 +1618,10 @@ def _looks_like_innings(
     value: Any,
 ) -> bool:
 
-    if not isinstance(value, dict):
+    if not isinstance(
+        value,
+        dict,
+    ):
         return False
 
     keys = {
@@ -1479,7 +1649,10 @@ def _walk_dicts(
     value: Any,
 ):
 
-    if isinstance(value, dict):
+    if isinstance(
+        value,
+        dict,
+    ):
 
         yield value
 
@@ -1489,7 +1662,10 @@ def _walk_dicts(
                 child
             )
 
-    elif isinstance(value, list):
+    elif isinstance(
+        value,
+        list,
+    ):
 
         for item in value:
 
@@ -1508,8 +1684,12 @@ def _extract_innings_candidates(
         payload
     ):
 
-        if _looks_like_innings(item):
-            candidates.append(item)
+        if _looks_like_innings(
+            item
+        ):
+            candidates.append(
+                item
+            )
 
     return candidates
 
@@ -1567,12 +1747,18 @@ def _find_top_level_value(
     keys: tuple,
 ) -> Any:
 
-    if isinstance(payload, dict):
+    if isinstance(
+        payload,
+        dict,
+    ):
 
         for key in keys:
 
             if key in payload:
-                value = payload.get(key)
+
+                value = payload.get(
+                    key
+                )
 
                 if value is not None:
                     return value
@@ -1618,6 +1804,7 @@ def _parse_score_text(
     )
 
     if match.group(3):
+
         result["overs"] = _overs_display(
             match.group(3)
         )
@@ -1630,6 +1817,7 @@ def normalize_score(
 ) -> Dict[str, Any]:
 
     if not payload:
+
         return {
             "success": False,
             "status": "UNAVAILABLE",
@@ -1702,7 +1890,7 @@ def normalize_score(
 
 
 # =========================================================
-# EXACT CRICKETBZ SCORE STATUS PARSER
+# REQUIRED SCORE STATUS PARSER
 # =========================================================
 
 def _parse_required_score_status(
@@ -1735,6 +1923,7 @@ def _parse_required_score_status(
     if match:
 
         try:
+
             result[
                 "required_runs"
             ] = int(
@@ -1743,6 +1932,7 @@ def _parse_required_score_status(
                     "",
                 )
             )
+
         except Exception:
             pass
 
@@ -1751,11 +1941,13 @@ def _parse_required_score_status(
         ] = match.group(2)
 
         try:
+
             result[
                 "required_balls"
             ] = int(
                 match.group(3)
             )
+
         except Exception:
             pass
 
@@ -1782,13 +1974,18 @@ def _parse_required_score_status(
     if runs_match:
 
         try:
+
             result[
                 "required_runs"
             ] = int(
                 runs_match.group(
                     1
-                ).replace(",", "")
+                ).replace(
+                    ",",
+                    "",
+                )
             )
+
         except Exception:
             pass
 
@@ -1801,13 +1998,173 @@ def _parse_required_score_status(
     if balls_match:
 
         try:
+
             result[
                 "required_balls"
             ] = int(
                 balls_match.group(1)
             )
+
         except Exception:
             pass
+
+    return result
+
+
+# =========================================================
+# NORMALIZE TEAM SCORE
+# =========================================================
+
+def _normalize_team_score(
+    name: str,
+    short_name: str,
+    flag: str,
+    score_display: str,
+    only_score: str,
+    score_only: str,
+    overs: str,
+) -> Dict[str, Any]:
+
+    parsed = _parse_score_text(
+        only_score
+        or score_display
+        or score_only
+    )
+
+    runs = parsed.get(
+        "runs"
+    )
+
+    wickets = parsed.get(
+        "wickets"
+    )
+
+    parsed_overs = (
+        overs
+        or parsed.get(
+            "overs"
+        )
+        or ""
+    )
+
+    return {
+        "name": name,
+
+        "short_name": short_name,
+
+        "short": short_name,
+
+        "flag": flag,
+
+        "score": (
+            score_only
+            or _format_score(
+                runs,
+                wickets,
+            )
+        ),
+
+        "score_display": (
+            score_display
+            or only_score
+            or score_only
+            or ""
+        ),
+
+        "only_score": (
+            only_score
+            or ""
+        ),
+
+        "score_only": (
+            score_only
+            or ""
+        ),
+
+        "runs": runs,
+
+        "wickets": wickets,
+
+        "overs": parsed_overs,
+    }
+
+
+# =========================================================
+# NORMALIZE LAST 4 OVERS
+# =========================================================
+
+def _normalize_last_overs(
+    values: Any,
+) -> List[Dict[str, Any]]:
+
+    if not isinstance(
+        values,
+        list,
+    ):
+        return []
+
+    result = []
+
+    for item in values:
+
+        if isinstance(
+            item,
+            dict,
+        ):
+
+            balls = item.get(
+                "balls"
+            )
+
+            if not isinstance(
+                balls,
+                list,
+            ):
+                balls = []
+
+            result.append(
+                {
+                    "over": item.get(
+                        "over"
+                    ),
+
+                    "balls": [
+                        str(ball)
+                        for ball in balls
+                    ],
+
+                    "runs": _safe_int(
+                        item.get(
+                            "runs"
+                        )
+                    )
+                    or 0,
+
+                    "raw": item,
+                }
+            )
+
+        elif isinstance(
+            item,
+            list,
+        ):
+
+            result.append(
+                {
+                    "over": len(
+                        result
+                    ) + 1,
+
+                    "balls": [
+                        str(ball)
+                        for ball in item
+                    ],
+
+                    "runs": 0,
+
+                    "raw": item,
+                }
+            )
 
     return result
 
@@ -1826,6 +2183,7 @@ def _parse_cricketbz_score(
         "source": "cricketbz",
         "score": None,
         "scores": [],
+        "data": None,
         "raw": payload,
     }
 
@@ -1886,6 +2244,10 @@ def _parse_cricketbz_score(
         if not score_list:
             return empty_result
 
+        # -------------------------------------------------
+        # USE FIRST SCORE OBJECT
+        # -------------------------------------------------
+
         score = score_list[0]
 
         if not isinstance(
@@ -1894,15 +2256,13 @@ def _parse_cricketbz_score(
         ):
             return empty_result
 
+        # -------------------------------------------------
+        # TEAM INFORMATION
+        # -------------------------------------------------
+
         team1_name = _clean_text(
             score.get(
                 "Team1Name"
-            )
-        )
-
-        team2_name = _clean_text(
-            score.get(
-                "Team2Name"
             )
         )
 
@@ -1912,21 +2272,15 @@ def _parse_cricketbz_score(
             )
         )
 
-        team2_short = _clean_text(
+        team1_flag = _clean_text(
             score.get(
-                "Team2Name_Short"
+                "Team1Flag"
             )
         )
 
-        team1_score = _clean_text(
+        team1_score_display = _clean_text(
             score.get(
                 "Team1Score"
-            )
-        )
-
-        team2_score = _clean_text(
-            score.get(
-                "Team2Score"
             )
         )
 
@@ -1936,21 +2290,9 @@ def _parse_cricketbz_score(
             )
         )
 
-        team2_only_score = _clean_text(
-            score.get(
-                "Team2OnlyScore"
-            )
-        )
-
         team1_score_only = _clean_text(
             score.get(
                 "Team1ScoreOnly"
-            )
-        )
-
-        team2_score_only = _clean_text(
-            score.get(
-                "Team2ScoreOnly"
             )
         )
 
@@ -1960,11 +2302,75 @@ def _parse_cricketbz_score(
             )
         )
 
+        team2_name = _clean_text(
+            score.get(
+                "Team2Name"
+            )
+        )
+
+        team2_short = _clean_text(
+            score.get(
+                "Team2Name_Short"
+            )
+        )
+
+        team2_flag = _clean_text(
+            score.get(
+                "Team2Flag"
+            )
+        )
+
+        team2_score_display = _clean_text(
+            score.get(
+                "Team2Score"
+            )
+        )
+
+        team2_only_score = _clean_text(
+            score.get(
+                "Team2OnlyScore"
+            )
+        )
+
+        team2_score_only = _clean_text(
+            score.get(
+                "Team2ScoreOnly"
+            )
+        )
+
         team2_overs = _clean_text(
             score.get(
                 "Team2Overs"
             )
         )
+
+        # -------------------------------------------------
+        # TEAM STRUCTURES
+        # -------------------------------------------------
+
+        team1 = _normalize_team_score(
+            name=team1_name,
+            short_name=team1_short,
+            flag=team1_flag,
+            score_display=team1_score_display,
+            only_score=team1_only_score,
+            score_only=team1_score_only,
+            overs=team1_overs,
+        )
+
+        team2 = _normalize_team_score(
+            name=team2_name,
+            short_name=team2_short,
+            flag=team2_flag,
+            score_display=team2_score_display,
+            only_score=team2_only_score,
+            score_only=team2_score_only,
+            overs=team2_overs,
+        )
+
+        # -------------------------------------------------
+        # STATUS
+        # -------------------------------------------------
 
         score_status = _clean_text(
             score.get(
@@ -1978,6 +2384,38 @@ def _parse_cricketbz_score(
             )
         )
 
+        live_commentary = score.get(
+            "LiveCommentary"
+        )
+
+        is_live = _as_bool(
+            live_commentary
+        )
+
+        if (
+            team1_score_display
+            or team2_score_display
+        ):
+            is_live = True
+
+        if is_live:
+
+            status = "LIVE"
+
+        elif provider_status:
+
+            status = str(
+                provider_status
+            ).upper()
+
+        else:
+
+            status = "AVAILABLE"
+
+        # -------------------------------------------------
+        # REQUIRED RUNS / BALLS
+        # -------------------------------------------------
+
         required_text = (
             score_status
             or nr_msg
@@ -1989,31 +2427,170 @@ def _parse_cricketbz_score(
             )
         )
 
-        live_commentary = score.get(
-            "LiveCommentary"
-        )
+        # -------------------------------------------------
+        # BATSMAN 1
+        # -------------------------------------------------
 
-        is_live = _as_bool(
-            live_commentary
-        )
+        player1 = {
+            "id": _clean_text(
+                score.get(
+                    "Player1ID"
+                )
+            ),
 
-        if (
-            team1_score
-            or team2_score
-        ):
-            is_live = True
+            "name": _clean_text(
+                score.get(
+                    "Player1"
+                )
+            ),
 
-        if is_live:
-            status = "LIVE"
-        elif provider_status:
-            status = str(
-                provider_status
-            ).upper()
-        else:
-            status = "AVAILABLE"
+            "image": _clean_text(
+                score.get(
+                    "Player1Image"
+                )
+            ),
+
+            "runs": _safe_int(
+                score.get(
+                    "Player1Run"
+                )
+            ),
+
+            "balls": _safe_int(
+                score.get(
+                    "Player1Balls"
+                )
+            ),
+
+            "fours": _safe_int(
+                score.get(
+                    "Player1Fours"
+                )
+            ),
+
+            "sixes": _safe_int(
+                score.get(
+                    "Player1Sixes"
+                )
+            ),
+
+            "strike_rate": _safe_float(
+                score.get(
+                    "Player1StrikeRate"
+                )
+            ),
+        }
 
         # -------------------------------------------------
-        # CURRENT OVER BALLS
+        # BATSMAN 2
+        # -------------------------------------------------
+
+        player2 = {
+            "id": _clean_text(
+                score.get(
+                    "Player2ID"
+                )
+            ),
+
+            "name": _clean_text(
+                score.get(
+                    "Player2"
+                )
+            ),
+
+            "image": _clean_text(
+                score.get(
+                    "Player2Image"
+                )
+            ),
+
+            "runs": _safe_int(
+                score.get(
+                    "Player2Run"
+                )
+            ),
+
+            "balls": _safe_int(
+                score.get(
+                    "Player2Balls"
+                )
+            ),
+
+            "fours": _safe_int(
+                score.get(
+                    "Player2Fours"
+                )
+            ),
+
+            "sixes": _safe_int(
+                score.get(
+                    "Player2Sixes"
+                )
+            ),
+
+            "strike_rate": _safe_float(
+                score.get(
+                    "Player2StrikeRate"
+                )
+            ),
+        }
+
+        # -------------------------------------------------
+        # CURRENT BOWLER
+        # -------------------------------------------------
+
+        bowler = {
+            "id": _clean_text(
+                score.get(
+                    "BowlerID"
+                )
+            ),
+
+            "name": _clean_text(
+                score.get(
+                    "Bowler"
+                )
+            ),
+
+            "image": _clean_text(
+                score.get(
+                    "BowlerImage"
+                )
+            ),
+
+            "runs": _safe_int(
+                score.get(
+                    "BowlerRun"
+                )
+            ),
+
+            "maidens": _safe_int(
+                score.get(
+                    "BowlerMaiden"
+                )
+            ),
+
+            "overs": _clean_text(
+                score.get(
+                    "BowlerOver"
+                )
+            ),
+
+            "wickets": _safe_int(
+                score.get(
+                    "BowlerWicket"
+                )
+            ),
+
+            "economy": _safe_float(
+                score.get(
+                    "BowlerEconomy"
+                )
+            ),
+        }
+
+        # -------------------------------------------------
+        # CURRENT OVER
         # -------------------------------------------------
 
         current_over_balls = []
@@ -2026,8 +2603,9 @@ def _parse_cricketbz_score(
 
             if (
                 value is not None
-                and value != ""
+                and str(value).strip() != ""
             ):
+
                 current_over_balls.append(
                     str(value)
                 )
@@ -2055,186 +2633,73 @@ def _parse_cricketbz_score(
 
                 if (
                     value is not None
-                    and value != ""
+                    and str(value).strip() != ""
                 ):
+
                     last6_balls.append(
                         str(value)
                     )
+
+        last6_balls = [
+            str(ball)
+            for ball in last6_balls
+        ]
 
         # -------------------------------------------------
         # LAST 4 OVERS
         # -------------------------------------------------
 
-        last4_overs = score.get(
-            "Last4Overs"
+        last4_overs = _normalize_last_overs(
+            score.get(
+                "Last4Overs"
+            )
         )
 
-        if not isinstance(
-            last4_overs,
-            list,
-        ):
-            last4_overs = []
-
         # -------------------------------------------------
-        # BATSMAN 1
+        # CHASE DATA
         # -------------------------------------------------
 
-        player1 = {
-            "id": _clean_text(
-                score.get(
-                    "Player1ID"
-                )
-            ),
-            "name": _clean_text(
-                score.get(
-                    "Player1"
-                )
-            ),
-            "image": _clean_text(
-                score.get(
-                    "Player1Image"
-                )
-            ),
-            "runs": _safe_int(
-                score.get(
-                    "Player1Run"
-                )
-            ),
-            "balls": _safe_int(
-                score.get(
-                    "Player1Balls"
-                )
-            ),
-            "fours": _safe_int(
-                score.get(
-                    "Player1Fours"
-                )
-            ),
-            "sixes": _safe_int(
-                score.get(
-                    "Player1Sixes"
-                )
-            ),
-            "strike_rate": _safe_float(
-                score.get(
-                    "Player1StrikeRate"
-                )
-            ),
-        }
+        target = _safe_int(
+            score.get(
+                "Target"
+            )
+        )
+
+        required_runs = required.get(
+            "required_runs"
+        )
+
+        required_overs = required.get(
+            "required_overs"
+        )
+
+        required_balls = required.get(
+            "required_balls"
+        )
 
         # -------------------------------------------------
-        # BATSMAN 2
+        # RATES
         # -------------------------------------------------
 
-        player2 = {
-            "id": _clean_text(
-                score.get(
-                    "Player2ID"
-                )
-            ),
-            "name": _clean_text(
-                score.get(
-                    "Player2"
-                )
-            ),
-            "image": _clean_text(
-                score.get(
-                    "Player2Image"
-                )
-            ),
-            "runs": _safe_int(
-                score.get(
-                    "Player2Run"
-                )
-            ),
-            "balls": _safe_int(
-                score.get(
-                    "Player2Balls"
-                )
-            ),
-            "fours": _safe_int(
-                score.get(
-                    "Player2Fours"
-                )
-            ),
-            "sixes": _safe_int(
-                score.get(
-                    "Player2Sixes"
-                )
-            ),
-            "strike_rate": _safe_float(
-                score.get(
-                    "Player2StrikeRate"
-                )
-            ),
-        }
+        crr = _safe_float(
+            score.get(
+                "CRR"
+            )
+        )
+
+        rrr = _safe_float(
+            score.get(
+                "RRR"
+            )
+        )
 
         # -------------------------------------------------
-        # BOWLER
+        # FULL STRUCTURED SCOREBOARD
         # -------------------------------------------------
 
-        bowler = {
-            "id": _clean_text(
-                score.get(
-                    "BowlerID"
-                )
-            ),
-            "name": _clean_text(
-                score.get(
-                    "Bowler"
-                )
-            ),
-            "image": _clean_text(
-                score.get(
-                    "BowlerImage"
-                )
-            ),
-            "runs": _safe_int(
-                score.get(
-                    "BowlerRun"
-                )
-            ),
-            "maidens": _safe_int(
-                score.get(
-                    "BowlerMaiden"
-                )
-            ),
-            "overs": _clean_text(
-                score.get(
-                    "BowlerOver"
-                )
-            ),
-            "wickets": _safe_int(
-                score.get(
-                    "BowlerWicket"
-                )
-            ),
-            "economy": _safe_float(
-                score.get(
-                    "BowlerEconomy"
-                )
-            ),
-        }
-
-        # -------------------------------------------------
-        # NORMALIZED SCORE
-        # -------------------------------------------------
-
-        normalized = {
-
-            "success": True,
+        scoreboard = {
 
             "status": status,
-
-            "provider_status": (
-                provider_status
-            ),
-
-            "provider_message": (
-                provider_message
-            ),
-
-            "source": "cricketbz",
 
             "is_live": is_live,
 
@@ -2246,189 +2711,292 @@ def _parse_cricketbz_score(
                 )
             ),
 
-            # -------------------------------------------------
-            # EVENT
-            # -------------------------------------------------
+            # ---------------------------------------------
+            # MATCH
+            # ---------------------------------------------
 
-            "event_name": (
-                f"{team1_name} v {team2_name}"
-                if team1_name
-                and team2_name
-                else ""
-            ),
+            "match": {
 
-            # -------------------------------------------------
-            # TEAM 1
-            # -------------------------------------------------
+                "event_name": (
+                    f"{team1_name} v {team2_name}"
+                    if team1_name
+                    and team2_name
+                    else ""
+                ),
 
-            "team1": team1_name,
+                "team1": team1,
 
-            "team1_name": team1_name,
+                "team2": team2,
+            },
 
-            "team1_short": team1_short,
+            # ---------------------------------------------
+            # TEAMS ALSO DIRECTLY AVAILABLE
+            # ---------------------------------------------
 
-            "team1_flag": _clean_text(
-                score.get(
-                    "Team1Flag"
-                )
-            ),
+            "team1": team1,
 
-            "team1_score": team1_score,
+            "team2": team2,
 
-            "team1_only_score": (
-                team1_only_score
-            ),
+            # ---------------------------------------------
+            # INNINGS
+            # ---------------------------------------------
 
-            "team1_score_only": (
-                team1_score_only
-            ),
+            "innings": {
 
-            "team1_overs": team1_overs,
+                "current": _safe_int(
+                    score.get(
+                        "CurrentInning"
+                    )
+                ),
 
-            # -------------------------------------------------
-            # TEAM 2
-            # -------------------------------------------------
+                "current_display": _clean_text(
+                    score.get(
+                        "CurrentInning"
+                    )
+                ),
+            },
 
-            "team2": team2_name,
+            # ---------------------------------------------
+            # BATTING
+            # ---------------------------------------------
 
-            "team2_name": team2_name,
+            "batting": {
 
-            "team2_short": team2_short,
+                "player1": player1,
 
-            "team2_flag": _clean_text(
-                score.get(
-                    "Team2Flag"
-                )
-            ),
+                "player2": player2,
 
-            "team2_score": team2_score,
+                "batsman1": player1,
 
-            "team2_only_score": (
-                team2_only_score
-            ),
+                "batsman2": player2,
+            },
 
-            "team2_score_only": (
-                team2_score_only
-            ),
+            # ---------------------------------------------
+            # BOWLING
+            # ---------------------------------------------
 
-            "team2_overs": team2_overs,
+            "bowling": {
 
-            # -------------------------------------------------
-            # RUN RATES
-            # -------------------------------------------------
+                "current": bowler,
 
-            "crr": _safe_float(
-                score.get(
-                    "CRR"
-                )
-            ),
+                "bowler": bowler,
+            },
 
-            "rrr": _safe_float(
-                score.get(
-                    "RRR"
-                )
-            ),
+            # ---------------------------------------------
+            # RATES
+            # ---------------------------------------------
 
-            # -------------------------------------------------
-            # BATSMEN
-            # -------------------------------------------------
+            "rates": {
 
-            "player1": player1,
+                "crr": crr,
 
-            "player2": player2,
+                "rrr": rrr,
+            },
 
-            "batsman1": player1,
-
-            "batsman2": player2,
-
-            # -------------------------------------------------
-            # BOWLER
-            # -------------------------------------------------
-
-            "bowler": bowler,
-
-            # -------------------------------------------------
-            # STATUS
-            # -------------------------------------------------
-
-            "message": _clean_text(
-                score.get(
-                    "Message"
-                )
-            ),
-
-            "score_status": score_status,
-
-            "commentary": _clean_text(
-                score.get(
-                    "Commentary"
-                )
-            ),
-
-            "live_commentary": (
-                live_commentary
-            ),
-
-            # -------------------------------------------------
-            # BALL DATA
-            # -------------------------------------------------
-
-            "current_over_balls": (
-                current_over_balls
-            ),
-
-            "last6_balls": (
-                last6_balls
-            ),
-
-            "last_6_balls": (
-                last6_balls
-            ),
-
-            "last4_overs": (
-                last4_overs
-            ),
-
-            "last_4_overs": (
-                last4_overs
-            ),
-
-            # -------------------------------------------------
+            # ---------------------------------------------
             # CHASE
-            # -------------------------------------------------
+            # ---------------------------------------------
 
-            "nr_msg": nr_msg,
+            "chase": {
 
-            "target": _safe_int(
-                score.get(
-                    "Target"
-                )
-            ),
+                "target": target,
 
-            "required_runs": (
-                required[
-                    "required_runs"
-                ]
-            ),
+                "required_runs": required_runs,
 
-            "required_overs": (
-                required[
-                    "required_overs"
-                ]
-            ),
+                "required_overs": required_overs,
 
-            "required_balls": (
-                required[
-                    "required_balls"
-                ]
-            ),
+                "required_balls": required_balls,
 
-            # -------------------------------------------------
-            # RAW PROVIDER SCORE
-            # -------------------------------------------------
+                "required_text": required_text,
+            },
+
+            # ---------------------------------------------
+            # CURRENT OVER
+            # ---------------------------------------------
+
+            "current_over": {
+
+                "balls": current_over_balls,
+
+                "ball_count": len(
+                    current_over_balls
+                ),
+            },
+
+            # ---------------------------------------------
+            # LAST SIX BALLS
+            # ---------------------------------------------
+
+            "last_six_balls": last6_balls,
+
+            "last6_balls": last6_balls,
+
+            # ---------------------------------------------
+            # LAST FOUR OVERS
+            # ---------------------------------------------
+
+            "last_four_overs": last4_overs,
+
+            "last4_overs": last4_overs,
+
+            # ---------------------------------------------
+            # COMMENTARY
+            # ---------------------------------------------
+
+            "commentary": {
+
+                "score_status": score_status,
+
+                "message": _clean_text(
+                    score.get(
+                        "Message"
+                    )
+                ),
+
+                "commentary": _clean_text(
+                    score.get(
+                        "Commentary"
+                    )
+                ),
+
+                "live_commentary": live_commentary,
+
+                "nr_msg": nr_msg,
+            },
+
+            # ---------------------------------------------
+            # RAW SCORE
+            # ---------------------------------------------
 
             "raw_score": score,
         }
+
+        # =================================================
+        # BACKWARD-COMPATIBLE FLAT STRUCTURE
+        # =================================================
+
+        # Keep these fields because your existing
+        # match.html may already be using them.
+
+        scoreboard.update(
+            {
+
+                "event_name": (
+                    f"{team1_name} v {team2_name}"
+                    if team1_name
+                    and team2_name
+                    else ""
+                ),
+
+                "current_inning": _clean_text(
+                    score.get(
+                        "CurrentInning"
+                    )
+                ),
+
+                "team1_name": team1_name,
+
+                "team1_short": team1_short,
+
+                "team1_flag": team1_flag,
+
+                "team1_score": team1_score_display,
+
+                "team1_only_score": (
+                    team1_only_score
+                ),
+
+                "team1_score_only": (
+                    team1_score_only
+                ),
+
+                "team1_overs": team1_overs,
+
+                "team2_name": team2_name,
+
+                "team2_short": team2_short,
+
+                "team2_flag": team2_flag,
+
+                "team2_score": team2_score_display,
+
+                "team2_only_score": (
+                    team2_only_score
+                ),
+
+                "team2_score_only": (
+                    team2_score_only
+                ),
+
+                "team2_overs": team2_overs,
+
+                "crr": crr,
+
+                "rrr": rrr,
+
+                "player1": player1,
+
+                "player2": player2,
+
+                "batsman1": player1,
+
+                "batsman2": player2,
+
+                "bowler": bowler,
+
+                "message": _clean_text(
+                    score.get(
+                        "Message"
+                    )
+                ),
+
+                "score_status": score_status,
+
+                "commentary": _clean_text(
+                    score.get(
+                        "Commentary"
+                    )
+                ),
+
+                "live_commentary": live_commentary,
+
+                "current_over_balls": (
+                    current_over_balls
+                ),
+
+                "last6_balls": (
+                    last6_balls
+                ),
+
+                "last_6_balls": (
+                    last6_balls
+                ),
+
+                "last4_overs": (
+                    last4_overs
+                ),
+
+                "last_4_overs": (
+                    last4_overs
+                ),
+
+                "nr_msg": nr_msg,
+
+                "target": target,
+
+                "required_runs": required_runs,
+
+                "required_overs": required_overs,
+
+                "required_balls": required_balls,
+
+                "raw_score": score,
+            }
+        )
+
+        # =================================================
+        # RETURN FULL SCORE RESPONSE
+        # =================================================
 
         return {
 
@@ -2436,21 +3004,34 @@ def _parse_cricketbz_score(
 
             "status": status,
 
+            "is_live": is_live,
+
             "source": "cricketbz",
 
-            "score": normalized,
+            # Full structured scoreboard
+            "scoreboard": scoreboard,
 
+            # Convenient direct data
+            "data": scoreboard,
+
+            # Backward-compatible score
+            "score": scoreboard,
+
+            # Backward-compatible list
             "scores": [
-                normalized
+                scoreboard
             ],
 
-            # IMPORTANT:
-            # Also expose it directly as data.
-            # This makes the response compatible
-            # with frontends expecting data.team1_score.
+            # Provider information
+            "provider_status": (
+                provider_status
+            ),
 
-            "data": normalized,
+            "provider_message": (
+                provider_message
+            ),
 
+            # Original provider response
             "raw": payload,
         }
 
@@ -2465,7 +3046,7 @@ def _parse_cricketbz_score(
 
 
 # =========================================================
-# GET CRICKETBZ SCORE THROUGH PROEXCH
+# GET CRICKETBZ THROUGH PROEXCH
 # =========================================================
 
 def get_cricketbz(
@@ -2507,6 +3088,7 @@ def get_score(
             "status": "UNAVAILABLE",
             "source": "cricketbz",
             "score": None,
+            "scoreboard": None,
             "scores": [],
             "data": None,
             "message": "Score ID is missing",
@@ -2514,9 +3096,9 @@ def get_score(
 
     now = _now()
 
-    # -----------------------------------------------------
+    # =====================================================
     # CACHE
-    # -----------------------------------------------------
+    # =====================================================
 
     cached = _score_cache.get(
         score_id
@@ -2545,12 +3127,11 @@ def get_score(
                 cached_data,
                 dict,
             ):
-
                 return cached_data
 
-    # -----------------------------------------------------
-    # PRIMARY CRICKETBZ
-    # -----------------------------------------------------
+    # =====================================================
+    # PRIMARY CRICKETBZ SOURCE
+    # =====================================================
 
     url = (
         f"{CRICKETBZ_BASE_URL.rstrip('/')}"
@@ -2568,13 +3149,13 @@ def get_score(
             url
         )
 
-        # First use exact parser for the
-        # actual CricketBZ response format.
-        normalized = _parse_cricketbz_score(
-            raw
+        normalized = (
+            _parse_cricketbz_score(
+                raw
+            )
         )
 
-        # Generic fallback remains available.
+        # Generic fallback
         if not normalized.get(
             "success"
         ):
@@ -2587,7 +3168,9 @@ def get_score(
             "success"
         ):
 
-            _score_cache[score_id] = {
+            _score_cache[
+                score_id
+            ] = {
                 "timestamp": now,
                 "data": normalized,
             }
@@ -2606,9 +3189,9 @@ def get_score(
             repr(exc),
         )
 
-    # -----------------------------------------------------
+    # =====================================================
     # PROEXCH FALLBACK
-    # -----------------------------------------------------
+    # =====================================================
 
     try:
 
@@ -2621,8 +3204,10 @@ def get_score(
             score_id
         )
 
-        normalized = _parse_cricketbz_score(
-            fallback
+        normalized = (
+            _parse_cricketbz_score(
+                fallback
+            )
         )
 
         if not normalized.get(
@@ -2637,7 +3222,9 @@ def get_score(
             "success"
         ):
 
-            _score_cache[score_id] = {
+            _score_cache[
+                score_id
+            ] = {
                 "timestamp": now,
                 "data": normalized,
             }
@@ -2651,15 +3238,16 @@ def get_score(
             repr(exc),
         )
 
-    # -----------------------------------------------------
+    # =====================================================
     # UNAVAILABLE
-    # -----------------------------------------------------
+    # =====================================================
 
     return {
         "success": False,
         "status": "UNAVAILABLE",
         "source": "cricketbz",
         "score": None,
+        "scoreboard": None,
         "scores": [],
         "data": None,
         "message": "Live score is currently unavailable",
@@ -2739,7 +3327,9 @@ def get_proexch_result(
             "raw": raw,
         }
 
-        _result_cache[game_id] = {
+        _result_cache[
+            game_id
+        ] = {
             "timestamp": now,
             "data": normalized,
         }
@@ -2815,15 +3405,12 @@ def clear_cache() -> None:
 
 
 def clear_odds_cache() -> None:
-
     _odds_cache.clear()
 
 
 def clear_score_cache() -> None:
-
     _score_cache.clear()
 
 
 def clear_result_cache() -> None:
-
     _result_cache.clear()
