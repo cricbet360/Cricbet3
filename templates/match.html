@@ -26,10 +26,7 @@
             padding: 0;
             background: #071b12;
             color: #ffffff;
-            font-family:
-                Arial,
-                Helvetica,
-                sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
         }
 
         body {
@@ -38,7 +35,6 @@
 
         /* =================================================
            ACCOUNT TOP BAR
-           Same balance / deposit / withdraw bar as dashboard
         ================================================= */
 
         .account-topbar {
@@ -193,6 +189,419 @@
             margin: 0 auto;
             padding: 16px;
         }
+
+        /* =================================================
+           TV / IPL STYLE SCOREBOARD
+        ================================================= */
+
+        .live-scoreboard {
+            width: 100%;
+            margin: 0;
+            padding: 14px 16px 16px;
+            background:
+                linear-gradient(
+                    180deg,
+                    #071d13 0%,
+                    #0a2819 100%
+                );
+            border-bottom: 1px solid #1b4931;
+            box-shadow:
+                0 8px 25px rgba(0, 0, 0, .22);
+        }
+
+        .scoreboard-inner {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .scoreboard-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .scoreboard-title-wrap {
+            min-width: 0;
+        }
+
+        .scoreboard-kicker {
+            color: #48df91;
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: 1.7px;
+            text-transform: uppercase;
+        }
+
+        .scoreboard-event {
+            margin-top: 2px;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 800;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .scoreboard-live {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 9px;
+            border-radius: 5px;
+            background: #671e1e;
+            color: #ffb6b6;
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: .7px;
+            white-space: nowrap;
+        }
+
+        .scoreboard-live-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ff5555;
+            box-shadow: 0 0 0 3px rgba(255, 85, 85, .12);
+        }
+
+        .scoreboard-main {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 120px minmax(0, 1fr);
+            min-height: 112px;
+            overflow: hidden;
+            border: 1px solid #205438;
+            border-radius: 9px;
+            background: #092116;
+        }
+
+        .score-team-panel {
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            padding: 14px 18px;
+            position: relative;
+        }
+
+        .score-team-panel.team-left {
+            justify-content: flex-end;
+            text-align: right;
+            border-right: 1px solid #173f2b;
+        }
+
+        .score-team-panel.team-right {
+            justify-content: flex-start;
+            text-align: left;
+            border-left: 1px solid #173f2b;
+        }
+
+        .score-team-content {
+            min-width: 0;
+        }
+
+        .score-team-name-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .team-left .score-team-name-row {
+            justify-content: flex-end;
+        }
+
+        .score-team-name {
+            max-width: 230px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .score-team-short {
+            color: #7fae98;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .score-team-score {
+            margin-top: 5px;
+            color: #ffffff;
+            font-size: 32px;
+            line-height: 1;
+            font-weight: 950;
+            letter-spacing: -1px;
+        }
+
+        .score-team-overs {
+            margin-top: 5px;
+            color: #9abaae;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .score-batting {
+            display: inline-flex;
+            align-items: center;
+            margin-top: 6px;
+            padding: 3px 7px;
+            border-radius: 4px;
+            background: #123f29;
+            color: #65e59c;
+            font-size: 8px;
+            font-weight: 900;
+            letter-spacing: .8px;
+        }
+
+        .score-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 5px;
+            background: #0b291a;
+        }
+
+        .score-center-label {
+            color: #6e9984;
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .score-center-innings {
+            margin-top: 5px;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 900;
+        }
+
+        .score-center-vs {
+            margin-top: 4px;
+            color: #5e8c75;
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .scoreboard-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            margin-top: 8px;
+            border: 1px solid #1b4b32;
+            border-radius: 7px;
+            overflow: hidden;
+            background: #0a2417;
+        }
+
+        .score-stat {
+            min-width: 0;
+            padding: 8px 10px;
+            text-align: center;
+            border-right: 1px solid #173f2a;
+        }
+
+        .score-stat:last-child {
+            border-right: 0;
+        }
+
+        .score-stat-label {
+            color: #6d9983;
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: .7px;
+            text-transform: uppercase;
+        }
+
+        .score-stat-value {
+            margin-top: 2px;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        .scoreboard-chase {
+            margin-top: 8px;
+            padding: 9px 12px;
+            border-left: 3px solid #e5a83b;
+            border-radius: 5px;
+            background: #241e0f;
+            color: #f2d078;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .scoreboard-below {
+            display: grid;
+            grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .scoreboard-section {
+            min-width: 0;
+            border: 1px solid #19462f;
+            border-radius: 7px;
+            overflow: hidden;
+            background: #092116;
+        }
+
+        .scoreboard-section-title {
+            padding: 7px 10px;
+            background: #0d2d1d;
+            color: #83aa96;
+            font-size: 8px;
+            font-weight: 900;
+            letter-spacing: .9px;
+            text-transform: uppercase;
+        }
+
+        .batter-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 42px 42px 42px 50px;
+            gap: 5px;
+            align-items: center;
+            padding: 7px 9px;
+            border-top: 1px solid #143a27;
+        }
+
+        .batter-name {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .batter-stat {
+            text-align: center;
+            color: #b4cfc1;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .batter-stat.main {
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .last-balls {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
+            padding: 10px;
+        }
+
+        .ball {
+            width: 26px;
+            height: 26px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #173c2a;
+            border: 1px solid #285c42;
+            color: #ffffff;
+            font-size: 9px;
+            font-weight: 900;
+        }
+
+        .ball.boundary {
+            background: #174f35;
+            border-color: #287b53;
+            color: #6ff0a5;
+        }
+
+        .ball.wicket {
+            background: #5a2424;
+            border-color: #883c3c;
+            color: #ffabab;
+        }
+
+        .recent-overs {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .recent-over {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 9px;
+            border-top: 1px solid #143a27;
+        }
+
+        .recent-over-number {
+            width: 35px;
+            flex-shrink: 0;
+            color: #6f9c85;
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .recent-over-balls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .recent-over-ball {
+            color: #c4d8cd;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .recent-over-runs {
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 900;
+        }
+
+        .scoreboard-empty,
+        .scoreboard-loading {
+            padding: 18px;
+            text-align: center;
+            color: #719887;
+            font-size: 12px;
+        }
+
+        .scoreboard-details {
+            margin-top: 8px;
+        }
+
+        .scoreboard-details summary {
+            cursor: pointer;
+            color: #638d78;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .scoreboard-details pre {
+            max-height: 250px;
+            overflow: auto;
+            margin: 8px 0 0;
+            padding: 10px;
+            border-radius: 6px;
+            background: #06170f;
+            color: #719887;
+            font-size: 9px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* =================================================
+           MATCH HEADER
+        ================================================= */
 
         .topbar {
             display: flex;
@@ -494,8 +903,7 @@
             border: 1px solid #28734b;
             border-radius: 14px;
             box-shadow:
-                0 18px 55px
-                rgba(0, 0, 0, 0.55);
+                0 18px 55px rgba(0, 0, 0, 0.55);
             z-index: 9999;
             overflow: hidden;
             display: none;
@@ -771,10 +1179,6 @@
             color: #9cf0c3;
         }
 
-        /* =================================================
-           REOPEN BUTTON
-        ================================================= */
-
         .bet-slip-reopen {
             position: fixed;
             right: 18px;
@@ -789,8 +1193,7 @@
             background: #0d3020;
             color: #ffffff;
             box-shadow:
-                0 10px 30px
-                rgba(0, 0, 0, 0.4);
+                0 10px 30px rgba(0, 0, 0, 0.4);
             cursor: pointer;
             font-size: 12px;
             font-weight: 800;
@@ -815,7 +1218,7 @@
            MOBILE
         ================================================= */
 
-        @media (max-width: 650px) {
+        @media (max-width: 700px) {
 
             .account-topbar {
                 position: sticky;
@@ -876,34 +1279,105 @@
             }
 
             .live-scoreboard {
-                width: 100%;
-                padding: 12px;
+                padding: 10px;
             }
 
-            .scoreboard-head {
-                align-items: flex-start;
+            .scoreboard-main {
+                grid-template-columns:
+                    minmax(0, 1fr)
+                    58px
+                    minmax(0, 1fr);
+                min-height: 92px;
             }
 
-            .live-scoreboard h2 {
-                font-size: 18px;
+            .score-team-panel {
+                padding: 10px 8px;
             }
 
-            .scoreboard-status {
+            .score-team-name {
+                max-width: 110px;
+                font-size: 11px;
+            }
+
+            .score-team-short {
+                display: none;
+            }
+
+            .score-team-score {
+                font-size: 24px;
+            }
+
+            .score-team-overs {
+                font-size: 9px;
+            }
+
+            .score-batting {
+                font-size: 7px;
+                padding: 3px 5px;
+            }
+
+            .score-center-label {
+                font-size: 7px;
+            }
+
+            .score-center-innings {
+                font-size: 12px;
+            }
+
+            .score-center-vs {
+                font-size: 7px;
+            }
+
+            .scoreboard-event {
+                max-width: 220px;
+                font-size: 11px;
+            }
+
+            .scoreboard-stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .score-stat {
+                padding: 7px 4px;
+            }
+
+            .score-stat-label {
+                font-size: 7px;
+            }
+
+            .score-stat-value {
+                font-size: 12px;
+            }
+
+            .scoreboard-chase {
                 font-size: 10px;
-                text-align: right;
+                line-height: 1.4;
             }
 
-            .scoreboard-summary {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 7px;
+            .scoreboard-below {
+                grid-template-columns: 1fr;
             }
 
-            .score-card {
-                padding: 9px;
+            .batter-row {
+                grid-template-columns:
+                    minmax(0, 1fr)
+                    35px
+                    35px
+                    35px
+                    42px;
+                gap: 3px;
             }
 
-            .score-card .value {
-                font-size: 14px;
+            .batter-name {
+                font-size: 10px;
+            }
+
+            .batter-stat {
+                font-size: 9px;
+            }
+
+            .batter-stat.main {
+                font-size: 11px;
             }
 
             .page {
@@ -948,11 +1422,9 @@
             }
         }
 
-
     </style>
 
 </head>
-
 
 <body>
 
@@ -972,7 +1444,6 @@
 
     </div>
 
-
     <div class="account-actions">
 
         <div class="account-balance">
@@ -990,7 +1461,6 @@
 
         </div>
 
-
         <button
             type="button"
             id="matchDepositBtn"
@@ -998,7 +1468,6 @@
         >
             Deposit
         </button>
-
 
         <button
             type="button"
@@ -1008,14 +1477,12 @@
             Withdraw
         </button>
 
-
         <a
             href="/profile"
             class="account-profile"
         >
             Profile
         </a>
-
 
         <a
             href="/logout"
@@ -1029,349 +1496,315 @@
 </header>
 
 
-<section id="liveScoreboard" class="live-scoreboard">
+<!-- =========================================================
+     TV / IPL STYLE LIVE SCOREBOARD
+========================================================= -->
 
-    <div class="scoreboard-head">
+<section
+    id="liveScoreboard"
+    class="live-scoreboard"
+>
 
-        <div>
-            <div class="scoreboard-kicker">
-                LIVE CRICKET
+    <div class="scoreboard-inner">
+
+        <div class="scoreboard-top">
+
+            <div class="scoreboard-title-wrap">
+
+                <div class="scoreboard-kicker">
+                    LIVE CRICKET
+                </div>
+
+                <div
+                    id="scoreboardEvent"
+                    class="scoreboard-event"
+                >
+                    {{ match.event_name if match else "Cricket Match" }}
+                </div>
+
             </div>
 
-            <h2 id="scoreboardTitle">
-                Scoreboard
-            </h2>
+            <div
+                id="scoreboardLiveBadge"
+                class="scoreboard-live"
+            >
+                <span class="scoreboard-live-dot"></span>
+                LIVE
+            </div>
+
         </div>
+
 
         <div
-            id="scoreboardStatus"
-            class="scoreboard-status"
+            id="scoreboardMain"
+            class="scoreboard-main"
         >
-            Loading…
+
+            <div
+                id="scoreTeam1"
+                class="score-team-panel team-left"
+            >
+
+                <div class="score-team-content">
+
+                    <div class="score-team-name-row">
+
+                        <span
+                            id="scoreTeam1Name"
+                            class="score-team-name"
+                        >
+                            --
+                        </span>
+
+                        <span
+                            id="scoreTeam1Short"
+                            class="score-team-short"
+                        >
+                            --
+                        </span>
+
+                    </div>
+
+                    <div
+                        id="scoreTeam1Value"
+                        class="score-team-score"
+                    >
+                        --/--
+                    </div>
+
+                    <div
+                        id="scoreTeam1Overs"
+                        class="score-team-overs"
+                    >
+                        -- overs
+                    </div>
+
+                    <div
+                        id="scoreTeam1Batting"
+                        class="score-batting"
+                        hidden
+                    >
+                        BATTING
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="score-center">
+
+                <div class="score-center-label">
+                    INNINGS
+                </div>
+
+                <div
+                    id="scoreCurrentInning"
+                    class="score-center-innings"
+                >
+                    --
+                </div>
+
+                <div class="score-center-vs">
+                    VS
+                </div>
+
+            </div>
+
+
+            <div
+                id="scoreTeam2"
+                class="score-team-panel team-right"
+            >
+
+                <div class="score-team-content">
+
+                    <div class="score-team-name-row">
+
+                        <span
+                            id="scoreTeam2Short"
+                            class="score-team-short"
+                        >
+                            --
+                        </span>
+
+                        <span
+                            id="scoreTeam2Name"
+                            class="score-team-name"
+                        >
+                            --
+                        </span>
+
+                    </div>
+
+                    <div
+                        id="scoreTeam2Value"
+                        class="score-team-score"
+                    >
+                        --/--
+                    </div>
+
+                    <div
+                        id="scoreTeam2Overs"
+                        class="score-team-overs"
+                    >
+                        -- overs
+                    </div>
+
+                    <div
+                        id="scoreTeam2Batting"
+                        class="score-batting"
+                        hidden
+                    >
+                        BATTING
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
 
-    </div>
+
+        <div class="scoreboard-stats">
+
+            <div class="score-stat">
+
+                <div class="score-stat-label">
+                    CRR
+                </div>
+
+                <div
+                    id="scoreCRR"
+                    class="score-stat-value"
+                >
+                    --
+                </div>
+
+            </div>
 
 
-    <div
-        id="scoreboardMatchName"
-        class="scoreboard-match-name"
-    ></div>
+            <div class="score-stat">
+
+                <div class="score-stat-label">
+                    RRR
+                </div>
+
+                <div
+                    id="scoreRRR"
+                    class="score-stat-value"
+                >
+                    --
+                </div>
+
+            </div>
 
 
-    <div
-        id="scoreboardInnings"
-        class="scoreboard-innings"
-    >
-        <div class="scoreboard-loading">
-            Loading live score…
+            <div class="score-stat">
+
+                <div class="score-stat-label">
+                    TARGET
+                </div>
+
+                <div
+                    id="scoreTargetValue"
+                    class="score-stat-value"
+                >
+                    --
+                </div>
+
+            </div>
+
         </div>
+
+
+        <div
+            id="scoreChase"
+            class="scoreboard-chase"
+            hidden
+        ></div>
+
+
+        <div class="scoreboard-below">
+
+            <!-- BATTERS -->
+
+            <div class="scoreboard-section">
+
+                <div class="scoreboard-section-title">
+                    BATTERS
+                </div>
+
+                <div
+                    id="scoreBatters"
+                >
+                    <div class="scoreboard-loading">
+                        Loading...
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- LAST BALLS -->
+
+            <div class="scoreboard-section">
+
+                <div class="scoreboard-section-title">
+                    LAST 6 BALLS
+                </div>
+
+                <div
+                    id="scoreLastBalls"
+                    class="last-balls"
+                >
+                    <span class="scoreboard-loading">
+                        --
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- RECENT OVERS -->
+
+        <div
+            id="recentOversSection"
+            class="scoreboard-section"
+            style="margin-top:8px;"
+        >
+
+            <div class="scoreboard-section-title">
+                RECENT OVERS
+            </div>
+
+            <div
+                id="scoreRecentOvers"
+                class="recent-overs"
+            >
+                <div class="scoreboard-loading">
+                    --
+                </div>
+            </div>
+
+        </div>
+
+
+        <details class="scoreboard-details">
+
+            <summary>
+                Match result / technical data
+            </summary>
+
+            <pre id="resultData">Loading…</pre>
+
+        </details>
+
     </div>
-
-
-    <div
-        id="scoreboardMatchInfo"
-        class="scoreboard-match-info"
-    ></div>
-
-
-    <div
-        id="scoreboardTarget"
-        class="scoreboard-target"
-        hidden
-    ></div>
-
-
-    <details class="scoreboard-details">
-
-        <summary>
-            Match result / details
-        </summary>
-
-        <pre id="resultData">Loading…</pre>
-
-    </details>
 
 </section>
-
-<style>
-/* =========================================================
-   LIVE CRICKET SCOREBOARD
-========================================================= */
-
-.live-scoreboard {
-    width: 100%;
-    margin: 0;
-    padding: 16px;
-    background:
-        linear-gradient(
-            135deg,
-            #071b12,
-            #10291c
-        );
-    color: #ffffff;
-    border-bottom: 1px solid rgba(255,255,255,.08);
-    box-shadow:
-        0 8px 24px rgba(0,0,0,.16);
-}
-
-.scoreboard-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-.scoreboard-kicker {
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 1.5px;
-    color: #6ee7a0;
-    text-transform: uppercase;
-}
-
-.live-scoreboard h2 {
-    margin: 3px 0 0;
-    font-size: 22px;
-    font-weight: 800;
-}
-
-.scoreboard-status {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 28px;
-    padding: 5px 10px;
-    border-radius: 999px;
-    background: rgba(52,211,153,.12);
-    border: 1px solid rgba(52,211,153,.20);
-    color: #86efac;
-    font-size: 11px;
-    font-weight: 700;
-    white-space: nowrap;
-}
-
-.scoreboard-match-name {
-    margin-top: 8px;
-    color: rgba(255,255,255,.65);
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.scoreboard-innings {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 14px;
-}
-
-.scoreboard-innings-grid {
-    display: grid;
-    grid-template-columns:
-        minmax(0, 1fr)
-        auto
-        auto
-        auto;
-    align-items: center;
-    gap: 12px;
-    padding: 14px;
-    border-radius: 12px;
-    background: rgba(255,255,255,.055);
-    border: 1px solid rgba(255,255,255,.07);
-}
-
-.scoreboard-innings-grid.current-innings {
-    background:
-        linear-gradient(
-            135deg,
-            rgba(34,197,94,.15),
-            rgba(255,255,255,.045)
-        );
-    border-color: rgba(74,222,128,.25);
-}
-
-.score-team {
-    min-width: 0;
-}
-
-.score-team-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 14px;
-    font-weight: 800;
-}
-
-.score-current-label {
-    margin-top: 3px;
-    color: #86efac;
-    font-size: 9px;
-    font-weight: 800;
-    letter-spacing: .7px;
-    text-transform: uppercase;
-}
-
-.score-main {
-    min-width: 85px;
-    text-align: right;
-}
-
-.score-main-value {
-    font-size: 25px;
-    line-height: 1;
-    font-weight: 900;
-    letter-spacing: -.5px;
-}
-
-.score-main-overs {
-    margin-top: 4px;
-    color: rgba(255,255,255,.62);
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.score-stat {
-    min-width: 55px;
-    text-align: center;
-}
-
-.score-stat-label {
-    color: rgba(255,255,255,.48);
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: .5px;
-    text-transform: uppercase;
-}
-
-.score-stat-value {
-    margin-top: 3px;
-    font-size: 13px;
-    font-weight: 800;
-}
-
-.scoreboard-match-info {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 7px;
-    margin-top: 10px;
-}
-
-.score-info-pill {
-    padding: 6px 9px;
-    border-radius: 7px;
-    background: rgba(255,255,255,.055);
-    color: rgba(255,255,255,.72);
-    font-size: 10px;
-    font-weight: 700;
-}
-
-.scoreboard-target {
-    margin-top: 10px;
-    padding: 10px 12px;
-    border-radius: 9px;
-    background: rgba(245,158,11,.10);
-    border: 1px solid rgba(245,158,11,.20);
-    color: #fcd34d;
-    font-size: 12px;
-    font-weight: 800;
-}
-
-.scoreboard-loading {
-    padding: 18px;
-    border-radius: 12px;
-    background: rgba(255,255,255,.045);
-    color: rgba(255,255,255,.58);
-    text-align: center;
-    font-size: 12px;
-}
-
-.scoreboard-empty {
-    padding: 18px;
-    border-radius: 12px;
-    background: rgba(255,255,255,.045);
-    color: rgba(255,255,255,.58);
-    text-align: center;
-    font-size: 12px;
-}
-
-.scoreboard-details {
-    margin-top: 10px;
-}
-
-.scoreboard-details summary {
-    cursor: pointer;
-    color: rgba(255,255,255,.58);
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.scoreboard-details pre {
-    white-space: pre-wrap;
-    word-break: break-word;
-    max-height: 280px;
-    overflow: auto;
-    margin: 10px 0 0;
-    padding: 10px;
-    border-radius: 8px;
-    background: rgba(0,0,0,.25);
-    font-size: 10px;
-}
-
-
-/* =========================================================
-   MOBILE SCOREBOARD
-========================================================= */
-
-@media (max-width: 600px) {
-
-    .live-scoreboard {
-        padding: 12px;
-    }
-
-    .scoreboard-head {
-        align-items: flex-start;
-    }
-
-    .live-scoreboard h2 {
-        font-size: 19px;
-    }
-
-    .scoreboard-status {
-        font-size: 9px;
-        min-height: 25px;
-        padding: 4px 8px;
-    }
-
-    .scoreboard-innings-grid {
-        grid-template-columns:
-            minmax(0, 1fr)
-            auto;
-        gap: 8px;
-        padding: 12px;
-    }
-
-    .score-main {
-        min-width: 80px;
-    }
-
-    .score-main-value {
-        font-size: 22px;
-    }
-
-    .score-stat {
-        display: none;
-    }
-
-    .score-team-name {
-        font-size: 13px;
-    }
-
-    .scoreboard-match-name {
-        font-size: 11px;
-    }
-
-}
-</style>
 
 
 <!-- =========================================================
@@ -1387,11 +1820,6 @@
         ← Back to Cricket
     </a>
 
-
-
-    <!-- =====================================================
-         MATCH HEADER
-    ====================================================== -->
 
     <section class="match-header">
 
@@ -1447,10 +1875,6 @@
     </section>
 
 
-    <!-- =====================================================
-         STATUS
-    ====================================================== -->
-
     <div class="status-bar">
 
         <div class="status-left">
@@ -1476,10 +1900,6 @@
     </div>
 
 
-    <!-- =====================================================
-         MARKETS
-    ====================================================== -->
-
     <main id="marketsContainer">
 
         <div class="loading">
@@ -1493,157 +1913,155 @@
     </main>
 
 
-
-
-
-<!-- =========================================================
-     MATCH DATA
-========================================================= -->
-
-<div
-    id="matchData"
-    data-game-id="{{ match.game_id if match else '' }}"
-    data-event-id="{{ match.event_id if match else '' }}"
-    data-market-id="{{ match.market_id if match else '' }}"
-    data-event-name="{{ match.event_name if match else '' }}"
-    data-team1="{{ match.team1 if match else '' }}"
-    data-team2="{{ match.team2 if match else '' }}"
-    data-event-time="{{ match.event_time if match else '' }}"
-    data-in-play="{{ 'true' if match and match.in_play else 'false' }}"
-    hidden
-></div>
-
-
-<!-- =========================================================
-     BET SLIP
-========================================================= -->
-
-<div
-    class="bet-slip"
-    id="betSlip"
->
-
-    <div class="bet-slip-header">
-
-        <div class="bet-slip-heading">
-
-            <div class="bet-slip-title">
-                Bet Slip
-            </div>
-
-            <span
-                class="bet-slip-count"
-                id="betSlipCount"
-            >
-                0
-            </span>
-
-        </div>
-
-
-        <button
-            type="button"
-            class="minimize-slip"
-            id="minimizeSlipButton"
-            aria-label="Minimize bet slip"
-            title="Minimize"
-        >
-            −
-        </button>
-
-    </div>
-
+    <!-- =====================================================
+         MATCH DATA
+    ====================================================== -->
 
     <div
-        class="bet-slip-body"
-        id="betSlipBody"
+        id="matchData"
+        data-game-id="{{ match.game_id if match else '' }}"
+        data-event-id="{{ match.event_id if match else '' }}"
+        data-market-id="{{ match.market_id if match else '' }}"
+        data-event-name="{{ match.event_name if match else '' }}"
+        data-team1="{{ match.team1 if match else '' }}"
+        data-team2="{{ match.team2 if match else '' }}"
+        data-event-time="{{ match.event_time if match else '' }}"
+        data-in-play="{{ 'true' if match and match.in_play else 'false' }}"
+        hidden
+    ></div>
+
+
+    <!-- =====================================================
+         BET SLIP
+    ====================================================== -->
+
+    <div
+        class="bet-slip"
+        id="betSlip"
     >
 
-        <div class="slip-empty">
-            Select odds from a market to add a bet.
-        </div>
+        <div class="bet-slip-header">
 
-    </div>
+            <div class="bet-slip-heading">
 
-
-    <div class="bet-slip-footer">
-
-        <div class="slip-summary">
-
-            <div class="summary-box">
-
-                <div class="summary-label">
-                    Total Stake
+                <div class="bet-slip-title">
+                    Bet Slip
                 </div>
 
-                <div
-                    class="summary-value"
-                    id="totalStake"
+                <span
+                    class="bet-slip-count"
+                    id="betSlipCount"
                 >
-                    ₹0.00
-                </div>
+                    0
+                </span>
 
             </div>
 
-
-            <div class="summary-box">
-
-                <div class="summary-label">
-                    Potential Return
-                </div>
-
-                <div
-                    class="summary-value"
-                    id="potentialReturn"
-                >
-                    ₹0.00
-                </div>
-
-            </div>
+            <button
+                type="button"
+                class="minimize-slip"
+                id="minimizeSlipButton"
+                aria-label="Minimize bet slip"
+                title="Minimize"
+            >
+                −
+            </button>
 
         </div>
-
-
-        <button
-            type="button"
-            class="place-all-btn"
-            id="placeAllButton"
-            disabled
-        >
-            Place Bet
-        </button>
 
 
         <div
-            class="bet-message"
-            id="betMessage"
-        ></div>
+            class="bet-slip-body"
+            id="betSlipBody"
+        >
+
+            <div class="slip-empty">
+                Select odds from a market to add a bet.
+            </div>
+
+        </div>
+
+
+        <div class="bet-slip-footer">
+
+            <div class="slip-summary">
+
+                <div class="summary-box">
+
+                    <div class="summary-label">
+                        Total Stake
+                    </div>
+
+                    <div
+                        class="summary-value"
+                        id="totalStake"
+                    >
+                        ₹0.00
+                    </div>
+
+                </div>
+
+
+                <div class="summary-box">
+
+                    <div class="summary-label">
+                        Potential Return
+                    </div>
+
+                    <div
+                        class="summary-value"
+                        id="potentialReturn"
+                    >
+                        ₹0.00
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="place-all-btn"
+                id="placeAllButton"
+                disabled
+            >
+                Place Bet
+            </button>
+
+
+            <div
+                class="bet-message"
+                id="betMessage"
+            ></div>
+
+        </div>
 
     </div>
 
-</div>
 
+    <!-- =====================================================
+         REOPEN BET SLIP
+    ====================================================== -->
 
-<!-- =========================================================
-     REOPEN BET SLIP BUTTON
-========================================================= -->
-
-<button
-    type="button"
-    class="bet-slip-reopen"
-    id="reopenSlipButton"
->
-
-    BET SLIP
-
-    <span
-        class="reopen-count"
-        id="reopenSlipCount"
+    <button
+        type="button"
+        class="bet-slip-reopen"
+        id="reopenSlipButton"
     >
-        0
-    </span>
 
-</button>
+        BET SLIP
+
+        <span
+            class="reopen-count"
+            id="reopenSlipCount"
+        >
+            0
+        </span>
+
+    </button>
+
+</div>
 
 
 <script>
@@ -1691,7 +2109,6 @@ function escapeHtml(value) {
 
 
 function escapeAttribute(value) {
-
     return escapeHtml(value);
 }
 
@@ -1804,38 +2221,26 @@ function initializeMatch() {
    MATCH HEADER
 ========================================================= */
 
-function updateMatchHeader(
-    match
-) {
+function updateMatchHeader(match) {
 
     if (!match) {
         return;
     }
 
     const eventName =
-        document.getElementById(
-            "eventName"
-        );
+        document.getElementById("eventName");
 
     const team1 =
-        document.getElementById(
-            "team1"
-        );
+        document.getElementById("team1");
 
     const team2 =
-        document.getElementById(
-            "team2"
-        );
+        document.getElementById("team2");
 
     const status =
-        document.getElementById(
-            "matchStatus"
-        );
+        document.getElementById("matchStatus");
 
     const time =
-        document.getElementById(
-            "matchTime"
-        );
+        document.getElementById("matchTime");
 
 
     if (eventName) {
@@ -1887,6 +2292,19 @@ function updateMatchHeader(
             formatTime(
                 match.event_time
             );
+    }
+
+
+    const scoreboardEvent =
+        document.getElementById(
+            "scoreboardEvent"
+        );
+
+    if (scoreboardEvent) {
+
+        scoreboardEvent.textContent =
+            match.event_name ||
+            "Cricket Match";
     }
 }
 
@@ -1949,12 +2367,14 @@ function setStatus(
             "status-dot";
 
         if (state === "online") {
+
             dot.classList.add(
                 "online"
             );
         }
 
         if (state === "error") {
+
             dot.classList.add(
                 "error"
             );
@@ -1962,6 +2382,7 @@ function setStatus(
     }
 
     if (status) {
+
         status.textContent =
             text;
     }
@@ -2086,9 +2507,7 @@ async function loadOdds() {
    GET ODDS ROOT
 ========================================================= */
 
-function getOddsRoot(
-    payload
-) {
+function getOddsRoot(payload) {
 
     if (
         payload &&
@@ -2115,9 +2534,7 @@ function getOddsRoot(
    RENDER MARKETS
 ========================================================= */
 
-function renderMarkets(
-    payload
-) {
+function renderMarkets(payload) {
 
     const container =
         document.getElementById(
@@ -2127,7 +2544,6 @@ function renderMarkets(
     if (!container) {
         return;
     }
-
 
     const root =
         getOddsRoot(
@@ -2170,13 +2586,7 @@ function renderMarkets(
     let html = "";
 
 
-    /* -----------------------------------------------------
-       MATCH ODDS
-    ----------------------------------------------------- */
-
-    if (
-        matchOdds.length
-    ) {
+    if (matchOdds.length) {
 
         matchOdds.forEach(
             market => {
@@ -2198,13 +2608,7 @@ function renderMarkets(
     }
 
 
-    /* -----------------------------------------------------
-       BOOKMAKER
-    ----------------------------------------------------- */
-
-    if (
-        bookmakerOdds.length
-    ) {
+    if (bookmakerOdds.length) {
 
         bookmakerOdds.forEach(
             market => {
@@ -2226,13 +2630,7 @@ function renderMarkets(
     }
 
 
-    /* -----------------------------------------------------
-       FANCY / SESSION
-    ----------------------------------------------------- */
-
-    if (
-        fancyOdds.length
-    ) {
+    if (fancyOdds.length) {
 
         html +=
             '<section class="market">';
@@ -2290,10 +2688,6 @@ function renderMarkets(
     }
 
 
-    /* -----------------------------------------------------
-       OTHER MARKETS
-    ----------------------------------------------------- */
-
     otherOdds.forEach(
         market => {
 
@@ -2317,9 +2711,7 @@ function renderMarkets(
    MATCH MARKET
 ========================================================= */
 
-function buildMatchMarket(
-    market
-) {
+function buildMatchMarket(market) {
 
     const runners =
         Array.isArray(
@@ -2448,9 +2840,7 @@ function buildMatchMarket(
    BOOKMAKER
 ========================================================= */
 
-function buildBookmakerMarket(
-    market
-) {
+function buildBookmakerMarket(market) {
 
     const runners =
         Array.isArray(
@@ -2576,9 +2966,7 @@ function buildBookmakerMarket(
    FANCY MARKET
 ========================================================= */
 
-function buildFancyMarket(
-    market
-) {
+function buildFancyMarket(market) {
 
     const rows =
         Array.isArray(
@@ -2731,10 +3119,6 @@ function buildFancyMarket(
                     "</div>";
 
 
-                /*
-                 * YES = BACK internally
-                 */
-
                 html +=
                     createOddBox(
                         yes,
@@ -2747,10 +3131,6 @@ function buildFancyMarket(
                         "BACK"
                     );
 
-
-                /*
-                 * NO = LAY internally
-                 */
 
                 html +=
                     createOddBox(
@@ -2786,9 +3166,7 @@ function buildFancyMarket(
    GENERIC MARKET
 ========================================================= */
 
-function buildGenericMarket(
-    market
-) {
+function buildGenericMarket(market) {
 
     const runners =
         Array.isArray(
@@ -3031,9 +3409,6 @@ function createOddBox(
     html +=
         '<div class="odd-price">';
 
-    /*
-     * Fancy / Session display
-     */
 
     if (
         marketType === "FANCY" ||
@@ -3205,7 +3580,9 @@ function loadBetSlip() {
             );
 
         if (!raw) {
+
             betSlipItems = [];
+
             return;
         }
 
@@ -3251,12 +3628,10 @@ function saveBetSlip() {
 
 
 /* =========================================================
-   ADD BET TO SLIP
+   ADD BET
 ========================================================= */
 
-function addToBetSlip(
-    item
-) {
+function addToBetSlip(item) {
 
     const key =
         [
@@ -3267,11 +3642,6 @@ function addToBetSlip(
             item.side
         ].join("|");
 
-
-    /*
-     * Same selection + same side:
-     * update odds instead of duplicating.
-     */
 
     const existingIndex =
         betSlipItems.findIndex(
@@ -3291,9 +3661,7 @@ function addToBetSlip(
         );
 
 
-    if (
-        existingIndex >= 0
-    ) {
+    if (existingIndex >= 0) {
 
         betSlipItems[
             existingIndex
@@ -3301,11 +3669,6 @@ function addToBetSlip(
             item.odds;
 
     } else {
-
-        /*
-         * Different side of same selection:
-         * remove previous one.
-         */
 
         betSlipItems =
             betSlipItems.filter(
@@ -3355,9 +3718,7 @@ function addToBetSlip(
    REMOVE BET
 ========================================================= */
 
-function removeBetFromSlip(
-    index
-) {
+function removeBetFromSlip(index) {
 
     if (
         index < 0 ||
@@ -3480,10 +3841,6 @@ function renderBetSlip() {
     }
 
 
-    /*
-     * Group by event.
-     */
-
     const groups = new Map();
 
 
@@ -3523,7 +3880,7 @@ function renderBetSlip() {
 
 
     groups.forEach(
-        (items) => {
+        items => {
 
             const eventName =
                 items[0].item.eventName ||
@@ -3693,7 +4050,7 @@ function renderBetSlip() {
                         'placeholder="Enter stake" ' +
                         'data-stake-index="' +
                         index +
-                        '">' ;
+                        '">';
 
 
                     html +=
@@ -3836,7 +4193,7 @@ function updateSlipSummary() {
 
 
 /* =========================================================
-   OPEN BET SLIP
+   BET SLIP OPEN / MINIMIZE
 ========================================================= */
 
 function openBetSlip() {
@@ -3868,10 +4225,6 @@ function openBetSlip() {
     }
 }
 
-
-/* =========================================================
-   MINIMIZE BET SLIP
-========================================================= */
 
 function minimizeBetSlip() {
 
@@ -3905,7 +4258,7 @@ function minimizeBetSlip() {
 
 
 /* =========================================================
-   MESSAGE
+   BET MESSAGE
 ========================================================= */
 
 function showBetMessage(
@@ -4019,11 +4372,6 @@ async function placeAllBets() {
 
     try {
 
-        /*
-         * Place sequentially so the balance returned by
-         * the backend remains authoritative.
-         */
-
         for (
             let index = 0;
             index < betSlipItems.length;
@@ -4072,14 +4420,6 @@ async function placeAllBets() {
                     String(
                         item.selectionName
                     ),
-
-                /*
-                 * Backend converts:
-                 * YES -> BACK
-                 * NO  -> LAY
-                 *
-                 * We already store internal BACK/LAY.
-                 */
 
                 side:
                     String(
@@ -4166,10 +4506,6 @@ async function placeAllBets() {
 
             placedCount++;
 
-
-            /*
-             * Remove the successfully placed item.
-             */
 
             betSlipItems =
                 betSlipItems.filter(
@@ -4280,9 +4616,7 @@ async function placeAllBets() {
    UPDATE BALANCE
 ========================================================= */
 
-function updateDisplayedBalance(
-    balance
-) {
+function updateDisplayedBalance(balance) {
 
     const value =
         Number(balance);
@@ -4324,7 +4658,7 @@ function updateDisplayedBalance(
 
 
 /* =========================================================
-   START POLLING
+   ODDS POLLING
 ========================================================= */
 
 function startOddsPolling() {
@@ -4358,10 +4692,6 @@ function startOddsPolling() {
 }
 
 
-/* =========================================================
-   STOP POLLING
-========================================================= */
-
 function stopOddsPolling() {
 
     if (refreshTimer) {
@@ -4375,224 +4705,1166 @@ function stopOddsPolling() {
 }
 
 
-
 /* =========================================================
-   SCOREBOARD / RESULT
+   SCOREBOARD
 ========================================================= */
 
-/*
- * Keep scoreboard IDs out of JavaScript/Jinja interpolation.
- * The match page URL is /match/<game_id>, so the game ID can
- * be read safely by normal browser JavaScript.
- */
-const MATCH_GAME_ID = decodeURIComponent(
-    window.location.pathname.split("/").filter(Boolean).pop() || ""
-);
+const MATCH_GAME_ID =
+    decodeURIComponent(
+        window.location.pathname
+            .split("/")
+            .filter(Boolean)
+            .pop() || ""
+    );
+
+
+const MATCH_SCORE_ID =
+    MATCH_GAME_ID;
+
+
+const MATCH_RESULT_ID =
+    MATCH_GAME_ID;
+
 
 /*
- * Backend scoreboard/result routes use the match game ID by default.
- * If your backend later exposes separate score/result IDs, those can
- * be assigned here without putting Jinja inside this script.
+ * Convert values safely.
  */
-const MATCH_SCORE_ID = MATCH_GAME_ID;
-const MATCH_RESULT_ID = MATCH_GAME_ID;
 
+function scoreText(value, fallback = "") {
 
-function scoreboardValue(value) {
-    if (value === null || value === undefined || value === "") {
-        return "";
-    }
-
-    if (typeof value === "object") {
-        return JSON.stringify(value);
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+        return fallback;
     }
 
     return String(value);
 }
 
 
-function collectScoreCards(data) {
-    const cards = [];
+/*
+ * Convert a score such as:
+ *
+ * 335-7
+ * 335/7
+ * 335-7 (50.0)
+ *
+ * into a clean 335/7 display.
+ */
 
-    if (!data || typeof data !== "object") {
-        return cards;
+function formatScoreValue(
+    scoreOnly,
+    fullScore
+) {
+
+    let value =
+        scoreText(
+            scoreOnly,
+            ""
+        ).trim();
+
+
+    if (!value) {
+
+        value =
+            scoreText(
+                fullScore,
+                ""
+            ).trim();
     }
 
-    const root =
-        data.data && typeof data.data === "object"
-            ? data.data
-            : data;
 
-    const candidateKeys = [
-        ["team1", "Team 1"],
-        ["team2", "Team 2"],
-        ["teamName1", "Team 1"],
-        ["teamName2", "Team 2"],
-        ["team1Name", "Team 1"],
-        ["team2Name", "Team 2"],
-        ["score1", "Score 1"],
-        ["score2", "Score 2"],
-        ["score", "Score"],
-        ["status", "Status"],
-        ["state", "Status"],
-        ["message", "Status"],
-    ];
+    if (!value) {
+        return "--/--";
+    }
 
-    candidateKeys.forEach(([key, label]) => {
-        if (
-            Object.prototype.hasOwnProperty.call(root, key) &&
-            root[key] !== null &&
-            root[key] !== ""
-        ) {
-            cards.push({
-                label,
-                value: scoreboardValue(root[key]),
-            });
-        }
-    });
 
-    return cards;
+    const match =
+        value.match(
+            /(\d+)\s*[-/]\s*(\d+)/
+        );
+
+
+    if (match) {
+
+        return (
+            match[1] +
+            "/" +
+            match[2]
+        );
+    }
+
+
+    return value;
 }
 
 
-function renderScoreboard(data) {
-    const summary =
-        document.getElementById("scoreboardSummary");
+/*
+ * Remove the trailing * from player name,
+ * while returning striker state separately.
+ */
 
-    const status =
-        document.getElementById("scoreboardStatus");
+function parsePlayerName(name) {
 
-    if (!summary || !status) {
+    const raw =
+        scoreText(
+            name,
+            ""
+        ).trim();
+
+
+    const striker =
+        raw.endsWith("*");
+
+
+    return {
+
+        name:
+            striker
+                ? raw.slice(0, -1).trim()
+                : raw,
+
+        striker
+    };
+}
+
+
+/*
+ * The API can return either:
+ *
+ * success -> data -> Data -> Score
+ *
+ * or an already-normalized response.
+ */
+
+function extractScoreRecord(payload) {
+
+    if (
+        !payload ||
+        typeof payload !== "object"
+    ) {
+        return null;
+    }
+
+
+    let root = payload;
+
+
+    if (
+        root.data &&
+        typeof root.data === "object"
+    ) {
+        root = root.data;
+    }
+
+
+    if (
+        root.Data &&
+        typeof root.Data === "object"
+    ) {
+        root = root.Data;
+    }
+
+
+    if (
+        Array.isArray(
+            root.Score
+        ) &&
+        root.Score.length
+    ) {
+
+        return root.Score[0];
+    }
+
+
+    if (
+        Array.isArray(
+            root.score
+        ) &&
+        root.score.length
+    ) {
+
+        return root.score[0];
+    }
+
+
+    if (
+        root.score &&
+        typeof root.score === "object"
+    ) {
+
+        return root.score;
+    }
+
+
+    if (
+        root.team1Name ||
+        root.Team1Name ||
+        root.team1
+    ) {
+
+        return root;
+    }
+
+
+    return null;
+}
+
+
+/*
+ * Render scoreboard.
+ */
+
+function renderScoreboard(
+    payload
+) {
+
+    const score =
+        extractScoreRecord(
+            payload
+        );
+
+
+    if (!score) {
+
+        showScoreboardEmpty(
+            "Live score is currently unavailable."
+        );
+
         return;
     }
 
-    const root =
-        data && data.data !== undefined
-            ? data.data
-            : data;
 
-    const cards =
-        collectScoreCards(root);
+    const team1Name =
+        score.Team1Name ||
+        score.team1Name ||
+        score.team1 ||
+        score.team_1 ||
+        "Team 1";
 
-    if (cards.length) {
-        summary.innerHTML =
-            cards.map(
-                card =>
-                    '<div class="score-card">' +
-                        '<div class="label">' +
-                            escapeHtml(card.label) +
-                        '</div>' +
-                        '<div class="value">' +
-                            escapeHtml(card.value) +
-                        '</div>' +
-                    '</div>'
-            ).join("");
-    } else {
-        summary.innerHTML =
-            '<div class="score-card">' +
-                '<div class="label">Scoreboard data</div>' +
-                '<div class="value">Received</div>' +
-            '</div>';
+
+    const team2Name =
+        score.Team2Name ||
+        score.team2Name ||
+        score.team2 ||
+        score.team_2 ||
+        "Team 2";
+
+
+    const team1Short =
+        score.Team1Name_Short ||
+        score.team1Short ||
+        "";
+
+
+    const team2Short =
+        score.Team2Name_Short ||
+        score.team2Short ||
+        "";
+
+
+    const team1Score =
+        formatScoreValue(
+            score.Team1ScoreOnly,
+            score.Team1OnlyScore ||
+            score.Team1Score
+        );
+
+
+    const team2Score =
+        formatScoreValue(
+            score.Team2ScoreOnly,
+            score.Team2OnlyScore ||
+            score.Team2Score
+        );
+
+
+    const team1Overs =
+        score.Team1Overs ||
+        extractOvers(
+            score.Team1OnlyScore ||
+            score.Team1Score
+        );
+
+
+    const team2Overs =
+        score.Team2Overs ||
+        extractOvers(
+            score.Team2OnlyScore ||
+            score.Team2Score
+        );
+
+
+    const currentInning =
+        Number(
+            score.CurrentInning
+        );
+
+
+    const team1Batting =
+        currentInning === 1;
+
+
+    const team2Batting =
+        currentInning === 2;
+
+
+    setText(
+        "scoreTeam1Name",
+        team1Name
+    );
+
+    setText(
+        "scoreTeam1Short",
+        team1Short
+    );
+
+    setText(
+        "scoreTeam1Value",
+        team1Score
+    );
+
+    setText(
+        "scoreTeam1Overs",
+        team1Overs
+            ? team1Overs + " OV"
+            : "-- OV"
+    );
+
+
+    setText(
+        "scoreTeam2Name",
+        team2Name
+    );
+
+    setText(
+        "scoreTeam2Short",
+        team2Short
+    );
+
+    setText(
+        "scoreTeam2Value",
+        team2Score
+    );
+
+    setText(
+        "scoreTeam2Overs",
+        team2Overs
+            ? team2Overs + " OV"
+            : "-- OV"
+    );
+
+
+    toggleHidden(
+        "scoreTeam1Batting",
+        !team1Batting
+    );
+
+    toggleHidden(
+        "scoreTeam2Batting",
+        !team2Batting
+    );
+
+
+    setText(
+        "scoreCurrentInning",
+        currentInning
+            ? currentInning + "nd"
+            : "--"
+    );
+
+
+    setText(
+        "scoreCRR",
+        score.CRR ||
+        score.crr ||
+        "--"
+    );
+
+
+    setText(
+        "scoreRRR",
+        score.RRR ||
+        score.rrr ||
+        "--"
+    );
+
+
+    setText(
+        "scoreTargetValue",
+        score.Target ||
+        score.target ||
+        "--"
+    );
+
+
+    const chase =
+        score.ScoreStatus ||
+        score.NRMsg ||
+        score.score_status ||
+        score.message ||
+        "";
+
+
+    const chaseElement =
+        document.getElementById(
+            "scoreChase"
+        );
+
+
+    if (
+        chaseElement &&
+        chase
+    ) {
+
+        chaseElement.textContent =
+            formatChaseMessage(
+                chase
+            );
+
+        chaseElement.hidden =
+            false;
+
+    } else if (chaseElement) {
+
+        chaseElement.hidden =
+            true;
     }
 
-    status.textContent = "Updated";
+
+    renderBatters(
+        score
+    );
+
+
+    renderLastBalls(
+        score
+    );
+
+
+    renderRecentOvers(
+        score
+    );
+
+
+    const scoreboardBadge =
+        document.getElementById(
+            "scoreboardLiveBadge"
+        );
+
+
+    if (scoreboardBadge) {
+
+        const live =
+            score.LiveCommentary === "1" ||
+            score.LiveCommentary === 1 ||
+            score.live === true ||
+            team1Batting ||
+            team2Batting;
+
+
+        scoreboardBadge.innerHTML =
+            live
+                ? '<span class="scoreboard-live-dot"></span> LIVE'
+                : "SCORE";
+
+
+        scoreboardBadge.style.background =
+            live
+                ? "#671e1e"
+                : "#123d28";
+
+        scoreboardBadge.style.color =
+            live
+                ? "#ffb6b6"
+                : "#9ee7bc";
+    }
+
+
+    const status =
+        document.getElementById(
+            "scoreboardStatus"
+        );
+
+    if (status) {
+        status.textContent =
+            "Updated";
+    }
+
+
+    const scoreboardMain =
+        document.getElementById(
+            "scoreboardMain"
+        );
+
+    if (scoreboardMain) {
+
+        scoreboardMain.style.display =
+            "grid";
+    }
 }
 
 
-function renderResult(data) {
+/*
+ * Extract overs from:
+ *
+ * 335-7 (50.0)
+ */
+
+function extractOvers(value) {
+
+    const text =
+        scoreText(
+            value,
+            ""
+        );
+
+
+    const match =
+        text.match(
+            /\(([^)]+)\)/
+        );
+
+
+    return match
+        ? match[1]
+        : "";
+}
+
+
+/*
+ * Format chase message to make it TV-like.
+ */
+
+function formatChaseMessage(
+    message
+) {
+
+    let text =
+        scoreText(
+            message,
+            ""
+        ).trim();
+
+
+    if (!text) {
+        return "";
+    }
+
+
+    text =
+        text.replace(
+            /In\s+/i,
+            "in "
+        );
+
+
+    text =
+        text.replace(
+            /Overs/i,
+            "overs"
+        );
+
+
+    text =
+        text.replace(
+            /\s+To\s+Win/i,
+            " to win"
+        );
+
+
+    return text;
+}
+
+
+/* =========================================================
+   BATTERS
+========================================================= */
+
+function renderBatters(score) {
+
+    const container =
+        document.getElementById(
+            "scoreBatters"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    const player1 =
+        parsePlayerName(
+            score.Player1
+        );
+
+
+    const player2 =
+        parsePlayerName(
+            score.Player2
+        );
+
+
+    const players = [];
+
+
+    if (player1.name) {
+
+        players.push({
+
+            name:
+                player1.name,
+
+            striker:
+                player1.striker,
+
+            runs:
+                score.Player1Run,
+
+            balls:
+                score.Player1Balls,
+
+            fours:
+                score.Player1Fours,
+
+            sixes:
+                score.Player1Sixes,
+
+            sr:
+                score.Player1StrikeRate
+        });
+    }
+
+
+    if (player2.name) {
+
+        players.push({
+
+            name:
+                player2.name,
+
+            striker:
+                player2.striker,
+
+            runs:
+                score.Player2Run,
+
+            balls:
+                score.Player2Balls,
+
+            fours:
+                score.Player2Fours,
+
+            sixes:
+                score.Player2Sixes,
+
+            sr:
+                score.Player2StrikeRate
+        });
+    }
+
+
+    if (!players.length) {
+
+        container.innerHTML =
+            '<div class="scoreboard-empty">' +
+            "Batting information unavailable" +
+            "</div>";
+
+        return;
+    }
+
+
+    let html = "";
+
+
+    players.forEach(
+        player => {
+
+            html +=
+                '<div class="batter-row">';
+
+
+            html +=
+                '<div class="batter-name">' +
+                escapeHtml(
+                    player.name
+                ) +
+                (
+                    player.striker
+                        ? " *"
+                        : ""
+                ) +
+                "</div>";
+
+
+            html +=
+                '<div class="batter-stat main">' +
+                escapeHtml(
+                    player.runs || "0"
+                ) +
+                "</div>";
+
+
+            html +=
+                '<div class="batter-stat">' +
+                escapeHtml(
+                    player.balls || "0"
+                ) +
+                "</div>";
+
+
+            html +=
+                '<div class="batter-stat">' +
+                escapeHtml(
+                    player.fours || "0"
+                ) +
+                "</div>";
+
+
+            html +=
+                '<div class="batter-stat">' +
+                escapeHtml(
+                    player.sr || "0"
+                ) +
+                "</div>";
+
+
+            html +=
+                "</div>";
+        }
+    );
+
+
+    container.innerHTML =
+        html;
+}
+
+
+/* =========================================================
+   LAST 6 BALLS
+========================================================= */
+
+function renderLastBalls(score) {
+
+    const container =
+        document.getElementById(
+            "scoreLastBalls"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    let balls = [];
+
+
+    if (
+        Array.isArray(
+            score.Last6Balls
+        )
+    ) {
+
+        balls =
+            score.Last6Balls;
+
+    } else {
+
+        for (
+            let i = 1;
+            i <= 6;
+            i++
+        ) {
+
+            const value =
+                score[
+                    "Last6Balls" +
+                    i
+                ];
+
+
+            if (
+                value !==
+                undefined &&
+                value !== null &&
+                value !== ""
+            ) {
+
+                balls.push(
+                    value
+                );
+            }
+        }
+    }
+
+
+    if (!balls.length) {
+
+        container.innerHTML =
+            '<span class="scoreboard-loading">' +
+            "No ball data" +
+            "</span>";
+
+        return;
+    }
+
+
+    container.innerHTML =
+        balls.map(
+            ball => {
+
+                const value =
+                    String(ball);
+
+
+                const wicket =
+                    value
+                        .toUpperCase()
+                        .includes("W");
+
+
+                const boundary =
+                    value === "4" ||
+                    value === "6";
+
+
+                const css =
+                    wicket
+                        ? "wicket"
+                        : boundary
+                            ? "boundary"
+                            : "";
+
+
+                return (
+                    '<span class="ball ' +
+                    css +
+                    '">' +
+                    escapeHtml(
+                        value
+                    ) +
+                    "</span>"
+                );
+            }
+        ).join("");
+}
+
+
+/* =========================================================
+   RECENT OVERS
+========================================================= */
+
+function renderRecentOvers(score) {
+
+    const container =
+        document.getElementById(
+            "scoreRecentOvers"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    const overs =
+        Array.isArray(
+            score.Last4Overs
+        )
+            ? score.Last4Overs
+            : [];
+
+
+    if (!overs.length) {
+
+        container.innerHTML =
+            '<div class="scoreboard-empty">' +
+            "Recent overs unavailable" +
+            "</div>";
+
+        return;
+    }
+
+
+    container.innerHTML =
+        overs.map(
+            over => {
+
+                const balls =
+                    Array.isArray(
+                        over.balls
+                    )
+                        ? over.balls
+                        : [];
+
+
+                return (
+                    '<div class="recent-over">' +
+
+                        '<div class="recent-over-number">' +
+                            "OV " +
+                            escapeHtml(
+                                over.over
+                            ) +
+                        "</div>" +
+
+                        '<div class="recent-over-balls">' +
+
+                            balls.map(
+                                ball =>
+                                    '<span class="recent-over-ball">' +
+                                    escapeHtml(
+                                        ball
+                                    ) +
+                                    "</span>"
+                            ).join(" ") +
+
+                        "</div>" +
+
+                        '<div class="recent-over-runs">' +
+                            escapeHtml(
+                                over.runs ??
+                                ""
+                            ) +
+                        "</div>" +
+
+                    "</div>"
+                );
+            }
+        ).join("");
+}
+
+
+/* =========================================================
+   SCOREBOARD HELPERS
+========================================================= */
+
+function setText(
+    id,
+    value
+) {
+
     const element =
-        document.getElementById("resultData");
+        document.getElementById(
+            id
+        );
 
     if (!element) {
         return;
     }
 
-    const root =
-        data && data.data !== undefined
-            ? data.data
-            : data;
+    element.textContent =
+        scoreText(
+            value,
+            "--"
+        );
+}
 
-    try {
-        element.textContent =
-            JSON.stringify(
-                root,
-                null,
-                2
-            );
-    } catch (error) {
-        element.textContent =
-            String(root);
+
+function toggleHidden(
+    id,
+    hidden
+) {
+
+    const element =
+        document.getElementById(
+            id
+        );
+
+    if (!element) {
+        return;
+    }
+
+    element.hidden =
+        Boolean(hidden);
+}
+
+
+function showScoreboardEmpty(
+    message
+) {
+
+    const main =
+        document.getElementById(
+            "scoreboardMain"
+        );
+
+    if (main) {
+
+        main.style.display =
+            "none";
+    }
+
+
+    const status =
+        document.getElementById(
+            "scoreboardLiveBadge"
+        );
+
+    if (status) {
+
+        status.innerHTML =
+            "SCORE";
+    }
+
+
+    const chase =
+        document.getElementById(
+            "scoreChase"
+        );
+
+    if (chase) {
+
+        chase.hidden =
+            false;
+
+        chase.textContent =
+            message;
     }
 }
 
 
+/* =========================================================
+   LOAD SCOREBOARD
+========================================================= */
+
 async function loadScoreboard() {
+
     const status =
-        document.getElementById("scoreboardStatus");
+        document.getElementById(
+            "scoreboardLiveBadge"
+        );
+
 
     if (status) {
-        status.textContent =
-            "Loading…";
+
+        status.innerHTML =
+            '<span class="scoreboard-live-dot"></span> LIVE';
     }
 
+
     try {
+
         const scoreResponse =
             await fetch(
                 "/api/cricket/score/" +
-                encodeURIComponent(MATCH_SCORE_ID),
+                encodeURIComponent(
+                    MATCH_SCORE_ID
+                ),
                 {
-                    credentials: "same-origin",
+                    method: "GET",
+                    credentials:
+                        "same-origin",
                     cache: "no-store",
+                    headers: {
+                        Accept:
+                            "application/json"
+                    }
                 }
             );
+
 
         const scorePayload =
             await scoreResponse.json();
 
-        if (!scoreResponse.ok || !scorePayload.success) {
+
+        if (
+            !scoreResponse.ok ||
+            !scorePayload.success
+        ) {
+
             throw new Error(
                 scorePayload.detail ||
+                scorePayload.message ||
                 "Scoreboard request failed"
             );
         }
 
+
+        /*
+         * The backend may return:
+         *
+         * {
+         *   success: true,
+         *   data: {
+         *      Status: "Success",
+         *      Data: {
+         *         Score: [...]
+         *      }
+         *   }
+         * }
+         *
+         * OR a normalized score object.
+         *
+         * renderScoreboard() handles both.
+         */
+
         renderScoreboard(
-            scorePayload.data
+            scorePayload
         );
 
+
     } catch (error) {
+
         console.error(
             "[SCOREBOARD] score error:",
             error
         );
 
-        if (status) {
-            status.textContent =
-                "Score unavailable";
-        }
+
+        showScoreboardEmpty(
+            "Live score unavailable"
+        );
     }
 
+
+    /*
+     * Result endpoint is kept separate.
+     */
+
     try {
+
         const resultResponse =
             await fetch(
                 "/api/cricket/results/" +
-                encodeURIComponent(MATCH_RESULT_ID),
+                encodeURIComponent(
+                    MATCH_RESULT_ID
+                ),
                 {
-                    credentials: "same-origin",
+                    method: "GET",
+                    credentials:
+                        "same-origin",
                     cache: "no-store",
+                    headers: {
+                        Accept:
+                            "application/json"
+                    }
                 }
             );
+
 
         const resultPayload =
             await resultResponse.json();
 
-        if (resultResponse.ok && resultPayload.success) {
+
+        if (
+            resultResponse.ok &&
+            resultPayload.success
+        ) {
+
             renderResult(
                 resultPayload.data
             );
         }
 
+
     } catch (error) {
+
         console.error(
             "[SCOREBOARD] result error:",
             error
@@ -4601,19 +5873,76 @@ async function loadScoreboard() {
 }
 
 
+/* =========================================================
+   RESULT
+========================================================= */
+
+function renderResult(data) {
+
+    const element =
+        document.getElementById(
+            "resultData"
+        );
+
+
+    if (!element) {
+        return;
+    }
+
+
+    try {
+
+        element.textContent =
+            JSON.stringify(
+                data,
+                null,
+                2
+            );
+
+    } catch (error) {
+
+        element.textContent =
+            String(data);
+    }
+}
+
+
+/* =========================================================
+   SCOREBOARD POLLING
+========================================================= */
+
 function startScoreboardPolling() {
+
     loadScoreboard();
 
+
     if (window.scoreboardTimer) {
+
         clearInterval(
             window.scoreboardTimer
         );
     }
 
+
+    /*
+     * Score updates every 3 seconds
+     * for a near-live TV scoreboard.
+     */
+
     window.scoreboardTimer =
         setInterval(
-            loadScoreboard,
-            10000
+            () => {
+
+                if (
+                    document.visibilityState ===
+                    "visible"
+                ) {
+
+                    loadScoreboard();
+                }
+
+            },
+            3000
         );
 }
 
@@ -4622,10 +5951,13 @@ function startScoreboardPolling() {
    ACCOUNT TOP BAR
 ========================================================= */
 
-const MATCH_PAGE_WHATSAPP_NUMBER = "919289461279";
+const MATCH_PAGE_WHATSAPP_NUMBER =
+    "919289461279";
 
 
-function matchPageOpenWhatsApp(message) {
+function matchPageOpenWhatsApp(
+    message
+) {
 
     if (!MATCH_PAGE_WHATSAPP_NUMBER) {
         return;
@@ -4633,6 +5965,7 @@ function matchPageOpenWhatsApp(message) {
 
     const url =
         `https://wa.me/${MATCH_PAGE_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+
 
     window.open(
         url,
@@ -4665,9 +5998,11 @@ async function loadMatchPageBalance() {
             "matchPageBalance"
         );
 
+
     if (!balanceElement) {
         return;
     }
+
 
     try {
 
@@ -4676,31 +6011,44 @@ async function loadMatchPageBalance() {
                 "/api/user/balance",
                 {
                     method: "GET",
-                    credentials: "same-origin",
+                    credentials:
+                        "same-origin",
                     cache: "no-store",
                     headers: {
-                        Accept: "application/json"
+                        Accept:
+                            "application/json"
                     }
                 }
             );
+
 
         if (!response.ok) {
             return;
         }
 
+
         const data =
             await response.json();
 
-        if (data.balance === undefined) {
+
+        if (
+            data.balance ===
+            undefined
+        ) {
             return;
         }
 
+
         const balance =
-            Number(data.balance);
+            Number(
+                data.balance
+            );
+
 
         if (!Number.isFinite(balance)) {
             return;
         }
+
 
         const formatted =
             "₹" +
@@ -4712,7 +6060,10 @@ async function loadMatchPageBalance() {
                 }
             );
 
-        balanceElement.textContent = formatted;
+
+        balanceElement.textContent =
+            formatted;
+
 
     } catch (error) {
 
@@ -4731,26 +6082,33 @@ function setupMatchPageAccountBar() {
             "matchDepositBtn"
         );
 
+
     if (depositButton) {
+
         depositButton.addEventListener(
             "click",
             matchPageDeposit
         );
     }
 
+
     const withdrawButton =
         document.getElementById(
             "matchWithdrawBtn"
         );
 
+
     if (withdrawButton) {
+
         withdrawButton.addEventListener(
             "click",
             matchPageWithdraw
         );
     }
 
+
     loadMatchPageBalance();
+
 
     window.setInterval(
         loadMatchPageBalance,
@@ -4783,6 +6141,7 @@ document.addEventListener(
                 "minimizeSlipButton"
             );
 
+
         if (minimize) {
 
             minimize.addEventListener(
@@ -4796,6 +6155,7 @@ document.addEventListener(
             document.getElementById(
                 "reopenSlipButton"
             );
+
 
         if (reopen) {
 
@@ -4811,6 +6171,7 @@ document.addEventListener(
                 "placeAllButton"
             );
 
+
         if (place) {
 
             place.addEventListener(
@@ -4820,16 +6181,11 @@ document.addEventListener(
         }
 
 
-        /*
-         * Don't automatically cover the dashboard.
-         * Existing selections can still be reopened
-         * through BET SLIP.
-         */
-
         const slip =
             document.getElementById(
                 "betSlip"
             );
+
 
         if (slip) {
 
@@ -4843,6 +6199,7 @@ document.addEventListener(
             document.getElementById(
                 "reopenSlipButton"
             );
+
 
         if (reopenButton) {
 
@@ -4876,6 +6233,8 @@ document.addEventListener(
         } else {
 
             startOddsPolling();
+
+            loadScoreboard();
         }
     }
 );
