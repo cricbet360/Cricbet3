@@ -34,7 +34,7 @@
         }
 
         /* =========================================================
-           ACCOUNT TOP BAR
+           ACCOUNT BAR
         ========================================================= */
 
         .account-topbar {
@@ -98,7 +98,6 @@
         }
 
         .account-balance-value {
-            display: block;
             min-width: 80px;
             color: #ffffff;
             font-size: 14px;
@@ -145,7 +144,6 @@
 
         .account-withdraw:hover {
             background: #1a3a2a;
-            border-color: #397357;
         }
 
         .account-profile {
@@ -167,35 +165,7 @@
         }
 
         /* =========================================================
-           PAGE
-        ========================================================= */
-
-        .page {
-            width: 100%;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 16px;
-        }
-
-        .account-back {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 9px 14px;
-            margin-bottom: 14px;
-            border-radius: 8px;
-            background: #123d28;
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 14px;
-        }
-
-        .account-back:hover {
-            background: #185234;
-        }
-
-        /* =========================================================
-           PROFESSIONAL SINGLE-MATCH SCOREBOARD
+           SCOREBOARD
         ========================================================= */
 
         .live-scoreboard {
@@ -233,7 +203,7 @@
             color: #48df91;
             font-size: 9px;
             font-weight: 900;
-            letter-spacing: 1.6px;
+            letter-spacing: 1.7px;
             text-transform: uppercase;
         }
 
@@ -247,7 +217,7 @@
             white-space: nowrap;
         }
 
-        .scoreboard-live-status {
+        .scoreboard-status {
             flex-shrink: 0;
             display: inline-flex;
             align-items: center;
@@ -261,27 +231,29 @@
             letter-spacing: .7px;
         }
 
-        .scoreboard-live-status.score {
+        .scoreboard-status.score {
             background: #123d28;
             color: #9ee7bc;
         }
 
-        .live-dot {
+        .scoreboard-status-dot {
             width: 6px;
             height: 6px;
             border-radius: 50%;
             background: #ff5555;
-            box-shadow: 0 0 0 3px rgba(255, 85, 85, .12);
         }
 
         /* =========================================================
-           TEAMS
+           SCORE
         ========================================================= */
 
-        .score-main {
+        .scoreboard-main {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) 100px minmax(0, 1fr);
-            min-height: 145px;
+            grid-template-columns:
+                minmax(0, 1fr)
+                100px
+                minmax(0, 1fr);
+            min-height: 148px;
             overflow: hidden;
             border: 1px solid #205438;
             border-radius: 11px;
@@ -311,33 +283,33 @@
             min-width: 0;
         }
 
-        .score-team-heading {
+        .score-team-title {
             display: flex;
             align-items: center;
             gap: 8px;
             min-width: 0;
         }
 
-        .score-team-left .score-team-heading {
+        .score-team-left .score-team-title {
             justify-content: flex-end;
         }
 
         .team-flag {
             width: 32px;
             height: 32px;
-            border-radius: 50%;
-            object-fit: contain;
             flex-shrink: 0;
+            object-fit: contain;
+            border-radius: 50%;
             background: #123223;
             border: 1px solid #28553d;
         }
 
-        .team-name-wrap {
+        .score-team-name-wrap {
             min-width: 0;
         }
 
-        .team-name {
-            max-width: 270px;
+        .score-team-name {
+            max-width: 260px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -347,14 +319,14 @@
             text-transform: uppercase;
         }
 
-        .team-short {
+        .score-team-short {
             margin-top: 2px;
-            color: #709883;
+            color: #789f8b;
             font-size: 9px;
             font-weight: 800;
         }
 
-        .team-score {
+        .score-team-score {
             margin-top: 7px;
             color: #ffffff;
             font-size: 34px;
@@ -363,16 +335,22 @@
             letter-spacing: -1px;
         }
 
-        .team-overs {
+        .score-team-full {
             margin-top: 5px;
-            color: #9bbbad;
-            font-size: 11px;
+            color: #89aa99;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .score-team-overs {
+            margin-top: 4px;
+            color: #9ebbae;
+            font-size: 10px;
             font-weight: 700;
         }
 
         .batting-badge {
             display: inline-flex;
-            align-items: center;
             margin-top: 6px;
             padding: 3px 7px;
             border-radius: 4px;
@@ -388,8 +366,8 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: #0b291a;
             text-align: center;
+            background: #0b291a;
         }
 
         .score-center-label {
@@ -414,7 +392,7 @@
         }
 
         /* =========================================================
-           SCORE STATS
+           STATS
         ========================================================= */
 
         .score-stats {
@@ -455,7 +433,7 @@
         }
 
         /* =========================================================
-           CHASE
+           CHASE / INFO
         ========================================================= */
 
         .score-chase {
@@ -470,15 +448,32 @@
             line-height: 1.45;
         }
 
+        .score-info-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .score-info-chip {
+            padding: 6px 8px;
+            border: 1px solid #194b32;
+            border-radius: 5px;
+            background: #0d2d1d;
+            color: #8cad9d;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
         /* =========================================================
-           DETAILED SCORE SECTIONS
+           DETAILED SECTIONS
         ========================================================= */
 
         .score-section {
             margin-top: 8px;
+            overflow: hidden;
             border: 1px solid #19462f;
             border-radius: 8px;
-            overflow: hidden;
             background: #092116;
         }
 
@@ -523,7 +518,24 @@
             border-top: 1px solid #143a27;
         }
 
-        .score-player {
+        .player-cell {
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .player-image {
+            width: 26px;
+            height: 26px;
+            flex-shrink: 0;
+            object-fit: cover;
+            border-radius: 50%;
+            background: #123223;
+            border: 1px solid #28553d;
+        }
+
+        .player-name {
             min-width: 0;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -533,38 +545,39 @@
             font-weight: 800;
         }
 
-        .striker-star {
-            color: #5ce9a1;
-        }
-
-        .score-player-value {
+        .player-stat {
             text-align: center;
             color: #b4cfc1;
             font-size: 10px;
             font-weight: 700;
         }
 
-        .score-player-value.strong {
+        .player-stat.strong {
             color: #ffffff;
             font-size: 12px;
             font-weight: 900;
         }
 
+        .star {
+            color: #5ce9a1;
+            font-weight: 900;
+        }
+
         /* =========================================================
-           LAST BALLS
+           LAST 6 / CURRENT OVER
         ========================================================= */
 
-        .last-balls {
+        .ball-row {
             display: flex;
-            align-items: center;
             flex-wrap: wrap;
+            align-items: center;
             gap: 6px;
             padding: 10px;
         }
 
         .ball {
-            width: 28px;
-            height: 28px;
+            width: 29px;
+            height: 29px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -594,23 +607,19 @@
             color: #f5d77d;
         }
 
-        /* =========================================================
-           RECENT OVERS
-        ========================================================= */
-
-        .recent-over {
+        .over-row {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 9px;
             padding: 8px 9px;
             border-top: 1px solid #143a27;
         }
 
-        .recent-over:first-child {
+        .over-row:first-child {
             border-top: 0;
         }
 
-        .recent-over-number {
+        .over-number {
             width: 42px;
             flex-shrink: 0;
             color: #6f9c85;
@@ -618,7 +627,7 @@
             font-weight: 800;
         }
 
-        .recent-over-balls {
+        .over-balls {
             display: flex;
             flex-wrap: wrap;
             gap: 7px;
@@ -626,28 +635,82 @@
             min-width: 0;
         }
 
-        .recent-over-ball {
+        .over-ball {
             color: #c4d8cd;
             font-size: 9px;
             font-weight: 700;
         }
 
-        .recent-over-runs {
+        .over-runs {
             color: #ffffff;
             font-size: 10px;
             font-weight: 900;
         }
 
-        .score-empty {
-            padding: 13px;
-            color: #678c79;
-            font-size: 10px;
-            text-align: center;
+        /* =========================================================
+           TEXT INFORMATION
+        ========================================================= */
+
+        .score-text-content {
+            padding: 10px;
+            color: #b8cfc3;
+            font-size: 11px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .score-technical {
+            margin-top: 8px;
+        }
+
+        .score-technical summary {
+            cursor: pointer;
+            color: #638d78;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .score-technical pre {
+            max-height: 320px;
+            overflow: auto;
+            margin: 7px 0 0;
+            padding: 10px;
+            border-radius: 6px;
+            background: #06170f;
+            color: #769c89;
+            font-size: 9px;
+            white-space: pre-wrap;
+            word-break: break-word;
         }
 
         /* =========================================================
            MATCH HEADER
         ========================================================= */
+
+        .page {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .account-back {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 9px 14px;
+            margin-bottom: 14px;
+            border-radius: 8px;
+            background: #123d28;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .account-back:hover {
+            background: #185234;
+        }
 
         .match-header {
             background: #0b2418;
@@ -994,10 +1057,6 @@
             overflow: hidden;
         }
 
-        .slip-event:last-child {
-            margin-bottom: 0;
-        }
-
         .slip-event-title {
             padding: 9px 10px;
             background: #0e3020;
@@ -1011,10 +1070,6 @@
             border-top: 1px solid #17462f;
         }
 
-        .slip-selection:first-child {
-            border-top: 0;
-        }
-
         .slip-selection-top {
             display: flex;
             align-items: flex-start;
@@ -1025,7 +1080,6 @@
         .slip-selection-name {
             font-size: 13px;
             font-weight: 800;
-            line-height: 1.3;
         }
 
         .remove-selection {
@@ -1034,7 +1088,6 @@
             color: #a06d6d;
             cursor: pointer;
             font-size: 17px;
-            line-height: 1;
             padding: 0 2px;
         }
 
@@ -1149,10 +1202,6 @@
             cursor: pointer;
         }
 
-        .place-all-btn:hover {
-            background: #25bd78;
-        }
-
         .place-all-btn:disabled {
             opacity: .55;
             cursor: not-allowed;
@@ -1164,7 +1213,6 @@
             padding: 9px 10px;
             border-radius: 7px;
             font-size: 12px;
-            line-height: 1.4;
         }
 
         .bet-message.show {
@@ -1224,8 +1272,6 @@
         @media (max-width: 700px) {
 
             .account-topbar {
-                position: sticky;
-                top: 0;
                 padding: 9px 10px;
                 flex-direction: column;
                 align-items: stretch;
@@ -1260,7 +1306,6 @@
             }
 
             .account-balance-value {
-                min-width: 0;
                 font-size: 12px;
                 text-align: center;
             }
@@ -1278,12 +1323,12 @@
                 padding: 11px 10px 14px;
             }
 
-            .score-main {
+            .scoreboard-main {
                 grid-template-columns:
                     minmax(0, 1fr)
-                    52px
+                    48px
                     minmax(0, 1fr);
-                min-height: 105px;
+                min-height: 112px;
             }
 
             .score-team {
@@ -1295,20 +1340,24 @@
                 height: 23px;
             }
 
-            .team-name {
-                max-width: 105px;
+            .score-team-name {
+                max-width: 100px;
                 font-size: 10px;
             }
 
-            .team-short {
+            .score-team-short {
                 display: none;
             }
 
-            .team-score {
-                font-size: 23px;
+            .score-team-score {
+                font-size: 22px;
             }
 
-            .team-overs {
+            .score-team-full {
+                font-size: 8px;
+            }
+
+            .score-team-overs {
                 font-size: 8px;
             }
 
@@ -1332,11 +1381,6 @@
             .scoreboard-event {
                 max-width: 220px;
                 font-size: 11px;
-            }
-
-            .scoreboard-live-status {
-                font-size: 8px;
-                padding: 4px 7px;
             }
 
             .score-stats {
@@ -1367,29 +1411,34 @@
                 gap: 3px;
             }
 
-            .score-player {
+            .player-image {
+                width: 22px;
+                height: 22px;
+            }
+
+            .player-name {
                 font-size: 9px;
             }
 
-            .score-player-value {
+            .player-stat {
                 font-size: 8px;
             }
 
-            .score-player-value.strong {
+            .player-stat.strong {
                 font-size: 10px;
             }
 
-            .teams {
-                font-size: 15px;
-                gap: 10px;
+            .page {
+                padding: 10px;
             }
 
             .event-name {
                 font-size: 17px;
             }
 
-            .page {
-                padding: 10px;
+            .teams {
+                font-size: 15px;
+                gap: 10px;
             }
 
             .market-columns,
@@ -1433,7 +1482,7 @@
 
 
 <!-- =========================================================
-     ACCOUNT BAR
+     ACCOUNT TOP BAR
 ========================================================= -->
 
 <header class="account-topbar">
@@ -1508,7 +1557,7 @@
 
 
 <!-- =========================================================
-     SINGLE SELECTED MATCH SCOREBOARD
+     SELECTED MATCH SCOREBOARD ONLY
 ========================================================= -->
 
 <section
@@ -1537,30 +1586,33 @@
 
 
             <div
-                id="scoreboardLiveStatus"
-                class="scoreboard-live-status"
+                id="scoreboardStatus"
+                class="scoreboard-status"
             >
-                <span class="live-dot"></span>
+                <span class="scoreboard-status-dot"></span>
                 LIVE
             </div>
 
         </div>
 
 
-        <!-- SCORE -->
+        <!-- MAIN SCORE -->
 
         <div
             id="scoreboardMain"
-            class="score-main"
+            class="scoreboard-main"
         >
 
             <!-- TEAM 1 -->
 
-            <div class="score-team score-team-left">
+            <div
+                id="scoreTeam1Panel"
+                class="score-team score-team-left"
+            >
 
                 <div class="score-team-content">
 
-                    <div class="score-team-heading">
+                    <div class="score-team-title">
 
                         <img
                             id="scoreTeam1Flag"
@@ -1569,16 +1621,18 @@
                             hidden
                         >
 
-                        <div class="team-name-wrap">
+
+                        <div class="score-team-name-wrap">
 
                             <div
                                 id="scoreTeam1Name"
-                                class="team-name"
+                                class="score-team-name"
                             ></div>
+
 
                             <div
                                 id="scoreTeam1Short"
-                                class="team-short"
+                                class="score-team-short"
                             ></div>
 
                         </div>
@@ -1588,13 +1642,19 @@
 
                     <div
                         id="scoreTeam1Value"
-                        class="team-score"
+                        class="score-team-score"
+                    ></div>
+
+
+                    <div
+                        id="scoreTeam1Full"
+                        class="score-team-full"
                     ></div>
 
 
                     <div
                         id="scoreTeam1Overs"
-                        class="team-overs"
+                        class="score-team-overs"
                     ></div>
 
 
@@ -1619,10 +1679,12 @@
                     INNINGS
                 </div>
 
+
                 <div
                     id="scoreCurrentInning"
                     class="score-center-value"
                 ></div>
+
 
                 <div class="score-center-vs">
                     VS
@@ -1633,22 +1695,26 @@
 
             <!-- TEAM 2 -->
 
-            <div class="score-team score-team-right">
+            <div
+                id="scoreTeam2Panel"
+                class="score-team score-team-right"
+            >
 
                 <div class="score-team-content">
 
-                    <div class="score-team-heading">
+                    <div class="score-team-title">
 
-                        <div class="team-name-wrap">
+                        <div class="score-team-name-wrap">
 
                             <div
                                 id="scoreTeam2Name"
-                                class="team-name"
+                                class="score-team-name"
                             ></div>
+
 
                             <div
                                 id="scoreTeam2Short"
-                                class="team-short"
+                                class="score-team-short"
                             ></div>
 
                         </div>
@@ -1666,13 +1732,19 @@
 
                     <div
                         id="scoreTeam2Value"
-                        class="team-score"
+                        class="score-team-score"
+                    ></div>
+
+
+                    <div
+                        id="scoreTeam2Full"
+                        class="score-team-full"
                     ></div>
 
 
                     <div
                         id="scoreTeam2Overs"
-                        class="team-overs"
+                        class="score-team-overs"
                     ></div>
 
 
@@ -1691,7 +1763,7 @@
         </div>
 
 
-        <!-- DYNAMIC STATS -->
+        <!-- CRR / RRR / TARGET / INNING -->
 
         <div
             id="scoreStats"
@@ -1706,6 +1778,35 @@
             class="score-chase"
             hidden
         ></div>
+
+
+        <!-- MATCH INFORMATION -->
+
+        <div
+            id="scoreInfo"
+            class="score-info-grid"
+        ></div>
+
+
+        <!-- CURRENT OVER -->
+
+        <section
+            id="currentOverSection"
+            class="score-section"
+            hidden
+        >
+
+            <div class="score-section-title">
+                CURRENT OVER
+            </div>
+
+
+            <div
+                id="currentOverBalls"
+                class="ball-row"
+            ></div>
+
+        </section>
 
 
         <!-- BATTERS -->
@@ -1781,7 +1882,7 @@
 
             <div
                 id="scoreLastBalls"
-                class="last-balls"
+                class="ball-row"
             ></div>
 
         </section>
@@ -1807,13 +1908,91 @@
         </section>
 
 
+        <!-- SCORE STATUS -->
+
+        <section
+            id="scoreStatusSection"
+            class="score-section"
+            hidden
+        >
+
+            <div class="score-section-title">
+                MATCH STATUS
+            </div>
+
+
+            <div
+                id="scoreStatusText"
+                class="score-text-content"
+            ></div>
+
+        </section>
+
+
+        <!-- COMMENTARY -->
+
+        <section
+            id="commentarySection"
+            class="score-section"
+            hidden
+        >
+
+            <div class="score-section-title">
+                COMMENTARY
+            </div>
+
+
+            <div
+                id="scoreCommentary"
+                class="score-text-content"
+            ></div>
+
+        </section>
+
+
+        <!-- MESSAGE -->
+
+        <section
+            id="messageSection"
+            class="score-section"
+            hidden
+        >
+
+            <div class="score-section-title">
+                MESSAGE
+            </div>
+
+
+            <div
+                id="scoreMessage"
+                class="score-text-content"
+            ></div>
+
+        </section>
+
+
+        <!-- TECHNICAL -->
+
+        <details
+            class="score-technical"
+        >
+
+            <summary>
+                Match data / provider details
+            </summary>
+
+
+            <pre id="scoreTechnicalData">Loading...</pre>
+
+        </details>
+
     </div>
 
 </section>
 
 
 <!-- =========================================================
-     MAIN MATCH
+     MAIN MATCH PAGE
 ========================================================= -->
 
 <div class="page">
@@ -1940,8 +2119,6 @@
         data-game-id="{{ match.game_id if match else '' }}"
         data-event-id="{{ match.event_id if match else '' }}"
         data-market-id="{{ match.market_id if match else '' }}"
-        data-score-id="{{ match.score_id if match and match.score_id else (match.game_id if match else '') }}"
-        data-result-id="{{ match.result_id if match and match.result_id else (match.game_id if match else '') }}"
         data-event-name="{{ match.event_name if match else '' }}"
         data-team1="{{ match.team1 if match else '' }}"
         data-team2="{{ match.team2 if match else '' }}"
@@ -2091,8 +2268,6 @@
 let gameId = "";
 let eventId = "";
 let marketId = "";
-let scoreId = "";
-let resultId = "";
 
 let oddsLoading = false;
 let refreshTimer = null;
@@ -2103,7 +2278,8 @@ let betSlipItems = [];
 const BET_SLIP_STORAGE =
     "crickbet_bet_slip";
 
-const MATCH_GAME_ID =
+
+const MATCH_PATH_GAME_ID =
     decodeURIComponent(
         window.location.pathname
             .split("/")
@@ -2139,27 +2315,15 @@ function escapeAttribute(value) {
 }
 
 
-function numberValue(value) {
-
-    const number =
-        Number(value);
-
-    return Number.isFinite(
-        number
-    )
-        ? number
-        : 0;
-}
-
-
 /*
- * This is important:
+ * IMPORTANT:
+ * 0 IS VALID DATA.
  *
- * "-", "", null and undefined are
- * treated as NO DATA.
+ * Only -, empty, null and undefined
+ * are considered unavailable.
  */
 
-function hasScoreValue(value) {
+function hasData(value) {
 
     if (
         value === null ||
@@ -2178,20 +2342,15 @@ function hasScoreValue(value) {
 }
 
 
-function cleanScoreValue(
-    value
-) {
+function cleanValue(value) {
 
-    return hasScoreValue(value)
+    return hasData(value)
         ? String(value).trim()
         : "";
 }
 
 
-function firstValid(
-    object,
-    keys
-) {
+function firstData(object, keys) {
 
     if (
         !object ||
@@ -2200,77 +2359,133 @@ function firstValid(
         return "";
     }
 
+
     for (const key of keys) {
 
         const value =
             object[key];
 
         if (
-            hasScoreValue(value)
+            hasData(value)
         ) {
             return value;
         }
     }
 
+
     return "";
 }
 
 
-function setTextIfValue(
+function setText(
     id,
-    value,
-    fallback = ""
+    value
 ) {
 
     const element =
-        document.getElementById(id);
+        document.getElementById(
+            id
+        );
 
     if (!element) {
         return;
     }
 
-    const clean =
-        cleanScoreValue(value);
 
     element.textContent =
-        clean ||
-        fallback;
+        cleanValue(value);
 }
 
 
-function setHidden(
-    id,
-    hidden
+function showElement(
+    id
 ) {
 
     const element =
-        document.getElementById(id);
+        document.getElementById(
+            id
+        );
 
-    if (!element) {
-        return;
+    if (element) {
+        element.hidden = false;
     }
-
-    element.hidden =
-        Boolean(hidden);
 }
 
 
-function formatTime(value) {
+function hideElement(
+    id
+) {
 
-    if (!hasScoreValue(value)) {
-        return "--";
+    const element =
+        document.getElementById(
+            id
+        );
+
+    if (element) {
+        element.hidden = true;
     }
+}
+
+
+function setImage(
+    id,
+    source
+) {
+
+    const image =
+        document.getElementById(
+            id
+        );
+
+    if (!image) {
+        return;
+    }
+
+
+    if (
+        hasData(source)
+    ) {
+
+        image.src =
+            String(source);
+
+        image.hidden =
+            false;
+
+    } else {
+
+        image.removeAttribute(
+            "src"
+        );
+
+        image.hidden =
+            true;
+    }
+}
+
+
+function formatTime(
+    value
+) {
+
+    if (!hasData(value)) {
+        return "";
+    }
+
 
     const date =
         new Date(value);
+
 
     if (
         Number.isNaN(
             date.getTime()
         )
     ) {
+
         return String(value);
     }
+
 
     return date.toLocaleString(
         "en-IN",
@@ -2281,6 +2496,70 @@ function formatTime(value) {
             minute: "2-digit"
         }
     );
+}
+
+
+function ordinalInning(
+    value
+) {
+
+    const number =
+        Number(
+            value
+        );
+
+
+    if (
+        !Number.isInteger(
+            number
+        ) ||
+        number <= 0
+    ) {
+
+        return "";
+    }
+
+
+    if (
+        number % 100 >= 11 &&
+        number % 100 <= 13
+    ) {
+
+        return (
+            number +
+            "th"
+        );
+    }
+
+
+    switch (
+        number % 10
+    ) {
+
+        case 1:
+            return (
+                number +
+                "st"
+            );
+
+        case 2:
+            return (
+                number +
+                "nd"
+            );
+
+        case 3:
+            return (
+                number +
+                "rd"
+            );
+
+        default:
+            return (
+                number +
+                "th"
+            );
+    }
 }
 
 
@@ -2295,20 +2574,25 @@ function readServerMatch() {
             "matchData"
         );
 
+
     if (!element) {
         return null;
     }
 
+
     const data =
         element.dataset;
 
+
     const resolvedGameId =
         data.gameId ||
-        MATCH_GAME_ID;
+        MATCH_PATH_GAME_ID;
+
 
     if (!resolvedGameId) {
         return null;
     }
+
 
     return {
 
@@ -2322,14 +2606,6 @@ function readServerMatch() {
         market_id:
             data.marketId ||
             "",
-
-        score_id:
-            data.scoreId ||
-            resolvedGameId,
-
-        result_id:
-            data.resultId ||
-            resolvedGameId,
 
         event_name:
             data.eventName ||
@@ -2358,14 +2634,17 @@ function initializeMatch() {
     const match =
         readServerMatch();
 
+
     if (!match) {
         return;
     }
+
 
     gameId =
         String(
             match.game_id
         );
+
 
     eventId =
         String(
@@ -2373,23 +2652,13 @@ function initializeMatch() {
             match.game_id
         );
 
+
     marketId =
         String(
             match.market_id ||
             ""
         );
 
-    scoreId =
-        String(
-            match.score_id ||
-            match.game_id
-        );
-
-    resultId =
-        String(
-            match.result_id ||
-            match.game_id
-        );
 
     updateMatchHeader(
         match
@@ -2410,54 +2679,28 @@ function updateMatchHeader(
     }
 
 
-    const eventName =
-        document.getElementById(
-            "eventName"
-        );
+    setText(
+        "eventName",
+        match.event_name
+    );
 
-    const team1 =
-        document.getElementById(
-            "team1"
-        );
 
-    const team2 =
-        document.getElementById(
-            "team2"
-        );
+    setText(
+        "team1",
+        match.team1
+    );
+
+
+    setText(
+        "team2",
+        match.team2
+    );
+
 
     const status =
         document.getElementById(
             "matchStatus"
         );
-
-    const time =
-        document.getElementById(
-            "matchTime"
-        );
-
-
-    if (eventName) {
-
-        eventName.textContent =
-            match.event_name ||
-            "Cricket Match";
-    }
-
-
-    if (team1) {
-
-        team1.textContent =
-            match.team1 ||
-            "";
-    }
-
-
-    if (team2) {
-
-        team2.textContent =
-            match.team2 ||
-            "";
-    }
 
 
     if (status) {
@@ -2467,10 +2710,12 @@ function updateMatchHeader(
             match.in_play === 1 ||
             match.in_play === "true";
 
+
         status.textContent =
             live
                 ? "LIVE"
                 : "UPCOMING";
+
 
         status.classList.toggle(
             "live-badge",
@@ -2479,26 +2724,18 @@ function updateMatchHeader(
     }
 
 
-    if (time) {
+    setText(
+        "matchTime",
+        formatTime(
+            match.event_time
+        )
+    );
 
-        time.textContent =
-            formatTime(
-                match.event_time
-            );
-    }
 
-
-    const scoreboardEvent =
-        document.getElementById(
-            "scoreboardEvent"
-        );
-
-    if (scoreboardEvent) {
-
-        scoreboardEvent.textContent =
-            match.event_name ||
-            "Cricket Match";
-    }
+    setText(
+        "scoreboardEvent",
+        match.event_name
+    );
 }
 
 
@@ -2516,34 +2753,42 @@ function setStatus(
             "statusDot"
         );
 
+
     const status =
         document.getElementById(
             "statusText"
         );
+
 
     if (dot) {
 
         dot.className =
             "status-dot";
 
+
         if (
             state === "online"
         ) {
+
             dot.classList.add(
                 "online"
             );
         }
 
+
         if (
             state === "error"
         ) {
+
             dot.classList.add(
                 "error"
             );
         }
     }
 
+
     if (status) {
+
         status.textContent =
             text;
     }
@@ -2563,17 +2808,22 @@ async function loadOdds() {
         return;
     }
 
-    oddsLoading = true;
+
+    oddsLoading =
+        true;
+
 
     try {
 
         const query =
             new URLSearchParams();
 
+
         query.set(
             "gameId",
             gameId
         );
+
 
         if (eventId) {
 
@@ -2582,6 +2832,7 @@ async function loadOdds() {
                 eventId
             );
         }
+
 
         if (marketId) {
 
@@ -2597,9 +2848,15 @@ async function loadOdds() {
                 "/api/cricket/odds?" +
                 query.toString(),
                 {
-                    method: "GET",
-                    credentials: "same-origin",
-                    cache: "no-store",
+                    method:
+                        "GET",
+
+                    credentials:
+                        "same-origin",
+
+                    cache:
+                        "no-store",
+
                     headers: {
                         Accept:
                             "application/json"
@@ -2622,7 +2879,8 @@ async function loadOdds() {
 
 
         if (
-            data.success === false
+            data.success ===
+            false
         ) {
 
             throw new Error(
@@ -2644,16 +2902,10 @@ async function loadOdds() {
         );
 
 
-        const refreshText =
-            document.getElementById(
-                "refreshText"
-            );
-
-        if (refreshText) {
-
-            refreshText.textContent =
-                "Updated just now";
-        }
+        setText(
+            "refreshText",
+            "Updated just now"
+        );
 
 
     } catch (error) {
@@ -2663,14 +2915,17 @@ async function loadOdds() {
             error
         );
 
+
         setStatus(
             "error",
             "Odds unavailable"
         );
 
+
     } finally {
 
-        oddsLoading = false;
+        oddsLoading =
+            false;
     }
 }
 
@@ -2682,7 +2937,8 @@ function getOddsRoot(
     if (
         payload &&
         payload.odds &&
-        typeof payload.odds === "object"
+        typeof payload.odds ===
+            "object"
     ) {
 
         return payload.odds;
@@ -2692,7 +2948,8 @@ function getOddsRoot(
     if (
         payload &&
         payload.data &&
-        typeof payload.data === "object" &&
+        typeof payload.data ===
+            "object" &&
         !Array.isArray(
             payload.data
         )
@@ -2706,10 +2963,6 @@ function getOddsRoot(
 }
 
 
-/* =========================================================
-   MARKET RENDERING
-========================================================= */
-
 function getRunners(
     market
 ) {
@@ -2718,21 +2971,26 @@ function getRunners(
         return [];
     }
 
+
     if (
         Array.isArray(
             market.runners
         )
     ) {
+
         return market.runners;
     }
+
 
     if (
         Array.isArray(
             market.rows
         )
     ) {
+
         return market.rows;
     }
+
 
     return [];
 }
@@ -2762,7 +3020,6 @@ function getSelectionId(
         runner.selection_id ||
         runner.selectionId ||
         runner.id ||
-        runner.selectionID ||
         ""
     );
 }
@@ -2776,6 +3033,7 @@ function renderMarkets(
         document.getElementById(
             "marketsContainer"
         );
+
 
     if (!container) {
         return;
@@ -2823,7 +3081,9 @@ function renderMarkets(
     let html = "";
 
 
-    if (matchOdds.length) {
+    if (
+        matchOdds.length
+    ) {
 
         matchOdds.forEach(
             market => {
@@ -2845,7 +3105,9 @@ function renderMarkets(
     }
 
 
-    if (bookmakerOdds.length) {
+    if (
+        bookmakerOdds.length
+    ) {
 
         bookmakerOdds.forEach(
             market => {
@@ -2867,31 +3129,27 @@ function renderMarkets(
     }
 
 
-    if (fancyOdds.length) {
+    if (
+        fancyOdds.length
+    ) {
 
         html +=
             '<section class="market">';
 
         html +=
-            '<div class="market-header">';
-
-        html +=
-            '<div class="market-title">' +
-                '🎯 Fancy / Session' +
-            '</div>';
-
-        html +=
-            '<div class="market-status">' +
-                fancyOdds.length +
-                " market" +
-                (
-                    fancyOdds.length === 1
-                        ? ""
-                        : "s"
-                ) +
-            '</div>';
-
-        html +=
+            '<div class="market-header">' +
+                '<div class="market-title">' +
+                    '🎯 Fancy / Session' +
+                '</div>' +
+                '<div class="market-status">' +
+                    fancyOdds.length +
+                    " market" +
+                    (
+                        fancyOdds.length === 1
+                            ? ""
+                            : "s"
+                    ) +
+                '</div>' +
             '</div>';
 
         html +=
@@ -3005,13 +3263,16 @@ function buildMatchMarket(
                         runner
                     );
 
+
                 const selectionId =
                     getSelectionId(
                         runner
                     );
 
+
                 html +=
                     '<div class="runner">';
+
 
                 html +=
                     '<div class="runner-name">' +
@@ -3019,6 +3280,7 @@ function buildMatchMarket(
                             name
                         ) +
                     '</div>';
+
 
                 html +=
                     createOddBox(
@@ -3033,6 +3295,7 @@ function buildMatchMarket(
                         "BACK"
                     );
 
+
                 html +=
                     createOddBox(
                         runner.lay,
@@ -3045,6 +3308,7 @@ function buildMatchMarket(
                         selectionId,
                         "LAY"
                     );
+
 
                 html +=
                     '</div>';
@@ -3122,6 +3386,7 @@ function buildBookmakerMarket(
                         runner
                     );
 
+
                 const selectionId =
                     getSelectionId(
                         runner
@@ -3131,12 +3396,14 @@ function buildBookmakerMarket(
                 html +=
                     '<div class="runner">';
 
+
                 html +=
                     '<div class="runner-name">' +
                         escapeHtml(
                             name
                         ) +
                     '</div>';
+
 
                 html +=
                     createOddBox(
@@ -3151,6 +3418,7 @@ function buildBookmakerMarket(
                         "BACK"
                     );
 
+
                 html +=
                     createOddBox(
                         runner.lay,
@@ -3163,6 +3431,7 @@ function buildBookmakerMarket(
                         selectionId,
                         "LAY"
                     );
+
 
                 html +=
                     '</div>';
@@ -3232,12 +3501,6 @@ function buildFancyMarket(
             : "FANCY";
 
 
-    const marketTitle =
-        isSession
-            ? "Session"
-            : "Fancy";
-
-
     let html =
         '<div class="fancy-market-block">';
 
@@ -3265,8 +3528,11 @@ function buildFancyMarket(
     html +=
         '<div class="market-columns">' +
             "<div>" +
-                escapeHtml(
-                    marketTitle
+                (
+                    marketType ===
+                        "SESSION"
+                        ? "Session"
+                        : "Fancy"
                 ) +
             "</div>" +
             "<div>Yes</div>" +
@@ -3536,7 +3802,9 @@ function createOddBox(
 ) {
 
     const numericPrice =
-        Number(price);
+        Number(
+            price
+        );
 
 
     const valid =
@@ -3564,7 +3832,9 @@ function createOddBox(
 
 
     const numericSize =
-        Number(size);
+        Number(
+            size
+        );
 
 
     const sizeText =
@@ -3662,7 +3932,7 @@ function createOddBox(
 
 
 /* =========================================================
-   BET EVENTS
+   BET EVENTS / SLIP
 ========================================================= */
 
 function attachBetEvents() {
@@ -3676,7 +3946,7 @@ function attachBetEvents() {
 
                 box.addEventListener(
                     "click",
-                    function() {
+                    () => {
 
                         const odds =
                             Number(
@@ -3696,6 +3966,7 @@ function attachBetEvents() {
                             ) ||
                             odds <= 1
                         ) {
+
                             return;
                         }
 
@@ -3783,10 +4054,6 @@ function attachBetEvents() {
 }
 
 
-/* =========================================================
-   BET SLIP
-========================================================= */
-
 function loadBetSlip() {
 
     try {
@@ -3821,11 +4088,6 @@ function loadBetSlip() {
 
     } catch (error) {
 
-        console.error(
-            "[BETSLIP] storage error:",
-            error
-        );
-
         betSlipItems = [];
     }
 }
@@ -3845,7 +4107,7 @@ function saveBetSlip() {
     } catch (error) {
 
         console.error(
-            "[BETSLIP] save error:",
+            "[BETSLIP]",
             error
         );
     }
@@ -3868,23 +4130,15 @@ function addToBetSlip(
 
     const existingIndex =
         betSlipItems.findIndex(
-            current => {
-
-                const currentKey =
-                    [
-                        current.gameId,
-                        current.marketId,
-                        current.marketType,
-                        current.selectionId,
-                        current.side
-                    ].join("|");
-
-
-                return (
-                    currentKey ===
-                    key
-                );
-            }
+            current =>
+                [
+                    current.gameId,
+                    current.marketId,
+                    current.marketType,
+                    current.selectionId,
+                    current.side
+                ].join("|") ===
+                key
         );
 
 
@@ -4057,7 +4311,8 @@ function renderBetSlip() {
 
 
         if (placeButton) {
-            placeButton.disabled = true;
+            placeButton.disabled =
+                true;
         }
 
 
@@ -4357,11 +4612,30 @@ function renderBetSlip() {
     if (placeButton) {
 
         placeButton.disabled =
-            betSlipItems.length === 0;
+            betSlipItems.length ===
+                0;
     }
 
 
     updateSlipSummary();
+}
+
+
+function numberValue(
+    value
+) {
+
+    const number =
+        Number(
+            value
+        );
+
+
+    return Number.isFinite(
+        number
+    )
+        ? number
+        : 0;
 }
 
 
@@ -4380,6 +4654,7 @@ function updateSlipSummary() {
 
 
     let totalStake = 0;
+
     let totalReturn = 0;
 
 
@@ -4408,19 +4683,27 @@ function updateSlipSummary() {
     );
 
 
-    if (totalStakeElement) {
+    if (
+        totalStakeElement
+    ) {
 
         totalStakeElement.textContent =
             "₹" +
-            totalStake.toFixed(2);
+            totalStake.toFixed(
+                2
+            );
     }
 
 
-    if (returnElement) {
+    if (
+        returnElement
+    ) {
 
         returnElement.textContent =
             "₹" +
-            totalReturn.toFixed(2);
+            totalReturn.toFixed(
+                2
+            );
     }
 }
 
@@ -4440,12 +4723,18 @@ function openBetSlip() {
 
 
     if (slip) {
-        slip.classList.add("open");
+
+        slip.classList.add(
+            "open"
+        );
     }
 
 
     if (reopen) {
-        reopen.classList.remove("show");
+
+        reopen.classList.remove(
+            "show"
+        );
     }
 }
 
@@ -4465,7 +4754,10 @@ function minimizeBetSlip() {
 
 
     if (slip) {
-        slip.classList.remove("open");
+
+        slip.classList.remove(
+            "open"
+        );
     }
 
 
@@ -4532,7 +4824,7 @@ function hideBetMessage() {
 
 
 /* =========================================================
-   PLACE BET
+   PLACE BETS
 ========================================================= */
 
 async function placeAllBets() {
@@ -4604,7 +4896,9 @@ async function placeAllBets() {
         ) {
 
             const item =
-                betSlipItems[index];
+                betSlipItems[
+                    index
+                ];
 
 
             const requestBody = {
@@ -4664,12 +4958,6 @@ async function placeAllBets() {
             };
 
 
-            console.log(
-                "[BET] placing:",
-                requestBody
-            );
-
-
             const response =
                 await fetch(
                     "/bets/place",
@@ -4705,11 +4993,6 @@ async function placeAllBets() {
                     await response.json();
 
             } catch (error) {
-
-                console.error(
-                    "[BET] JSON error:",
-                    error
-                );
             }
 
 
@@ -4724,7 +5007,8 @@ async function placeAllBets() {
 
 
             if (
-                data.success === false
+                data.success ===
+                false
             ) {
 
                 throw new Error(
@@ -4776,50 +5060,10 @@ async function placeAllBets() {
         );
 
 
-        setTimeout(
-            () => {
-
-                if (
-                    betSlipItems.length === 0
-                ) {
-
-                    const slip =
-                        document.getElementById(
-                            "betSlip"
-                        );
-
-
-                    if (slip) {
-
-                        slip.classList.remove(
-                            "open"
-                        );
-                    }
-
-
-                    const reopen =
-                        document.getElementById(
-                            "reopenSlipButton"
-                        );
-
-
-                    if (reopen) {
-
-                        reopen.classList.remove(
-                            "show"
-                        );
-                    }
-                }
-
-            },
-            1600
-        );
-
-
     } catch (error) {
 
         console.error(
-            "[BET] placement error:",
+            "[BET]",
             error
         );
 
@@ -4881,45 +5125,21 @@ function updateDisplayedBalance(
         );
 
 
-    const topBalance =
+    const element =
         document.getElementById(
             "matchPageBalance"
         );
 
 
-    if (topBalance) {
+    if (element) {
 
-        topBalance.textContent =
+        element.textContent =
             formatted;
     }
-
-
-    document
-        .querySelectorAll(
-            ".balance"
-        )
-        .forEach(
-            element => {
-
-                element.textContent =
-                    formatted;
-            }
-        );
 }
 
 
 async function loadMatchPageBalance() {
-
-    const balanceElement =
-        document.getElementById(
-            "matchPageBalance"
-        );
-
-
-    if (!balanceElement) {
-        return;
-    }
-
 
     try {
 
@@ -4954,23 +5174,20 @@ async function loadMatchPageBalance() {
 
 
         if (
-            data.balance ===
+            data.balance !==
             undefined
         ) {
 
-            return;
+            updateDisplayedBalance(
+                data.balance
+            );
         }
-
-
-        updateDisplayedBalance(
-            data.balance
-        );
 
 
     } catch (error) {
 
         console.error(
-            "[ACCOUNT] balance error:",
+            "[ACCOUNT]",
             error
         );
     }
@@ -4978,39 +5195,41 @@ async function loadMatchPageBalance() {
 
 
 /* =========================================================
-   SCOREBOARD HELPERS
+   SELECTED MATCH SCOREBOARD
+   ONLY CURRENT GAME_ID
 ========================================================= */
 
-function getScoreRoot(
+function getScoreRecord(
     payload
 ) {
 
     if (
         !payload ||
-        typeof payload !== "object"
+        typeof payload !==
+            "object"
     ) {
 
-        return {};
+        return null;
     }
+
+
+    /*
+     * Exact provider structure:
+     *
+     * data
+     *   Data
+     *     Score[]
+     */
 
 
     let root =
         payload;
 
 
-    /*
-     * Your exact response:
-     *
-     * success
-     *  -> data
-     *      -> Status
-     *      -> Data
-     *          -> Score[]
-     */
-
     if (
         root.data &&
-        typeof root.data === "object"
+        typeof root.data ===
+            "object"
     ) {
 
         root =
@@ -5020,26 +5239,13 @@ function getScoreRoot(
 
     if (
         root.Data &&
-        typeof root.Data === "object"
+        typeof root.Data ===
+            "object"
     ) {
 
         root =
             root.Data;
     }
-
-
-    return root;
-}
-
-
-function getScoreRecord(
-    payload
-) {
-
-    const root =
-        getScoreRoot(
-            payload
-        );
 
 
     if (
@@ -5064,336 +5270,314 @@ function getScoreRecord(
     }
 
 
-    if (
-        root.Score &&
-        typeof root.Score === "object"
-    ) {
-
-        return root.Score;
-    }
-
-
-    if (
-        root.score &&
-        typeof root.score === "object"
-    ) {
-
-        return root.score;
-    }
-
-
     return null;
 }
 
 
-function parseScore(
-    value
+/* =========================================================
+   SCORE STATUS
+========================================================= */
+
+function renderScoreStatus(
+    score,
+    payload
 ) {
 
-    const text =
-        cleanScoreValue(
-            value
+    const badge =
+        document.getElementById(
+            "scoreboardStatus"
         );
 
 
-    if (!text) {
-
-        return {
-
-            runs: "",
-            wickets: "",
-            overs: ""
-        };
-    }
-
-
-    const scoreMatch =
-        text.match(
-            /(\d+)\s*[-/]\s*(\d+)/
+    const liveValue =
+        firstData(
+            score,
+            [
+                "LiveCommentary"
+            ]
         );
 
 
-    const oversMatch =
-        text.match(
-            /\(([^)]+)\)/
-        );
+    const isLive =
+        String(
+            liveValue
+        ) ===
+            "1";
 
 
-    return {
+    if (badge) {
 
-        runs:
-            scoreMatch
-                ? scoreMatch[1]
-                : "",
+        if (isLive) {
 
-        wickets:
-            scoreMatch
-                ? scoreMatch[2]
-                : "",
+            badge.className =
+                "scoreboard-status";
 
-        overs:
-            oversMatch
-                ? oversMatch[1]
-                : ""
-    };
-}
+            badge.innerHTML =
+                '<span class="scoreboard-status-dot"></span>' +
+                "LIVE";
 
+        } else {
 
-function getFormattedScore(
-    scoreOnly,
-    fullScore
-) {
+            badge.className =
+                "scoreboard-status score";
 
-    if (
-        hasScoreValue(
-            scoreOnly
-        )
-    ) {
-
-        const parsed =
-            parseScore(
-                scoreOnly
-            );
-
-
-        if (
-            parsed.runs &&
-            parsed.wickets
-        ) {
-
-            return (
-                parsed.runs +
-                "/" +
-                parsed.wickets
-            );
+            badge.textContent =
+                "SCORE";
         }
+    }
 
 
-        return String(
-            scoreOnly
+    const source =
+        payload &&
+        hasData(
+            payload.source
+        )
+            ? payload.source
+            : "";
+
+
+    const cached =
+        payload &&
+        payload.cached;
+
+
+    const stale =
+        payload &&
+        payload.stale;
+
+
+    const responseTime =
+        payload &&
+        hasData(
+            payload.responseTime
+        )
+            ? payload.responseTime
+            : "";
+
+
+    const timestamp =
+        payload &&
+        hasData(
+            payload.timestamp
+        )
+            ? payload.timestamp
+            : "";
+
+
+    const info =
+        document.getElementById(
+            "scoreInfo"
+        );
+
+
+    if (!info) {
+        return;
+    }
+
+
+    let chips = [];
+
+
+    if (
+        hasData(
+            source
+        )
+    ) {
+
+        chips.push(
+            "Source: " +
+            String(
+                source
+            )
         );
     }
 
 
     if (
-        hasScoreValue(
-            fullScore
-        )
+        cached === true
     ) {
 
-        const parsed =
-            parseScore(
-                fullScore
-            );
-
-
-        if (
-            parsed.runs &&
-            parsed.wickets
-        ) {
-
-            return (
-                parsed.runs +
-                "/" +
-                parsed.wickets
-            );
-        }
-
-
-        return String(
-            fullScore
+        chips.push(
+            "Cached"
         );
     }
 
-
-    return "";
-}
-
-
-function getOvers(
-    overs,
-    fullScore
-) {
 
     if (
-        hasScoreValue(
-            overs
-        )
+        stale === true
     ) {
 
-        return String(
-            overs
+        chips.push(
+            "Stale"
         );
     }
 
 
-    const parsed =
-        parseScore(
-            fullScore
+    if (
+        hasData(
+            responseTime
+        )
+    ) {
+
+        chips.push(
+            "Response: " +
+            String(
+                responseTime
+            )
         );
+    }
 
 
-    return parsed.overs;
+    if (
+        hasData(
+            timestamp
+        )
+    ) {
+
+        chips.push(
+            "Updated: " +
+            formatTime(
+                timestamp
+            )
+        );
+    }
+
+
+    info.innerHTML =
+        chips.map(
+            chip =>
+                '<div class="score-info-chip">' +
+                    escapeHtml(
+                        chip
+                    ) +
+                '</div>'
+        ).join("");
 }
 
 
 /* =========================================================
-   TEAM DISPLAY
+   SCORE TEAMS
 ========================================================= */
 
 function renderScoreTeam(
     number,
     score,
-    matchTeam
+    fallbackTeam
 ) {
 
-    const nameKey =
+    const prefix =
         number === 1
-            ? [
-                "Team1Name"
-            ]
-            : [
-                "Team2Name"
-            ];
+            ? "Team1"
+            : "Team2";
 
 
-    const shortKey =
-        number === 1
-            ? [
-                "Team1Name_Short"
-            ]
-            : [
-                "Team2Name_Short"
-            ];
-
-
-    const flagKey =
-        number === 1
-            ? [
-                "Team1Flag"
-            ]
-            : [
-                "Team2Flag"
-            ];
-
-
-    const scoreOnlyKey =
-        number === 1
-            ? [
-                "Team1ScoreOnly"
-            ]
-            : [
-                "Team2ScoreOnly"
-            ];
-
-
-    const fullScoreKey =
-        number === 1
-            ? [
-                "Team1OnlyScore",
-                "Team1Score"
-            ]
-            : [
-                "Team2OnlyScore",
-                "Team2Score"
-            ];
-
-
-    const oversKey =
-        number === 1
-            ? [
-                "Team1Overs"
-            ]
-            : [
-                "Team2Overs"
-            ];
-
-
-    const nameFromScore =
-        firstValid(
+    const name =
+        firstData(
             score,
-            nameKey
+            [
+                prefix +
+                "Name"
+            ]
+        ) ||
+        (
+            hasData(
+                fallbackTeam
+            )
+                ? fallbackTeam
+                : ""
         );
 
 
-    const teamName =
-        hasScoreValue(
-            nameFromScore
-        )
-            ? nameFromScore
-            : (
-                hasScoreValue(
-                    matchTeam
-                )
-                    ? matchTeam
-                    : ""
-            );
-
-
     const short =
-        firstValid(
+        firstData(
             score,
-            shortKey
+            [
+                prefix +
+                "Name_Short"
+            ]
         );
 
 
     const flag =
-        firstValid(
+        firstData(
             score,
-            flagKey
+            [
+                prefix +
+                "Flag"
+            ]
         );
 
 
-    const scoreValue =
-        getFormattedScore(
-            firstValid(
-                score,
-                scoreOnlyKey
-            ),
-            firstValid(
-                score,
-                fullScoreKey
-            )
+    const fullScore =
+        firstData(
+            score,
+            [
+                prefix +
+                "OnlyScore",
+                prefix +
+                "Score"
+            ]
+        );
+
+
+    const scoreOnly =
+        firstData(
+            score,
+            [
+                prefix +
+                "ScoreOnly"
+            ]
         );
 
 
     const overs =
-        getOvers(
-            firstValid(
-                score,
-                oversKey
-            ),
-            firstValid(
-                score,
-                fullScoreKey
-            )
+        firstData(
+            score,
+            [
+                prefix +
+                "Overs"
+            ]
         );
 
 
-    setTextIfValue(
+    setText(
         "scoreTeam" +
         number +
         "Name",
-        teamName,
-        ""
+        name
     );
 
 
-    setTextIfValue(
+    setText(
         "scoreTeam" +
         number +
         "Short",
-        short,
-        ""
+        short
     );
 
 
-    setTextIfValue(
+    setImage(
+        "scoreTeam" +
+        number +
+        "Flag",
+        flag
+    );
+
+
+    setText(
         "scoreTeam" +
         number +
         "Value",
-        scoreValue,
-        ""
+        scoreOnly ||
+        fullScore
+    );
+
+
+    setText(
+        "scoreTeam" +
+        number +
+        "Full",
+        fullScore
     );
 
 
@@ -5407,57 +5591,152 @@ function renderScoreTeam(
 
     if (oversElement) {
 
-        oversElement.textContent =
-            hasScoreValue(
-                overs
-            )
-                ? String(
-                    overs
-                ) +
-                " OV"
-                : "";
-    }
-
-
-    const flagElement =
-        document.getElementById(
-            "scoreTeam" +
-            number +
-            "Flag"
-        );
-
-
-    if (flagElement) {
-
         if (
-            hasScoreValue(
-                flag
+            hasData(
+                overs
             )
         ) {
 
-            flagElement.src =
+            oversElement.textContent =
                 String(
-                    flag
-                );
-
-            flagElement.hidden =
-                false;
+                    overs
+                ) +
+                " OV";
 
         } else {
 
-            flagElement.removeAttribute(
-                "src"
-            );
-
-            flagElement.hidden =
-                true;
+            oversElement.textContent =
+                "";
         }
     }
 }
 
 
 /* =========================================================
-   STATS
+   FIXED BATTING LOGIC
+========================================================= */
+
+function renderBattingSide(
+    score
+) {
+
+    const team1Badge =
+        document.getElementById(
+            "scoreTeam1Batting"
+        );
+
+
+    const team2Badge =
+        document.getElementById(
+            "scoreTeam2Batting"
+        );
+
+
+    /*
+     * ALWAYS hide both first.
+     */
+
+    if (team1Badge) {
+        team1Badge.hidden = true;
+    }
+
+
+    if (team2Badge) {
+        team2Badge.hidden = true;
+    }
+
+
+    const rawInning =
+        firstData(
+            score,
+            [
+                "CurrentInning"
+            ]
+        );
+
+
+    /*
+     * Do not turn missing data into 0.
+     */
+
+    if (
+        !hasData(
+            rawInning
+        )
+    ) {
+
+        setText(
+            "scoreCurrentInning",
+            ""
+        );
+
+        return;
+    }
+
+
+    const inning =
+        parseInt(
+            String(
+                rawInning
+            ).trim(),
+            10
+        );
+
+
+    if (
+        !Number.isInteger(
+            inning
+        ) ||
+        inning <= 0
+    ) {
+
+        setText(
+            "scoreCurrentInning",
+            ""
+        );
+
+        return;
+    }
+
+
+    setText(
+        "scoreCurrentInning",
+        ordinalInning(
+            inning
+        )
+    );
+
+
+    /*
+     * Only current innings gets BATTING.
+     *
+     * 1 -> Team 1
+     * 2 -> Team 2
+     */
+
+    if (
+        inning === 1
+    ) {
+
+        if (team1Badge) {
+            team1Badge.hidden = false;
+        }
+    }
+
+
+    if (
+        inning === 2
+    ) {
+
+        if (team2Badge) {
+            team2Badge.hidden = false;
+        }
+    }
+}
+
+
+/* =========================================================
+   SCORE STATS
 ========================================================= */
 
 function renderScoreStats(
@@ -5475,53 +5754,52 @@ function renderScoreStats(
     }
 
 
-    const items = [];
+    const stats = [];
 
 
     const crr =
-        firstValid(
+        firstData(
             score,
             [
-                "CRR",
-                "crr"
+                "CRR"
             ]
         );
 
 
     const rrr =
-        firstValid(
+        firstData(
             score,
             [
-                "RRR",
-                "rrr"
+                "RRR"
             ]
         );
 
 
     const target =
-        firstValid(
+        firstData(
             score,
             [
-                "Target",
-                "target"
+                "Target"
             ]
         );
 
 
     const inning =
-        firstValid(
+        firstData(
             score,
             [
-                "CurrentInning",
-                "currentInning"
+                "CurrentInning"
             ]
         );
 
 
-    if (hasScoreValue(crr)) {
+    if (
+        hasData(
+            crr
+        )
+    ) {
 
-        items.push({
-
+        stats.push({
             label:
                 "CRR",
 
@@ -5531,10 +5809,13 @@ function renderScoreStats(
     }
 
 
-    if (hasScoreValue(rrr)) {
+    if (
+        hasData(
+            rrr
+        )
+    ) {
 
-        items.push({
-
+        stats.push({
             label:
                 "RRR",
 
@@ -5544,10 +5825,13 @@ function renderScoreStats(
     }
 
 
-    if (hasScoreValue(target)) {
+    if (
+        hasData(
+            target
+        )
+    ) {
 
-        items.push({
-
+        stats.push({
             label:
                 "TARGET",
 
@@ -5557,36 +5841,48 @@ function renderScoreStats(
     }
 
 
-    if (hasScoreValue(inning)) {
+    if (
+        hasData(
+            inning
+        )
+    ) {
 
-        items.push({
+        const ordinal =
+            ordinalInning(
+                inning
+            );
 
-            label:
-                "INNING",
 
-            value:
-                ordinalInning(
-                    inning
-                )
-        });
+        if (
+            ordinal
+        ) {
+
+            stats.push({
+                label:
+                    "INNING",
+
+                value:
+                    ordinal
+            });
+        }
     }
 
 
     container.innerHTML =
-        items.map(
-            item =>
+        stats.map(
+            stat =>
 
                 '<div class="score-stat">' +
 
                     '<div class="score-stat-label">' +
                         escapeHtml(
-                            item.label
+                            stat.label
                         ) +
                     '</div>' +
 
                     '<div class="score-stat-value">' +
                         escapeHtml(
-                            item.value
+                            stat.value
                         ) +
                     '</div>' +
 
@@ -5614,27 +5910,25 @@ function renderChase(
     }
 
 
-    const message =
-        firstValid(
+    const value =
+        firstData(
             score,
             [
                 "ScoreStatus",
-                "NRMsg",
-                "Message",
-                "message"
+                "NRMsg"
             ]
         );
 
 
     if (
-        hasScoreValue(
-            message
+        hasData(
+            value
         )
     ) {
 
         element.textContent =
             String(
-                message
+                value
             );
 
         element.hidden =
@@ -5684,139 +5978,146 @@ function renderBatters(
 
 
     const player1 =
-        cleanScoreValue(
-            firstValid(
-                score,
-                [
-                    "Player1"
-                ]
-            )
+        firstData(
+            score,
+            [
+                "Player1"
+            ]
         );
 
 
     const player2 =
-        cleanScoreValue(
-            firstValid(
-                score,
-                [
-                    "Player2"
-                ]
-            )
+        firstData(
+            score,
+            [
+                "Player2"
+            ]
         );
 
 
-    if (
-        hasScoreValue(
-            player1
-        )
+    /*
+     * Hide '*' from visible name,
+     * use it only as striker marker.
+     */
+
+    function addPlayer(
+        playerName,
+        number
     ) {
+
+        if (
+            !hasData(
+                playerName
+            )
+        ) {
+
+            return;
+        }
+
+
+        const raw =
+            String(
+                playerName
+            ).trim();
+
+
+        const striker =
+            raw.endsWith("*");
+
+
+        const cleanName =
+            raw.replace(
+                /\*$/,
+                ""
+            ).trim();
+
+
+        if (!hasData(cleanName)) {
+            return;
+        }
+
 
         players.push({
 
             name:
-                player1,
+                cleanName,
 
-            id:
-                firstValid(
+            striker:
+                striker,
+
+            image:
+                firstData(
                     score,
                     [
-                        "Player1ID"
+                        "Player" +
+                        number +
+                        "Image"
                     ]
                 ),
 
             runs:
-                firstValid(
+                firstData(
                     score,
                     [
-                        "Player1Run"
+                        "Player" +
+                        number +
+                        "Run"
                     ]
                 ),
 
             balls:
-                firstValid(
+                firstData(
                     score,
                     [
-                        "Player1Balls"
+                        "Player" +
+                        number +
+                        "Balls"
                     ]
                 ),
 
             fours:
-                firstValid(
+                firstData(
                     score,
                     [
-                        "Player1Fours"
+                        "Player" +
+                        number +
+                        "Fours"
+                    ]
+                ),
+
+            sixes:
+                firstData(
+                    score,
+                    [
+                        "Player" +
+                        number +
+                        "Sixes"
                     ]
                 ),
 
             sr:
-                firstValid(
+                firstData(
                     score,
                     [
-                        "Player1StrikeRate"
+                        "Player" +
+                        number +
+                        "StrikeRate"
                     ]
-                ),
-
-            striker:
-                player1.endsWith("*")
+                )
         });
     }
 
 
-    if (
-        hasScoreValue(
-            player2
-        )
-    ) {
+    addPlayer(
+        player1,
+        1
+    );
 
-        players.push({
 
-            name:
-                player2,
-
-            id:
-                firstValid(
-                    score,
-                    [
-                        "Player2ID"
-                    ]
-                ),
-
-            runs:
-                firstValid(
-                    score,
-                    [
-                        "Player2Run"
-                    ]
-                ),
-
-            balls:
-                firstValid(
-                    score,
-                    [
-                        "Player2Balls"
-                    ]
-                ),
-
-            fours:
-                firstValid(
-                    score,
-                    [
-                        "Player2Fours"
-                    ]
-                ),
-
-            sr:
-                firstValid(
-                    score,
-                    [
-                        "Player2StrikeRate"
-                    ]
-                ),
-
-            striker:
-                player2.endsWith("*")
-        });
-    }
+    addPlayer(
+        player2,
+        2
+    );
 
 
     if (!players.length) {
@@ -5839,48 +6140,70 @@ function renderBatters(
         players.map(
             player => {
 
-                const playerName =
-                    player.name.replace(
-                        /\*$/,
-                        ""
-                    ).trim();
-
-
                 return (
 
                     '<div class="batter-row">' +
 
-                        '<div class="score-player">' +
-                            escapeHtml(
-                                playerName
-                            ) +
+                        '<div class="player-cell">' +
 
                             (
-                                player.striker
-                                    ? ' <span class="striker-star">*</span>'
+                                hasData(
+                                    player.image
+                                )
+                                    ? (
+                                        '<img ' +
+                                            'class="player-image" ' +
+                                            'src="' +
+                                                escapeAttribute(
+                                                    player.image
+                                                ) +
+                                            '" ' +
+                                            'alt="" ' +
+                                            'loading="lazy" ' +
+                                            'onerror="this.style.display=\'none\'">'
+                                    )
                                     : ""
                             ) +
+
+                            '<div class="player-name">' +
+
+                                escapeHtml(
+                                    player.name
+                                ) +
+
+                                (
+                                    player.striker
+                                        ? ' <span class="star">*</span>'
+                                        : ""
+                                ) +
+
+                            '</div>' +
+
                         '</div>' +
 
-                        '<div class="score-player-value strong">' +
+
+                        '<div class="player-stat strong">' +
                             escapeHtml(
                                 player.runs
                             ) +
                         '</div>' +
 
-                        '<div class="score-player-value">' +
+
+                        '<div class="player-stat">' +
                             escapeHtml(
                                 player.balls
                             ) +
                         '</div>' +
 
-                        '<div class="score-player-value">' +
+
+                        '<div class="player-stat">' +
                             escapeHtml(
                                 player.fours
                             ) +
                         '</div>' +
 
-                        '<div class="score-player-value">' +
+
+                        '<div class="player-stat">' +
                             escapeHtml(
                                 player.sr
                             ) +
@@ -5922,32 +6245,262 @@ function renderBowler(
     }
 
 
+    const bowler =
+        firstData(
+            score,
+            [
+                "Bowler"
+            ]
+        );
+
+
     /*
-     * Your exact example:
+     * In your current JSON:
      *
      * "Bowler": "-"
      *
-     * In that situation the complete section
-     * is hidden.
+     * Therefore nothing is shown.
      */
 
-    const bowlerName =
-        cleanScoreValue(
-            firstValid(
-                score,
-                [
-                    "Bowler",
-                    "BowlerName"
-                ]
-            )
+    if (
+        !hasData(
+            bowler
+        ) ||
+        String(
+            bowler
+        ).trim() ===
+            "0"
+    ) {
+
+        section.hidden =
+            true;
+
+        container.innerHTML =
+            "";
+
+        return;
+    }
+
+
+    const image =
+        firstData(
+            score,
+            [
+                "BowlerImage"
+            ]
+        );
+
+
+    const over =
+        firstData(
+            score,
+            [
+                "BowlerOver"
+            ]
+        );
+
+
+    const maiden =
+        firstData(
+            score,
+            [
+                "BowlerMaiden"
+            ]
+        );
+
+
+    const runs =
+        firstData(
+            score,
+            [
+                "BowlerRun"
+            ]
+        );
+
+
+    const wickets =
+        firstData(
+            score,
+            [
+                "BowlerWicket"
+            ]
+        );
+
+
+    section.hidden =
+        false;
+
+
+    container.innerHTML =
+
+        '<div class="bowler-row">' +
+
+            '<div class="player-cell">' +
+
+                (
+                    hasData(
+                        image
+                    )
+                        ? (
+                            '<img ' +
+                                'class="player-image" ' +
+                                'src="' +
+                                    escapeAttribute(
+                                        image
+                                    ) +
+                                '" ' +
+                                'alt="" ' +
+                                'loading="lazy" ' +
+                                'onerror="this.style.display=\'none\'">'
+                        )
+                        : ""
+                ) +
+
+                '<div class="player-name">' +
+                    escapeHtml(
+                        bowler
+                    ) +
+                '</div>' +
+
+            '</div>' +
+
+            '<div class="player-stat">' +
+                escapeHtml(
+                    over
+                ) +
+            '</div>' +
+
+            '<div class="player-stat">' +
+                escapeHtml(
+                    maiden
+                ) +
+            '</div>' +
+
+            '<div class="player-stat">' +
+                escapeHtml(
+                    runs
+                ) +
+            '</div>' +
+
+            '<div class="player-stat">' +
+                escapeHtml(
+                    wickets
+                ) +
+            '</div>' +
+
+        '</div>';
+}
+
+
+/* =========================================================
+   BALL CLASS
+========================================================= */
+
+function ballClass(
+    value
+) {
+
+    const text =
+        String(
+            value
+        )
+        .trim()
+        .toUpperCase();
+
+
+    if (
+        text.includes("W") ||
+        text.includes("OUT")
+    ) {
+
+        return "wicket";
+    }
+
+
+    if (
+        text === "4" ||
+        text === "6"
+    ) {
+
+        return "boundary";
+    }
+
+
+    if (
+        text.includes("WD") ||
+        text.includes("NB") ||
+        text.includes("LB") ||
+        text === "B" ||
+        text === "WB"
+    ) {
+
+        return "extra";
+    }
+
+
+    return "";
+}
+
+
+/* =========================================================
+   CURRENT OVER
+========================================================= */
+
+function renderCurrentOver(
+    score
+) {
+
+    const section =
+        document.getElementById(
+            "currentOverSection"
+        );
+
+
+    const container =
+        document.getElementById(
+            "currentOverBalls"
         );
 
 
     if (
-        !hasScoreValue(
-            bowlerName
-        )
+        !section ||
+        !container
     ) {
+
+        return;
+    }
+
+
+    const balls = [];
+
+
+    for (
+        let i = 1;
+        i <= 6;
+        i++
+    ) {
+
+        const value =
+            score[
+                "CurrentOverBalls" +
+                i
+            ];
+
+
+        if (
+            hasData(
+                value
+            )
+        ) {
+
+            balls.push(
+                value
+            );
+        }
+    }
+
+
+    if (!balls.length) {
 
         section.hidden =
             true;
@@ -5964,72 +6517,27 @@ function renderBowler(
 
 
     container.innerHTML =
+        balls.map(
+            value =>
 
-        '<div class="bowler-row">' +
-
-            '<div class="score-player">' +
-                escapeHtml(
-                    bowlerName
-                ) +
-            '</div>' +
-
-            '<div class="score-player-value">' +
-                escapeHtml(
-                    firstValid(
-                        score,
-                        [
-                            "BowlerOver",
-                            "BowlerOvers"
-                        ]
-                    )
-                ) +
-            '</div>' +
-
-            '<div class="score-player-value">' +
-                escapeHtml(
-                    firstValid(
-                        score,
-                        [
-                            "BowlerMaiden",
-                            "BowlerMaidens"
-                        ]
-                    )
-                ) +
-            '</div>' +
-
-            '<div class="score-player-value">' +
-                escapeHtml(
-                    firstValid(
-                        score,
-                        [
-                            "BowlerRun",
-                            "BowlerRuns"
-                        ]
-                    )
-                ) +
-            '</div>' +
-
-            '<div class="score-player-value">' +
-                escapeHtml(
-                    firstValid(
-                        score,
-                        [
-                            "BowlerWicket",
-                            "BowlerWickets"
-                        ]
-                    )
-                ) +
-            '</div>' +
-
-        '</div>';
+                '<span class="ball ' +
+                    ballClass(
+                        value
+                    ) +
+                '">' +
+                    escapeHtml(
+                        value
+                    ) +
+                '</span>'
+        ).join("");
 }
 
 
 /* =========================================================
-   LAST 6 BALLS
+   LAST SIX
 ========================================================= */
 
-function renderLastBalls(
+function renderLastSix(
     score
 ) {
 
@@ -6064,18 +6572,14 @@ function renderLastBalls(
     ) {
 
         balls =
-            score.Last6Balls
-            .filter(
-                ball =>
-                    hasScoreValue(
-                        ball
+            score.Last6Balls.filter(
+                value =>
+                    hasData(
+                        value
                     )
-            )
-            .slice(-6);
-    }
+            );
 
-
-    if (!balls.length) {
+    } else {
 
         for (
             let i = 1;
@@ -6091,7 +6595,7 @@ function renderLastBalls(
 
 
             if (
-                hasScoreValue(
+                hasData(
                     value
                 )
             ) {
@@ -6121,63 +6625,24 @@ function renderLastBalls(
 
 
     container.innerHTML =
-        balls.map(
-            ball => {
-
-                const value =
-                    String(
-                        ball
-                    ).trim();
-
-
-                const upper =
-                    value.toUpperCase();
-
-
-                let css =
-                    "";
-
-
-                if (
-                    upper.includes("W") ||
-                    upper.includes("OUT")
-                ) {
-
-                    css =
-                        "wicket";
-
-                } else if (
-                    value === "4" ||
-                    value === "6"
-                ) {
-
-                    css =
-                        "boundary";
-
-                } else if (
-                    upper.includes("WD") ||
-                    upper.includes("NB") ||
-                    upper.includes("LB") ||
-                    upper === "B"
-                ) {
-
-                    css =
-                        "extra";
-                }
-
-
-                return (
+        balls
+            .slice(
+                -6
+            )
+            .map(
+                value =>
 
                     '<span class="ball ' +
-                        css +
+                        ballClass(
+                            value
+                        ) +
                     '">' +
                         escapeHtml(
                             value
                         ) +
                     '</span>'
-                );
-            }
-        ).join("");
+            )
+            .join("");
 }
 
 
@@ -6227,14 +6692,12 @@ function renderRecentOvers(
 
 
     const overs =
-        score.Last4Overs
-            .filter(
-                over =>
-                    over &&
-                    typeof over ===
-                        "object"
-            )
-            .slice(-6);
+        score.Last4Overs.filter(
+            over =>
+                over &&
+                typeof over ===
+                    "object"
+        );
 
 
     if (!overs.length) {
@@ -6261,40 +6724,43 @@ function renderRecentOvers(
                     Array.isArray(
                         over.balls
                     )
-                        ? over.balls
-                            .filter(
-                                ball =>
-                                    hasScoreValue(
-                                        ball
-                                    )
-                            )
+                        ? over.balls.filter(
+                            value =>
+                                hasData(
+                                    value
+                                )
+                        )
                         : [];
 
 
                 const overNumber =
-                    hasScoreValue(
-                        over.over
-                    )
-                        ? over.over
-                        : "";
+                    firstData(
+                        over,
+                        [
+                            "over"
+                        ]
+                    );
 
 
                 const runs =
-                    hasScoreValue(
-                        over.runs
-                    )
-                        ? over.runs
-                        : "";
+                    firstData(
+                        over,
+                        [
+                            "runs"
+                        ]
+                    );
 
 
                 return (
 
-                    '<div class="recent-over">' +
+                    '<div class="over-row">' +
 
-                        '<div class="recent-over-number">' +
+                        '<div class="over-number">' +
 
                             (
-                                overNumber
+                                hasData(
+                                    overNumber
+                                )
                                     ? "OV " +
                                       escapeHtml(
                                           overNumber
@@ -6305,27 +6771,30 @@ function renderRecentOvers(
                         '</div>' +
 
 
-                        '<div class="recent-over-balls">' +
+                        '<div class="over-balls">' +
 
-                            balls
-                                .map(
-                                    ball =>
-
-                                        '<span class="recent-over-ball">' +
-                                            escapeHtml(
-                                                ball
-                                            ) +
-                                        '</span>'
-                                )
-                                .join(" ") +
+                            balls.map(
+                                ball =>
+                                    '<span class="over-ball">' +
+                                        escapeHtml(
+                                            ball
+                                        ) +
+                                    '</span>'
+                            ).join(" ") +
 
                         '</div>' +
 
 
-                        '<div class="recent-over-runs">' +
+                        '<div class="over-runs">' +
 
-                            escapeHtml(
-                                runs
+                            (
+                                hasData(
+                                    runs
+                                )
+                                    ? escapeHtml(
+                                        runs
+                                    )
+                                    : ""
                             ) +
 
                         '</div>' +
@@ -6338,64 +6807,101 @@ function renderRecentOvers(
 
 
 /* =========================================================
-   ORDINAL
+   SCORE STATUS / COMMENTARY / MESSAGE
 ========================================================= */
 
-function ordinalInning(
+function renderTextSection(
+    sectionId,
+    contentId,
     value
 ) {
 
-    const n =
-        Number(
-            value
+    const section =
+        document.getElementById(
+            sectionId
+        );
+
+
+    const content =
+        document.getElementById(
+            contentId
         );
 
 
     if (
-        !Number.isFinite(
-            n
-        )
+        !section ||
+        !content
     ) {
 
-        return "";
+        return;
     }
 
 
     if (
-        n % 100 >= 11 &&
-        n % 100 <= 13
+        hasData(
+            value
+        )
     ) {
 
-        return n +
-            "th";
-    }
+        section.hidden =
+            false;
 
+        content.textContent =
+            String(
+                value
+            );
 
-    switch (
-        n % 10
-    ) {
+    } else {
 
-        case 1:
-            return n +
-                "st";
+        section.hidden =
+            true;
 
-        case 2:
-            return n +
-                "nd";
-
-        case 3:
-            return n +
-                "rd";
-
-        default:
-            return n +
-                "th";
+        content.textContent =
+            "";
     }
 }
 
 
 /* =========================================================
-   MAIN SCORE RENDER
+   TECHNICAL DATA
+========================================================= */
+
+function renderTechnicalData(
+    payload
+) {
+
+    const element =
+        document.getElementById(
+            "scoreTechnicalData"
+        );
+
+
+    if (!element) {
+        return;
+    }
+
+
+    try {
+
+        element.textContent =
+            JSON.stringify(
+                payload,
+                null,
+                2
+            );
+
+    } catch (error) {
+
+        element.textContent =
+            String(
+                payload
+            );
+    }
+}
+
+
+/* =========================================================
+   MAIN SCOREBOARD RENDER
 ========================================================= */
 
 function renderScoreboard(
@@ -6421,11 +6927,11 @@ function renderScoreboard(
 
 
     /*
-     * Match name
+     * Event name.
      */
 
     const eventName =
-        firstValid(
+        firstData(
             score,
             [
                 "EventName",
@@ -6441,27 +6947,26 @@ function renderScoreboard(
 
 
     if (
-        hasScoreValue(
+        hasData(
             eventName
         )
     ) {
 
-        setTextIfValue(
+        setText(
             "scoreboardEvent",
-            eventName,
-            ""
+            eventName
         );
 
-        setTextIfValue(
+
+        setText(
             "eventName",
-            eventName,
-            ""
+            eventName
         );
     }
 
 
     /*
-     * Team scores
+     * Team names, flags, scores and overs.
      */
 
     renderScoreTeam(
@@ -6483,45 +6988,14 @@ function renderScoreboard(
 
 
     /*
-     * Innings
+     * This is the important fix:
+     *
+     * CurrentInning "2"
+     * => only Team 2 is batting.
      */
 
-    const currentInning =
-        firstValid(
-            score,
-            [
-                "CurrentInning",
-                "currentInning"
-            ]
-        );
-
-
-    setTextIfValue(
-        "scoreCurrentInning",
-        ordinalInning(
-            currentInning
-        ),
-        ""
-    );
-
-
-    /*
-     * Determine batting side.
-     */
-
-    setHidden(
-        "scoreTeam1Batting",
-        String(
-            currentInning
-        ) !== "1"
-    );
-
-
-    setHidden(
-        "scoreTeam2Batting",
-        String(
-            currentInning
-        ) !== "2"
+    renderBattingSide(
+        score
     );
 
 
@@ -6535,7 +7009,7 @@ function renderScoreboard(
 
 
     /*
-     * Chase message.
+     * Chase.
      */
 
     renderChase(
@@ -6544,7 +7018,16 @@ function renderScoreboard(
 
 
     /*
-     * Batter information.
+     * Current over.
+     */
+
+    renderCurrentOver(
+        score
+    );
+
+
+    /*
+     * Batters.
      */
 
     renderBatters(
@@ -6553,7 +7036,8 @@ function renderScoreboard(
 
 
     /*
-     * Bowler information.
+     * Bowler.
+     * If Bowler == "-" => entire section hidden.
      */
 
     renderBowler(
@@ -6562,10 +7046,10 @@ function renderScoreboard(
 
 
     /*
-     * Last balls.
+     * Last six balls.
      */
 
-    renderLastBalls(
+    renderLastSix(
         score
     );
 
@@ -6580,68 +7064,63 @@ function renderScoreboard(
 
 
     /*
-     * LIVE status.
+     * Message / status / commentary.
      */
 
-    const liveValue =
-        firstValid(
+    renderTextSection(
+        "scoreStatusSection",
+        "scoreStatusText",
+        firstData(
             score,
             [
-                "LiveCommentary",
-                "live",
-                "isLive"
+                "ScoreStatus"
             ]
-        );
+        )
+    );
 
 
-    const isLive =
-        String(
-            liveValue
-        ) === "1" ||
-        String(
-            liveValue
-        ).toLowerCase() ===
-            "true";
+    renderTextSection(
+        "commentarySection",
+        "scoreCommentary",
+        firstData(
+            score,
+            [
+                "Commentary"
+            ]
+        )
+    );
 
 
-    const liveBadge =
-        document.getElementById(
-            "scoreboardLiveStatus"
-        );
+    renderTextSection(
+        "messageSection",
+        "scoreMessage",
+        firstData(
+            score,
+            [
+                "Message"
+            ]
+        )
+    );
 
 
-    if (liveBadge) {
+    /*
+     * Provider metadata.
+     */
 
-        if (isLive) {
-
-            liveBadge.className =
-                "scoreboard-live-status";
-
-            liveBadge.innerHTML =
-                '<span class="live-dot"></span> LIVE';
-
-        } else {
-
-            liveBadge.className =
-                "scoreboard-live-status score";
-
-            liveBadge.innerHTML =
-                "SCORE";
-        }
-    }
+    renderScoreStatus(
+        score,
+        payload
+    );
 
 
-    setStatus(
-        "online",
-        isLive
-            ? "Live score"
-            : "Score updated"
+    renderTechnicalData(
+        payload
     );
 }
 
 
 /* =========================================================
-   SCORE UNAVAILABLE
+   SCOREBOARD EMPTY
 ========================================================= */
 
 function showScoreboardUnavailable() {
@@ -6655,8 +7134,16 @@ function showScoreboardUnavailable() {
     if (main) {
 
         main.innerHTML =
-            '<div style="grid-column:1/-1;display:flex;align-items:center;justify-content:center;min-height:120px;color:#719887;font-size:12px;">' +
-                "Live score unavailable" +
+            '<div style="' +
+                'grid-column:1/-1;' +
+                'display:flex;' +
+                'align-items:center;' +
+                'justify-content:center;' +
+                'min-height:120px;' +
+                'color:#719887;' +
+                'font-size:12px;' +
+            '">' +
+                'Live score unavailable' +
             '</div>';
     }
 
@@ -6664,23 +7151,40 @@ function showScoreboardUnavailable() {
     [
         "scoreStats",
         "scoreChase",
+        "scoreInfo",
+        "currentOverSection",
         "battersSection",
         "bowlerSection",
         "lastBallsSection",
-        "recentOversSection"
+        "recentOversSection",
+        "scoreStatusSection",
+        "commentarySection",
+        "messageSection"
     ]
     .forEach(
-        id =>
-            setHidden(
-                id,
-                true
-            )
+        hideElement
     );
+
+
+    const badge =
+        document.getElementById(
+            "scoreboardStatus"
+        );
+
+
+    if (badge) {
+
+        badge.className =
+            "scoreboard-status score";
+
+        badge.textContent =
+            "SCORE";
+    }
 }
 
 
 /* =========================================================
-   LOAD SELECTED MATCH SCORE ONLY
+   LOAD SELECTED GAME SCORE
 ========================================================= */
 
 async function loadScoreboard() {
@@ -6690,20 +7194,21 @@ async function loadScoreboard() {
      *
      * We do NOT call /api/cricket/matches here.
      *
-     * We only call the score endpoint for the
-     * match that is currently open.
+     * We do NOT load all matches.
+     *
+     * We only use the game_id of the
+     * match currently opened.
      */
 
-    const selectedScoreId =
+    const selectedGameId =
         String(
-            scoreId ||
-            MATCH_GAME_ID ||
             gameId ||
+            MATCH_PATH_GAME_ID ||
             ""
         );
 
 
-    if (!selectedScoreId) {
+    if (!selectedGameId) {
 
         showScoreboardUnavailable();
 
@@ -6717,7 +7222,7 @@ async function loadScoreboard() {
             await fetch(
                 "/api/cricket/score/" +
                 encodeURIComponent(
-                    selectedScoreId
+                    selectedGameId
                 ),
                 {
                     method:
@@ -6745,29 +7250,36 @@ async function loadScoreboard() {
             payload =
                 await response.json();
 
-        } catch (jsonError) {
+        } catch (error) {
 
             throw new Error(
-                "Score endpoint returned invalid JSON."
+                "Invalid score JSON"
             );
         }
 
 
         if (
             !response.ok ||
-            payload.success === false
+            payload.success ===
+                false
         ) {
 
             throw new Error(
                 payload.detail ||
                 payload.message ||
-                "Scoreboard request failed"
+                "Score request failed"
             );
         }
 
 
         console.log(
-            "[SCOREBOARD]",
+            "[SCOREBOARD] selected game:",
+            selectedGameId
+        );
+
+
+        console.log(
+            "[SCOREBOARD] payload:",
             payload
         );
 
@@ -6780,7 +7292,7 @@ async function loadScoreboard() {
     } catch (error) {
 
         console.error(
-            "[SCOREBOARD] error:",
+            "[SCOREBOARD]",
             error
         );
 
@@ -6791,7 +7303,7 @@ async function loadScoreboard() {
 
 
 /* =========================================================
-   SCOREBOARD POLLING
+   SCORE POLLING
 ========================================================= */
 
 function startScoreboardPolling() {
@@ -6840,7 +7352,7 @@ function stopScoreboardPolling() {
 
 
 /* =========================================================
-   ACCOUNT BAR
+   ACCOUNT BUTTONS
 ========================================================= */
 
 const MATCH_PAGE_WHATSAPP_NUMBER =
@@ -6860,7 +7372,12 @@ function matchPageOpenWhatsApp(
 
 
     const url =
-        `https://wa.me/${MATCH_PAGE_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+        "https://wa.me/" +
+        MATCH_PAGE_WHATSAPP_NUMBER +
+        "?text=" +
+        encodeURIComponent(
+            message
+        );
 
 
     window.open(
@@ -6887,32 +7404,36 @@ function matchPageWithdraw() {
 }
 
 
+/* =========================================================
+   ACCOUNT SETUP
+========================================================= */
+
 function setupMatchPageAccountBar() {
 
-    const depositButton =
+    const deposit =
         document.getElementById(
             "matchDepositBtn"
         );
 
 
-    if (depositButton) {
+    const withdraw =
+        document.getElementById(
+            "matchWithdrawBtn"
+        );
 
-        depositButton.addEventListener(
+
+    if (deposit) {
+
+        deposit.addEventListener(
             "click",
             matchPageDeposit
         );
     }
 
 
-    const withdrawButton =
-        document.getElementById(
-            "matchWithdrawBtn"
-        );
+    if (withdraw) {
 
-
-    if (withdrawButton) {
-
-        withdrawButton.addEventListener(
+        withdraw.addEventListener(
             "click",
             matchPageWithdraw
         );
@@ -6988,14 +7509,19 @@ document.addEventListener(
 
         setupMatchPageAccountBar();
 
+
         initializeMatch();
 
+
         /*
-         * ONLY THE OPEN MATCH SCOREBOARD.
+         * ONLY THE CLICKED MATCH SCORE.
          */
+
         startScoreboardPolling();
 
+
         loadBetSlip();
+
 
         renderBetSlip();
 
@@ -7080,7 +7606,7 @@ document.addEventListener(
 
 
 /* =========================================================
-   PAGE VISIBILITY
+   VISIBILITY
 ========================================================= */
 
 document.addEventListener(
