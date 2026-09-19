@@ -1,4 +1,4 @@
-
+import re
 import time
 from typing import Any, Dict, List, Optional
 
@@ -17,6 +17,8 @@ MAX_RETRIES = 2
 # Cache durations
 MATCH_CACHE_TTL = 15.0
 ODDS_CACHE_TTL = 2.0
+SCORE_CACHE_TTL = 3.0
+RESULT_CACHE_TTL = 10.0
 
 # Leave empty when your server IP is whitelisted.
 PROXY = ""
@@ -25,8 +27,6 @@ PROXY = ""
 # =========================================================
 # CRICKETBZ SCORE / RESULT PROVIDER
 # =========================================================
-# These endpoints are called by the backend only.
-# The browser never calls cricketbz.app directly.
 
 CRICKETBZ_BASE_URL = "https://cricketbz.app"
 
@@ -65,6 +65,10 @@ _matches_cache: Dict[str, Any] = {
 
 _odds_cache: Dict[str, Dict[str, Any]] = {}
 
+_score_cache: Dict[str, Dict[str, Any]] = {}
+
+_result_cache: Dict[str, Dict[str, Any]] = {}
+
 
 # =========================================================
 # HELPERS
@@ -81,7 +85,7 @@ def _safe_float(value: Any) -> Optional[float]:
     try:
         value = str(value).strip()
 
-        if value in ("", "-", "null", "None"):
+        if value in ("", "-", "null", "None", "N/A", "NA"):
             return None
 
         return float(value)
@@ -95,10 +99,117 @@ def _safe_int(value: Any) -> Optional[int]:
         return None
 
     try:
-        return int(value)
+        text = str(value).strip()
+
+        if text in ("", "-", "null", "None", "N/A", "NA"):
+            return None
+
+        return int(float(text))
 
     except (TypeError, ValueError):
         return None
+
+
+def _clean_text(value: Any) -> str:
+    if value is None:
+        return ""
+
+    if isinstance(value, (dict, list)):
+        return ""
+
+    return str(value).strip()
+
+
+def _first_value(
+    data: Dict[str, Any],
+    keys: List[str],
+) -> Any:
+    for key in keys:
+        if key in data:
+            value = data.get(key)
+
+            if value is not None and value != "":
+                return value
+
+    return None
+
+
+def _format_number(value: Any) -> str:
+    number = _safe_float(value)
+
+    if number is None:
+        return ""
+
+    if number.is_integer():
+        return str(int(number))
+
+    return str(number)
+
+
+def _format_score(
+    runs: Any,
+    wickets: Any,
+) -> str:
+
+    runs_text = _format_number(runs)
+
+    wickets_int = _safe_int(wickets)
+
+    if not runs_text:
+        return ""
+
+    if wickets_int is None:
+        return runs_text
+
+    return f"{runs_text}/{wickets_int}"
+
+
+def _parse_overs(value: Any) -> Optional[float]:
+    if value is None:
+        return None
+
+    text = str(value).strip()
+
+    if not text:
+        return None
+
+    # Cricket overs such as 18.2 are NOT normal decimal overs.
+    # Keep them as a float only for display/calculation where
+    # appropriate. The original value is preserved separately.
+    match = re.match(
+        r"^\s*(\d+)(?:\.(\d+))?\s*$",
+        text,
+    )
+
+    if match:
+        whole = int(match.group(1))
+        balls = match.group(2)
+
+        if balls is None:
+            return float(whole)
+
+        # 18.2 means 18 overs + 2 balls.
+        if len(balls) == 1 and int(balls) <= 5:
+            return whole + (int(balls) / 6)
+
+        try:
+            return float(text)
+        except ValueError:
+            return None
+
+    return None
+
+
+def _overs_display(value: Any) -> str:
+    if value is None:
+        return ""
+
+    text = str(value).strip()
+
+    if not text:
+        return ""
+
+    return text
 
 
 # =========================================================
@@ -133,7 +244,9 @@ def _request(
             last_error = exc
 
             if attempt < MAX_RETRIES:
-                time.sleep(0.25 * (attempt + 1))
+                time.sleep(
+                    0.25 * (attempt + 1)
+                )
 
     raise RuntimeError(
         f"ProExch request failed: {last_error}"
@@ -150,49 +263,97 @@ def _request_cricketbz(
     """
     Fetch CricketBZ response through the backend.
 
-    The provider may return JSON or plain text.
-    Both formats are preserved.
+    CricketBZ may return:
+        - JSON
+        - JSON with an incorrect content-type
+        - plain text
+
+    All formats are supported.
     """
 
-    try:
+    last_error = None
 
-        response = session.get(
-            url,
-            timeout=REQUEST_TIMEOUT,
-            headers={
-                "Accept": "application/json,text/plain,*/*",
-                "User-Agent": "CrickBet/1.0",
-            },
-        )
+    for attempt in range(MAX_RETRIES + 1):
 
-        response.raise_for_status()
+        try:
 
-        content_type = (
-            response.headers
-            .get("content-type", "")
-            .lower()
-        )
+            response = session.get(
+                url,
+                timeout=REQUEST_TIMEOUT,
+                headers={
+                    "Accept":
+                        "application/json,"
+                        "text/plain,"
+                        "*/*",
+                    "User-Agent":
+                        "CrickBet/1.0",
+                },
+            )
 
-        if "json" in content_type:
+            response.raise_for_status()
 
             try:
                 return response.json()
 
             except ValueError:
-                pass
+                return response.text
 
-        try:
-            return response.json()
+        except Exception as exc:
 
-        except ValueError:
-            return response.text
+            last_error = exc
 
-    except Exception as exc:
+            if attempt < MAX_RETRIES:
+                time.sleep(
+                    0.25 * (attempt + 1)
+                )
 
-        raise RuntimeError(
-            "CricketBZ request failed: "
-            f"{exc}"
-        ) from exc
+    raise RuntimeError(
+        "CricketBZ request failed: "
+        f"{last_error}"
+    )
+
+
+# =========================================================
+# GENERIC RESPONSE UNWRAPPER
+# =========================================================
+
+def _unwrap_generic(
+    payload: Any,
+) -> Any:
+
+    current = payload
+
+    # Safely unwrap common API envelopes.
+    for _ in range(5):
+
+        if not isinstance(current, dict):
+            break
+
+        next_value = None
+
+        for key in (
+            "data",
+            "result",
+            "response",
+            "body",
+            "payload",
+        ):
+            if key in current:
+                value = current.get(key)
+
+                if isinstance(
+                    value,
+                    (dict, list),
+                ):
+                    next_value = value
+                    break
+
+        if next_value is None:
+            break
+
+        current = next_value
+
+    return current
 
 
 # =========================================================
@@ -201,27 +362,983 @@ def _request_cricketbz(
 
 def get_score(
     score_id: str,
+    force_refresh: bool = False,
 ) -> Any:
     """
-    Get live scoreboard data from CricketBZ.
+    Get and normalize live cricket scoreboard data.
 
-    Endpoint:
+    Primary source:
         https://cricketbz.app/getScore/<score_id>
+
+    The returned object is normalized for the CrickBet
+    frontend so the browser does not need to understand
+    provider-specific score fields.
     """
 
-    score_id = str(score_id).strip()
+    score_id = str(
+        score_id
+    ).strip()
 
     if not score_id:
         raise ValueError(
             "score_id is required"
         )
 
+    current = _now()
+
+    cached = _score_cache.get(
+        score_id
+    )
+
+    if (
+        not force_refresh
+        and cached
+        and (
+            current
+            - cached["timestamp"]
+        ) < SCORE_CACHE_TTL
+    ):
+        return cached["data"]
+
     url = (
         f"{CRICKETBZ_BASE_URL}"
         f"/getScore/{score_id}"
     )
 
-    return _request_cricketbz(url)
+    try:
+
+        raw = _request_cricketbz(
+            url
+        )
+
+        normalized = normalize_score(
+            raw
+        )
+
+        normalized["score_id"] = score_id
+        normalized["provider"] = "CricketBZ"
+
+        # Preserve provider response for debugging.
+        normalized["raw"] = raw
+
+        _score_cache[score_id] = {
+            "timestamp": current,
+            "data": normalized,
+        }
+
+        return normalized
+
+    except Exception as exc:
+
+        print(
+            "[CRICKETBZ] score request failed:",
+            exc,
+        )
+
+        # Try ProExch's cricketbz endpoint as a fallback.
+        try:
+
+            fallback = get_cricketbz(
+                score_id
+            )
+
+            if fallback is not None:
+
+                normalized = normalize_score(
+                    fallback
+                )
+
+                normalized["score_id"] = (
+                    score_id
+                )
+
+                normalized["provider"] = (
+                    "ProExch/CricketBZ"
+                )
+
+                normalized["raw"] = fallback
+
+                _score_cache[score_id] = {
+                    "timestamp": current,
+                    "data": normalized,
+                }
+
+                return normalized
+
+        except Exception as fallback_exc:
+
+            print(
+                "[PROEXCH] score fallback failed:",
+                fallback_exc,
+            )
+
+        raise RuntimeError(
+            "Unable to retrieve live score"
+        ) from exc
+
+
+# =========================================================
+# SCORE NORMALIZATION HELPERS
+# =========================================================
+
+_SCORE_CONTAINER_KEYS = (
+    "innings",
+    "inning",
+    "inningsData",
+    "innings_data",
+    "scores",
+    "score",
+    "scorecard",
+    "scoreCard",
+    "score_data",
+    "scoreData",
+    "teamScores",
+    "team_scores",
+)
+
+_TEAM_KEYS = (
+    "team",
+    "teamName",
+    "team_name",
+    "name",
+    "title",
+    "battingTeam",
+    "batting_team",
+    "team1",
+    "team2",
+)
+
+_RUN_KEYS = (
+    "runs",
+    "run",
+    "score",
+    "total",
+    "r",
+    "runsScored",
+    "totalRuns",
+    "teamScore",
+)
+
+_WICKET_KEYS = (
+    "wickets",
+    "wicket",
+    "wkts",
+    "wkt",
+    "w",
+    "wicketsLost",
+)
+
+_OVERS_KEYS = (
+    "overs",
+    "over",
+    "ovs",
+    "overNumber",
+    "oversPlayed",
+)
+
+_RATE_KEYS = (
+    "runRate",
+    "run_rate",
+    "rr",
+    "currentRunRate",
+    "crr",
+)
+
+_TARGET_KEYS = (
+    "target",
+    "targetRuns",
+    "target_runs",
+)
+
+_REQUIRED_RUN_KEYS = (
+    "requiredRuns",
+    "required_runs",
+    "runsRequired",
+    "runs_required",
+    "remainingRuns",
+    "remaining_runs",
+)
+
+_REQUIRED_BALL_KEYS = (
+    "requiredBalls",
+    "required_balls",
+    "ballsRequired",
+    "balls_required",
+    "remainingBalls",
+    "remaining_balls",
+)
+
+_REQUIRED_RATE_KEYS = (
+    "requiredRunRate",
+    "required_run_rate",
+    "rrr",
+    "requiredRR",
+)
+
+
+def _looks_like_innings(
+    value: Dict[str, Any],
+) -> bool:
+
+    if not isinstance(value, dict):
+        return False
+
+    has_team = any(
+        key in value
+        for key in _TEAM_KEYS
+    )
+
+    has_score = any(
+        key in value
+        for key in _RUN_KEYS
+    )
+
+    has_overs = any(
+        key in value
+        for key in _OVERS_KEYS
+    )
+
+    has_wickets = any(
+        key in value
+        for key in _WICKET_KEYS
+    )
+
+    return (
+        has_score
+        and (
+            has_team
+            or has_overs
+            or has_wickets
+        )
+    )
+
+
+def _walk_dicts(
+    value: Any,
+) -> List[Dict[str, Any]]:
+
+    found: List[Dict[str, Any]] = []
+
+    if isinstance(value, dict):
+
+        found.append(value)
+
+        for child in value.values():
+
+            if isinstance(
+                child,
+                (dict, list),
+            ):
+                found.extend(
+                    _walk_dicts(child)
+                )
+
+    elif isinstance(value, list):
+
+        for item in value:
+
+            if isinstance(
+                item,
+                (dict, list),
+            ):
+                found.extend(
+                    _walk_dicts(item)
+                )
+
+    return found
+
+
+def _extract_innings_candidates(
+    payload: Any,
+) -> List[Dict[str, Any]]:
+
+    candidates: List[Dict[str, Any]] = []
+
+    all_dicts = _walk_dicts(
+        payload
+    )
+
+    # First prefer explicitly named innings containers.
+    for obj in all_dicts:
+
+        for key in _SCORE_CONTAINER_KEYS:
+
+            value = obj.get(key)
+
+            if isinstance(value, list):
+
+                for item in value:
+
+                    if (
+                        isinstance(item, dict)
+                        and _looks_like_innings(item)
+                    ):
+                        candidates.append(
+                            item
+                        )
+
+            elif (
+                isinstance(value, dict)
+                and _looks_like_innings(value)
+            ):
+
+                candidates.append(
+                    value
+                )
+
+    # Then inspect all nested objects.
+    for obj in all_dicts:
+
+        if _looks_like_innings(obj):
+            candidates.append(obj)
+
+    # Remove duplicate objects by identity-like content.
+    unique: List[Dict[str, Any]] = []
+    seen = set()
+
+    for item in candidates:
+
+        marker = repr(
+            sorted(
+                (
+                    str(k),
+                    str(v),
+                )
+                for k, v in item.items()
+                if k in (
+                    *_TEAM_KEYS,
+                    *_RUN_KEYS,
+                    *_WICKET_KEYS,
+                    *_OVERS_KEYS,
+                )
+            )
+        )
+
+        if marker in seen:
+            continue
+
+        seen.add(marker)
+        unique.append(item)
+
+    return unique
+
+
+def _normalize_innings(
+    item: Dict[str, Any],
+    index: int,
+) -> Dict[str, Any]:
+
+    team_value = _first_value(
+        item,
+        list(_TEAM_KEYS),
+    )
+
+    runs_value = _first_value(
+        item,
+        list(_RUN_KEYS),
+    )
+
+    wickets_value = _first_value(
+        item,
+        list(_WICKET_KEYS),
+    )
+
+    overs_value = _first_value(
+        item,
+        list(_OVERS_KEYS),
+    )
+
+    rate_value = _first_value(
+        item,
+        list(_RATE_KEYS),
+    )
+
+    # Some providers put the score in a string such as:
+    # "156/4 (18.2)"
+    if isinstance(
+        runs_value,
+        str,
+    ):
+
+        score_match = re.search(
+            r"(\d+)\s*/\s*(\d+)",
+            runs_value,
+        )
+
+        if score_match:
+
+            parsed_runs = _safe_int(
+                score_match.group(1)
+            )
+
+            parsed_wickets = _safe_int(
+                score_match.group(2)
+            )
+
+            if parsed_runs is not None:
+                runs_value = parsed_runs
+
+            if parsed_wickets is not None:
+                wickets_value = (
+                    parsed_wickets
+                )
+
+        overs_match = re.search(
+            r"\(\s*(\d+(?:\.\d+)?)\s*\)",
+            runs_value,
+        )
+
+        if (
+            overs_value is None
+            and overs_match
+        ):
+            overs_value = (
+                overs_match.group(1)
+            )
+
+    runs = _safe_int(
+        runs_value
+    )
+
+    wickets = _safe_int(
+        wickets_value
+    )
+
+    overs = _overs_display(
+        overs_value
+    )
+
+    run_rate = _safe_float(
+        rate_value
+    )
+
+    if (
+        run_rate is None
+        and runs is not None
+        and overs
+    ):
+
+        overs_decimal = _parse_overs(
+            overs
+        )
+
+        if (
+            overs_decimal is not None
+            and overs_decimal > 0
+        ):
+            run_rate = (
+                runs
+                / overs_decimal
+            )
+
+    team = _clean_text(
+        team_value
+    )
+
+    # If there is no team field, some providers use
+    # "team1"/"team2" structures.
+    if not team:
+
+        team = (
+            _clean_text(
+                item.get("batting")
+            )
+            or _clean_text(
+                item.get("battingTeamName")
+            )
+            or f"Innings {index + 1}"
+        )
+
+    target = _safe_int(
+        _first_value(
+            item,
+            list(_TARGET_KEYS),
+        )
+    )
+
+    required_runs = _safe_int(
+        _first_value(
+            item,
+            list(_REQUIRED_RUN_KEYS),
+        )
+    )
+
+    required_balls = _safe_int(
+        _first_value(
+            item,
+            list(_REQUIRED_BALL_KEYS),
+        )
+    )
+
+    required_rate = _safe_float(
+        _first_value(
+            item,
+            list(_REQUIRED_RATE_KEYS),
+        )
+    )
+
+    score_text = _format_score(
+        runs,
+        wickets,
+    )
+
+    return {
+        "team": team,
+        "runs": runs,
+        "wickets": wickets,
+        "overs": overs,
+        "score": score_text,
+        "run_rate": (
+            round(run_rate, 2)
+            if run_rate is not None
+            else None
+        ),
+        "target": target,
+        "required_runs": required_runs,
+        "required_balls": required_balls,
+        "required_run_rate": (
+            round(required_rate, 2)
+            if required_rate is not None
+            else None
+        ),
+        "is_current": bool(
+            item.get("isCurrent")
+            or item.get("is_current")
+            or item.get("current")
+            or item.get("batting")
+            is True
+        ),
+        "raw": item,
+    }
+
+
+def _find_top_level_value(
+    payload: Any,
+    keys: List[str],
+) -> Any:
+
+    for obj in _walk_dicts(payload):
+
+        for key in keys:
+
+            if key in obj:
+
+                value = obj.get(key)
+
+                if value is not None and value != "":
+                    return value
+
+    return None
+
+
+def _parse_score_text(
+    text: str,
+) -> List[Dict[str, Any]]:
+
+    if not text:
+        return []
+
+    text = str(text)
+
+    innings: List[Dict[str, Any]] = []
+
+    # Examples:
+    # India 185/3 (20)
+    # Australia: 142/5 18.4
+    pattern = re.compile(
+        r"""
+        (?P<team>[A-Za-z][A-Za-z0-9 .&'()_-]{1,40}?)
+        \s*[:\-]?\s*
+        (?P<runs>\d+)
+        \s*/\s*
+        (?P<wickets>\d+)
+        (?:\s*
+            (?:\(|@)?
+            (?P<overs>\d+(?:\.\d+)?)
+            (?:\))?
+            \s*(?:overs|ov)?
+        )?
+        """,
+        re.IGNORECASE | re.VERBOSE,
+    )
+
+    for match in pattern.finditer(
+        text
+    ):
+
+        team = match.group(
+            "team"
+        ).strip()
+
+        if team.lower() in {
+            "score",
+            "scores",
+            "result",
+            "live",
+            "status",
+        }:
+            continue
+
+        runs = _safe_int(
+            match.group("runs")
+        )
+
+        wickets = _safe_int(
+            match.group("wickets")
+        )
+
+        overs = match.group(
+            "overs"
+        )
+
+        innings.append(
+            {
+                "team": team,
+                "runs": runs,
+                "wickets": wickets,
+                "overs": overs or "",
+                "score": _format_score(
+                    runs,
+                    wickets,
+                ),
+                "run_rate": None,
+                "target": None,
+                "required_runs": None,
+                "required_balls": None,
+                "required_run_rate": None,
+                "is_current": False,
+                "raw": match.group(0),
+            }
+        )
+
+    return innings
+
+
+# =========================================================
+# NORMALIZE SCORE
+# =========================================================
+
+def normalize_score(
+    payload: Any,
+) -> Dict[str, Any]:
+
+    root = _unwrap_generic(
+        payload
+    )
+
+    innings_raw = (
+        _extract_innings_candidates(
+            payload
+        )
+    )
+
+    innings: List[Dict[str, Any]] = []
+
+    for index, item in enumerate(
+        innings_raw
+    ):
+
+        normalized = _normalize_innings(
+            item,
+            index,
+        )
+
+        if (
+            normalized["runs"] is not None
+            or normalized["score"]
+        ):
+            innings.append(
+                normalized
+            )
+
+    # If the provider returned plain text,
+    # try to extract score lines.
+    if not innings:
+
+        if isinstance(
+            root,
+            str,
+        ):
+
+            innings = _parse_score_text(
+                root
+            )
+
+        elif isinstance(
+            payload,
+            str,
+        ):
+
+            innings = _parse_score_text(
+                payload
+            )
+
+    # -----------------------------------------------------
+    # Team / match information
+    # -----------------------------------------------------
+
+    event_name = _find_top_level_value(
+        payload,
+        [
+            "eventName",
+            "event_name",
+            "matchName",
+            "match_name",
+            "match",
+            "title",
+            "name",
+        ],
+    )
+
+    status = _find_top_level_value(
+        payload,
+        [
+            "status",
+            "matchStatus",
+            "match_status",
+            "state",
+            "gameStatus",
+            "game_status",
+        ],
+    )
+
+    toss = _find_top_level_value(
+        payload,
+        [
+            "toss",
+            "tossResult",
+            "toss_result",
+        ],
+    )
+
+    message = _find_top_level_value(
+        payload,
+        [
+            "message",
+            "msg",
+        ],
+    )
+
+    batting_team = _find_top_level_value(
+        payload,
+        [
+            "battingTeam",
+            "batting_team",
+            "currentBattingTeam",
+            "current_batting_team",
+        ],
+    )
+
+    bowling_team = _find_top_level_value(
+        payload,
+        [
+            "bowlingTeam",
+            "bowling_team",
+            "currentBowlingTeam",
+            "current_bowling_team",
+        ],
+    )
+
+    target = _safe_int(
+        _find_top_level_value(
+            payload,
+            list(_TARGET_KEYS),
+        )
+    )
+
+    required_runs = _safe_int(
+        _find_top_level_value(
+            payload,
+            list(_REQUIRED_RUN_KEYS),
+        )
+    )
+
+    required_balls = _safe_int(
+        _find_top_level_value(
+            payload,
+            list(_REQUIRED_BALL_KEYS),
+        )
+    )
+
+    required_rate = _safe_float(
+        _find_top_level_value(
+            payload,
+            list(_REQUIRED_RATE_KEYS),
+        )
+    )
+
+    # -----------------------------------------------------
+    # Pull target/required information from innings when
+    # it exists there rather than at root level.
+    # -----------------------------------------------------
+
+    if innings:
+
+        current_innings = None
+
+        for inning in innings:
+
+            if inning.get("is_current"):
+                current_innings = inning
+                break
+
+        if current_innings is None:
+            current_innings = innings[-1]
+
+        if target is None:
+            target = current_innings.get(
+                "target"
+            )
+
+        if required_runs is None:
+            required_runs = (
+                current_innings.get(
+                    "required_runs"
+                )
+            )
+
+        if required_balls is None:
+            required_balls = (
+                current_innings.get(
+                    "required_balls"
+                )
+            )
+
+        if required_rate is None:
+            required_rate = (
+                current_innings.get(
+                    "required_run_rate"
+                )
+            )
+
+        if not batting_team:
+            batting_team = (
+                current_innings.get(
+                    "team"
+                )
+            )
+
+    # -----------------------------------------------------
+    # Calculate required runs if target and current score
+    # are available.
+    # -----------------------------------------------------
+
+    if (
+        required_runs is None
+        and target is not None
+        and innings
+    ):
+
+        current = innings[-1]
+
+        current_runs = current.get(
+            "runs"
+        )
+
+        if current_runs is not None:
+
+            required_runs = max(
+                0,
+                target - current_runs,
+            )
+
+    # -----------------------------------------------------
+    # Current innings marker
+    # -----------------------------------------------------
+
+    if innings:
+
+        current_index = None
+
+        for index, inning in enumerate(
+            innings
+        ):
+
+            if inning.get("is_current"):
+                current_index = index
+                break
+
+        if current_index is None:
+            current_index = len(innings) - 1
+
+        for index, inning in enumerate(
+            innings
+        ):
+            inning["is_current"] = (
+                index == current_index
+            )
+
+    # -----------------------------------------------------
+    # Determine a useful status when provider does not
+    # provide one.
+    # -----------------------------------------------------
+
+    if not status:
+
+        if innings:
+            status = "LIVE"
+
+        elif message:
+            status = str(
+                message
+            )
+
+        else:
+            status = "SCORE UNAVAILABLE"
+
+    return {
+        "success": bool(
+            len(innings) > 0
+        ),
+
+        "event_name": (
+            str(event_name)
+            if event_name is not None
+            else ""
+        ),
+
+        "status": str(
+            status
+        ),
+
+        "toss": (
+            str(toss)
+            if toss is not None
+            else ""
+        ),
+
+        "batting_team": (
+            str(batting_team)
+            if batting_team is not None
+            else ""
+        ),
+
+        "bowling_team": (
+            str(bowling_team)
+            if bowling_team is not None
+            else ""
+        ),
+
+        "innings": innings,
+
+        "target": target,
+
+        "required_runs": required_runs,
+
+        "required_balls": required_balls,
+
+        "required_run_rate": (
+            round(required_rate, 2)
+            if required_rate is not None
+            else None
+        ),
+
+        "message": (
+            str(message)
+            if message is not None
+            else ""
+        ),
+    }
 
 
 # =========================================================
@@ -230,31 +1347,49 @@ def get_score(
 
 def get_cricketbz_result(
     result_id: str,
+    force_refresh: bool = False,
 ) -> Any:
-    """
-    Get match/result data from CricketBZ.
 
-    Endpoint:
-        https://cricketbz.app/getResults/<result_id>
-
-    IMPORTANT:
-    This has a different function name from the ProExch
-    betfair-result endpoint so there is no function collision.
-    """
-
-    result_id = str(result_id).strip()
+    result_id = str(
+        result_id
+    ).strip()
 
     if not result_id:
         raise ValueError(
             "result_id is required"
         )
 
+    current = _now()
+
+    cached = _result_cache.get(
+        result_id
+    )
+
+    if (
+        not force_refresh
+        and cached
+        and (
+            current
+            - cached["timestamp"]
+        ) < RESULT_CACHE_TTL
+    ):
+        return cached["data"]
+
     url = (
         f"{CRICKETBZ_BASE_URL}"
         f"/getResults/{result_id}"
     )
 
-    return _request_cricketbz(url)
+    data = _request_cricketbz(
+        url
+    )
+
+    _result_cache[result_id] = {
+        "timestamp": current,
+        "data": data,
+    }
+
+    return data
 
 
 # =========================================================
@@ -264,14 +1399,10 @@ def get_cricketbz_result(
 def get_proexch_result(
     market_id: str,
 ) -> Any:
-    """
-    Get result/settlement information from ProExch.
 
-    Endpoint:
-        /api/betfair-result
-    """
-
-    market_id = str(market_id).strip()
+    market_id = str(
+        market_id
+    ).strip()
 
     if not market_id:
         raise ValueError(
@@ -296,15 +1427,29 @@ def _unwrap_matches(
     payload: Any,
 ) -> List[Dict[str, Any]]:
 
-    if not isinstance(payload, dict):
+    if not isinstance(
+        payload,
+        dict,
+    ):
         return []
 
-    data = payload.get("data")
+    data = payload.get(
+        "data"
+    )
 
-    if isinstance(data, dict):
-        data = data.get("data", [])
+    if isinstance(
+        data,
+        dict,
+    ):
+        data = data.get(
+            "data",
+            [],
+        )
 
-    if isinstance(data, list):
+    if isinstance(
+        data,
+        list,
+    ):
         return data
 
     return []
@@ -318,12 +1463,20 @@ def _unwrap_odds(
     payload: Any,
 ) -> Dict[str, Any]:
 
-    if not isinstance(payload, dict):
+    if not isinstance(
+        payload,
+        dict,
+    ):
         return {}
 
-    data = payload.get("data")
+    data = payload.get(
+        "data"
+    )
 
-    if isinstance(data, dict):
+    if isinstance(
+        data,
+        dict,
+    ):
         return data
 
     return {}
@@ -363,7 +1516,10 @@ def get_matches(
 
     for item in raw_matches:
 
-        if not isinstance(item, dict):
+        if not isinstance(
+            item,
+            dict,
+        ):
             continue
 
         game_id = (
@@ -412,17 +1568,13 @@ def get_matches(
             or ""
         )
 
-        in_play = item.get("inPlay")
+        in_play = item.get(
+            "inPlay"
+        )
 
-        tv = item.get("tv")
-
-        # -------------------------------------------------
-        # Optional score/result identifiers.
-        #
-        # If ProExch supplies these, use them.
-        # Otherwise leave empty so the frontend/backend
-        # can fall back to game_id.
-        # -------------------------------------------------
+        tv = item.get(
+            "tv"
+        )
 
         score_id = (
             item.get("scoreId")
@@ -477,9 +1629,17 @@ def get_matches(
                 else ""
             ),
 
-            "team1": str(team1),
-            "team2": str(team2),
-            "team3": str(team3),
+            "team1": str(
+                team1
+            ),
+
+            "team2": str(
+                team2
+            ),
+
+            "team3": str(
+                team3
+            ),
 
             "raw": item,
         }
@@ -728,30 +1888,6 @@ def parse_match_odds(
             ):
                 continue
 
-            back1 = _safe_float(
-                runner.get("b1")
-            )
-
-            back2 = _safe_float(
-                runner.get("b2")
-            )
-
-            back3 = _safe_float(
-                runner.get("b3")
-            )
-
-            lay1 = _safe_float(
-                runner.get("l1")
-            )
-
-            lay2 = _safe_float(
-                runner.get("l2")
-            )
-
-            lay3 = _safe_float(
-                runner.get("l3")
-            )
-
             normalized_runner = {
                 "id": runner.get(
                     "sid"
@@ -773,37 +1909,49 @@ def parse_match_odds(
                     "status"
                 ),
 
-                "back": back1,
+                "back": _safe_float(
+                    runner.get("b1")
+                ),
 
                 "back_size": _safe_float(
                     runner.get("bs1")
                 ),
 
-                "back2": back2,
+                "back2": _safe_float(
+                    runner.get("b2")
+                ),
 
                 "back2_size": _safe_float(
                     runner.get("bs2")
                 ),
 
-                "back3": back3,
+                "back3": _safe_float(
+                    runner.get("b3")
+                ),
 
                 "back3_size": _safe_float(
                     runner.get("bs3")
                 ),
 
-                "lay": lay1,
+                "lay": _safe_float(
+                    runner.get("l1")
+                ),
 
                 "lay_size": _safe_float(
                     runner.get("ls1")
                 ),
 
-                "lay2": lay2,
+                "lay2": _safe_float(
+                    runner.get("l2")
+                ),
 
                 "lay2_size": _safe_float(
                     runner.get("ls2")
                 ),
 
-                "lay3": lay3,
+                "lay3": _safe_float(
+                    runner.get("l3")
+                ),
 
                 "lay3_size": _safe_float(
                     runner.get("ls3")
@@ -894,14 +2042,6 @@ def parse_bookmaker_odds(
             ):
                 continue
 
-            back = _safe_float(
-                runner.get("b1")
-            )
-
-            lay = _safe_float(
-                runner.get("l1")
-            )
-
             normalized_runner = {
                 "id": runner.get(
                     "sid"
@@ -923,13 +2063,17 @@ def parse_bookmaker_odds(
                     "status"
                 ),
 
-                "back": back,
+                "back": _safe_float(
+                    runner.get("b1")
+                ),
 
                 "back_size": _safe_float(
                     runner.get("bs1")
                 ),
 
-                "lay": lay,
+                "lay": _safe_float(
+                    runner.get("l1")
+                ),
 
                 "lay_size": _safe_float(
                     runner.get("ls1")
@@ -1054,7 +2198,9 @@ def parse_fancy_odds(
                     "sid"
                 ),
 
-                "name": str(name),
+                "name": str(
+                    name
+                ),
 
                 "status": runner.get(
                     "status"
@@ -1090,37 +2236,35 @@ def parse_fancy_odds(
             or "Fancy / Session"
         )
 
-        normalized_market = {
-            "id": (
-                market.get("mid")
-                or market.get(
-                    "marketId"
-                )
-            ),
-
-            "name": str(
-                market_name
-            ),
-
-            "status": (
-                market.get("mstatus")
-                or market.get("status")
-                or "OPEN"
-            ),
-
-            "type": "fancy",
-
-            "rows": rows,
-
-            "runners": rows,
-
-            "outcomes": rows,
-
-            "raw": market,
-        }
-
         result.append(
-            normalized_market
+            {
+                "id": (
+                    market.get("mid")
+                    or market.get(
+                        "marketId"
+                    )
+                ),
+
+                "name": str(
+                    market_name
+                ),
+
+                "status": (
+                    market.get("mstatus")
+                    or market.get("status")
+                    or "OPEN"
+                ),
+
+                "type": "fancy",
+
+                "rows": rows,
+
+                "runners": rows,
+
+                "outcomes": rows,
+
+                "raw": market,
+            }
         )
 
     return result
@@ -1274,6 +2418,8 @@ def clear_cache() -> None:
     }
 
     _odds_cache.clear()
+    _score_cache.clear()
+    _result_cache.clear()
 
     print(
         "[PROEXCH] cache cleared"
@@ -1306,8 +2452,24 @@ def clear_odds_cache(
 
         _odds_cache.pop(
             key,
-            None
+            None,
         )
+
+
+def clear_score_cache(
+    score_id: Optional[str] = None,
+) -> None:
+
+    if score_id is None:
+
+        _score_cache.clear()
+
+        return
+
+    _score_cache.pop(
+        str(score_id),
+        None,
+    )
 
 
 # =========================================================
@@ -1333,7 +2495,7 @@ def get_cricketbz(
 
         print(
             "[PROEXCH] cricketbz error:",
-            exc
+            exc,
         )
 
         return None
@@ -1362,8 +2524,7 @@ def get_video(
 
         print(
             "[PROEXCH] video error:",
-            exc
+            exc,
         )
 
         return None
-

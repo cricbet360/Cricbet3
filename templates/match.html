@@ -1030,88 +1030,346 @@
 
 
 <section id="liveScoreboard" class="live-scoreboard">
+
     <div class="scoreboard-head">
+
         <div>
-            <div class="scoreboard-kicker">LIVE CRICKET</div>
-            <h2>Scoreboard</h2>
+            <div class="scoreboard-kicker">
+                LIVE CRICKET
+            </div>
+
+            <h2 id="scoreboardTitle">
+                Scoreboard
+            </h2>
         </div>
-        <div id="scoreboardStatus" class="scoreboard-status">Loading…</div>
+
+        <div
+            id="scoreboardStatus"
+            class="scoreboard-status"
+        >
+            Loading…
+        </div>
+
     </div>
 
-    <div id="scoreboardSummary" class="scoreboard-summary"></div>
+
+    <div
+        id="scoreboardMatchName"
+        class="scoreboard-match-name"
+    ></div>
+
+
+    <div
+        id="scoreboardInnings"
+        class="scoreboard-innings"
+    >
+        <div class="scoreboard-loading">
+            Loading live score…
+        </div>
+    </div>
+
+
+    <div
+        id="scoreboardMatchInfo"
+        class="scoreboard-match-info"
+    ></div>
+
+
+    <div
+        id="scoreboardTarget"
+        class="scoreboard-target"
+        hidden
+    ></div>
+
 
     <details class="scoreboard-details">
-        <summary>Match result / details</summary>
+
+        <summary>
+            Match result / details
+        </summary>
+
         <pre id="resultData">Loading…</pre>
+
     </details>
+
 </section>
 
 <style>
+/* =========================================================
+   LIVE CRICKET SCOREBOARD
+========================================================= */
+
 .live-scoreboard {
     width: 100%;
     margin: 0;
     padding: 16px;
-    border-radius: 0;
-    background: linear-gradient(135deg, #101827, #172338);
-    color: #fff;
-    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    background:
+        linear-gradient(
+            135deg,
+            #071b12,
+            #10291c
+        );
+    color: #ffffff;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    box-shadow:
+        0 8px 24px rgba(0,0,0,.16);
 }
+
 .scoreboard-head {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 }
+
 .scoreboard-kicker {
-    font-size:11px;
-    letter-spacing:1.4px;
-    opacity:.65;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: #6ee7a0;
+    text-transform: uppercase;
 }
+
 .live-scoreboard h2 {
-    margin:2px 0 0;
-    font-size:22px;
+    margin: 3px 0 0;
+    font-size: 22px;
+    font-weight: 800;
 }
+
 .scoreboard-status {
-    font-size:12px;
-    opacity:.75;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgba(52,211,153,.12);
+    border: 1px solid rgba(52,211,153,.20);
+    color: #86efac;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
 }
-.scoreboard-summary {
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-    gap:10px;
-    margin-top:14px;
+
+.scoreboard-match-name {
+    margin-top: 8px;
+    color: rgba(255,255,255,.65);
+    font-size: 12px;
+    font-weight: 600;
 }
-.score-card {
-    padding:12px;
-    border-radius:10px;
-    background:rgba(255,255,255,.08);
+
+.scoreboard-innings {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 14px;
 }
-.score-card .label {
-    font-size:12px;
-    opacity:.65;
+
+.scoreboard-innings-grid {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto
+        auto
+        auto;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.055);
+    border: 1px solid rgba(255,255,255,.07);
 }
-.score-card .value {
-    margin-top:4px;
-    font-size:18px;
-    font-weight:700;
+
+.scoreboard-innings-grid.current-innings {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(34,197,94,.15),
+            rgba(255,255,255,.045)
+        );
+    border-color: rgba(74,222,128,.25);
 }
+
+.score-team {
+    min-width: 0;
+}
+
+.score-team-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.score-current-label {
+    margin-top: 3px;
+    color: #86efac;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .7px;
+    text-transform: uppercase;
+}
+
+.score-main {
+    min-width: 85px;
+    text-align: right;
+}
+
+.score-main-value {
+    font-size: 25px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: -.5px;
+}
+
+.score-main-overs {
+    margin-top: 4px;
+    color: rgba(255,255,255,.62);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.score-stat {
+    min-width: 55px;
+    text-align: center;
+}
+
+.score-stat-label {
+    color: rgba(255,255,255,.48);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+}
+
+.score-stat-value {
+    margin-top: 3px;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.scoreboard-match-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 10px;
+}
+
+.score-info-pill {
+    padding: 6px 9px;
+    border-radius: 7px;
+    background: rgba(255,255,255,.055);
+    color: rgba(255,255,255,.72);
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.scoreboard-target {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 9px;
+    background: rgba(245,158,11,.10);
+    border: 1px solid rgba(245,158,11,.20);
+    color: #fcd34d;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.scoreboard-loading {
+    padding: 18px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.045);
+    color: rgba(255,255,255,.58);
+    text-align: center;
+    font-size: 12px;
+}
+
+.scoreboard-empty {
+    padding: 18px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.045);
+    color: rgba(255,255,255,.58);
+    text-align: center;
+    font-size: 12px;
+}
+
 .scoreboard-details {
-    margin-top:12px;
+    margin-top: 10px;
 }
+
 .scoreboard-details summary {
-    cursor:pointer;
-    opacity:.85;
+    cursor: pointer;
+    color: rgba(255,255,255,.58);
+    font-size: 11px;
+    font-weight: 600;
 }
+
 .scoreboard-details pre {
-    white-space:pre-wrap;
-    word-break:break-word;
-    max-height:280px;
-    overflow:auto;
-    margin:10px 0 0;
-    padding:10px;
-    border-radius:8px;
-    background:rgba(0,0,0,.25);
-    font-size:11px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 280px;
+    overflow: auto;
+    margin: 10px 0 0;
+    padding: 10px;
+    border-radius: 8px;
+    background: rgba(0,0,0,.25);
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   MOBILE SCOREBOARD
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .live-scoreboard {
+        padding: 12px;
+    }
+
+    .scoreboard-head {
+        align-items: flex-start;
+    }
+
+    .live-scoreboard h2 {
+        font-size: 19px;
+    }
+
+    .scoreboard-status {
+        font-size: 9px;
+        min-height: 25px;
+        padding: 4px 8px;
+    }
+
+    .scoreboard-innings-grid {
+        grid-template-columns:
+            minmax(0, 1fr)
+            auto;
+        gap: 8px;
+        padding: 12px;
+    }
+
+    .score-main {
+        min-width: 80px;
+    }
+
+    .score-main-value {
+        font-size: 22px;
+    }
+
+    .score-stat {
+        display: none;
+    }
+
+    .score-team-name {
+        font-size: 13px;
+    }
+
+    .scoreboard-match-name {
+        font-size: 11px;
+    }
+
 }
 </style>
 
