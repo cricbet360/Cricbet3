@@ -4,10 +4,11 @@ from sqlalchemy import (
     Float,
     String,
     DateTime,
-    ForeignKey
+    ForeignKey,
 )
 
 from sqlalchemy.sql import func
+
 from sqlalchemy.orm import relationship
 
 from database.database import Base
@@ -68,18 +69,18 @@ class DepositRequest(Base):
         nullable=True
     )
 
-    # ------------------------------------------------------
+    # ======================================================
     # USER
-    # ------------------------------------------------------
+    # ======================================================
 
     user = relationship(
         "User",
         back_populates="deposit_requests"
     )
 
-    # ------------------------------------------------------
+    # ======================================================
     # EMPLOYEE
-    # ------------------------------------------------------
+    # ======================================================
 
     employee = relationship(
         "Employee",

@@ -1,4 +1,11 @@
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Float,
+    Boolean,
+    ForeignKey,
+)
 from sqlalchemy.orm import relationship
 
 from database.database import Base
@@ -7,6 +14,10 @@ from database.database import Base
 class User(Base):
 
     __tablename__ = "users"
+
+    # ======================================================
+    # BASIC USER INFORMATION
+    # ======================================================
 
     id = Column(
         Integer,
@@ -39,7 +50,8 @@ class User(Base):
 
     balance = Column(
         Float,
-        default=10000.00
+        default=0.00,
+        nullable=False
     )
 
     status = Column(
@@ -47,9 +59,59 @@ class User(Base):
         default="Active"
     )
 
-    # ------------------------------------------------------
+    # ======================================================
+    # REFERRAL SYSTEM
+    # ======================================================
+
+    referral_code = Column(
+        String(20),
+        unique=True,
+        nullable=True,
+        index=True
+    )
+
+    referred_by_user_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=True,
+        index=True
+    )
+
+    # True once this user has had their first approved deposit.
+    first_deposit_completed = Column(
+        Boolean,
+        default=False,
+        nullable=False
+    )
+
+    # True once the one-time referral bonus for this user
+    # has been paid to their referrer.
+    referral_bonus_paid = Column(
+        Boolean,
+        default=False,
+        nullable=False
+    )
+
+    # ======================================================
+    # REFERRAL RELATIONSHIPS
+    # ======================================================
+
+    referrer = relationship(
+        "User",
+        remote_side=[id],
+        foreign_keys=[referred_by_user_id],
+        back_populates="referred_users",
+    )
+
+    referred_users = relationship(
+        "User",
+        foreign_keys=[referred_by_user_id],
+        back_populates="referrer",
+    )
+
+    # ======================================================
     # WALLET
-    # ------------------------------------------------------
+    # ======================================================
 
     wallet = relationship(
         "Wallet",
@@ -57,9 +119,9 @@ class User(Base):
         uselist=False
     )
 
-    # ------------------------------------------------------
+    # ======================================================
     # TRANSACTIONS
-    # ------------------------------------------------------
+    # ======================================================
 
     transactions = relationship(
         "Transaction",
@@ -68,9 +130,9 @@ class User(Base):
         order_by="Transaction.created_at.desc()",
     )
 
-    # ------------------------------------------------------
+    # ======================================================
     # BETS
-    # ------------------------------------------------------
+    # ======================================================
 
     bets = relationship(
         "Bet",
@@ -79,9 +141,9 @@ class User(Base):
         cascade="all, delete-orphan",
     )
 
-    # ------------------------------------------------------
+    # ======================================================
     # DEPOSITS
-    # ------------------------------------------------------
+    # ======================================================
 
     deposit_requests = relationship(
         "DepositRequest",
@@ -90,9 +152,9 @@ class User(Base):
         order_by="DepositRequest.created_at.desc()",
     )
 
-    # ------------------------------------------------------
+    # ======================================================
     # WITHDRAWALS
-    # ------------------------------------------------------
+    # ======================================================
 
     withdrawal_requests = relationship(
         "WithdrawalRequest",
