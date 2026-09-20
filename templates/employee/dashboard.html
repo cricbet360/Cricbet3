@@ -10,1692 +10,367 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>CrickBet Employee Portal</title>
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            min-height: 100%;
-            font-family:
-                Arial,
-                Helvetica,
-                sans-serif;
-            background: #071b12;
-            color: #ffffff;
-        }
-
-        body {
-            min-height: 100vh;
-        }
-
-        /* =====================================================
-           HEADER
-        ===================================================== */
-
-        .topbar {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-
-            width: 100%;
-
-            background: #0b2418;
-
-            border-bottom: 1px solid #173f2b;
-
-            box-shadow:
-                0 4px 18px rgba(0, 0, 0, 0.25);
-        }
-
-        .topbar-inner {
-            width: 100%;
-            max-width: 1250px;
-
-            margin: 0 auto;
-
-            min-height: 64px;
-
-            padding:
-                10px 18px;
-
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            gap: 15px;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-
-            min-width: 0;
-        }
-
-        .brand-title {
-            font-size: 21px;
-            font-weight: 800;
-
-            color: #ffffff;
-
-            white-space: nowrap;
-        }
-
-        .brand-subtitle {
-            margin-left: 9px;
-
-            padding: 4px 8px;
-
-            border-radius: 5px;
-
-            background: #123b28;
-
-            color: #9bd8b7;
-
-            font-size: 11px;
-            font-weight: 700;
-
-            white-space: nowrap;
-        }
-
-        .employee-area {
-            display: flex;
-            align-items: center;
-
-            gap: 12px;
-
-            flex-shrink: 0;
-        }
-
-        .employee-id {
-            color: #a9c8b7;
-
-            font-size: 13px;
-
-            white-space: nowrap;
-        }
-
-        .employee-id strong {
-            color: #ffffff;
-        }
-
-        .logout-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-
-            min-height: 38px;
-
-            padding: 0 14px;
-
-            border-radius: 7px;
-
-            background: #173a29;
-
-            border: 1px solid #27543c;
-
-            color: #ffffff;
-
-            text-decoration: none;
-
-            font-size: 13px;
-            font-weight: 700;
-
-            transition: 0.2s ease;
-        }
-
-        .logout-btn:hover {
-            background: #205239;
-        }
-
-
-        /* =====================================================
-           MAIN
-        ===================================================== */
-
-        .container {
-            width: 100%;
-            max-width: 1250px;
-
-            margin: 0 auto;
-
-            padding:
-                24px 18px 40px;
-        }
-
-
-        /* =====================================================
-           PAGE TITLE
-        ===================================================== */
-
-        .page-title {
-            margin-bottom: 20px;
-        }
-
-        .page-title h1 {
-            margin: 0;
-
-            font-size: 25px;
-            font-weight: 800;
-
-            color: #ffffff;
-        }
-
-        .page-title p {
-            margin: 7px 0 0;
-
-            color: #8eac9d;
-
-            font-size: 13px;
-        }
-
-
-        /* =====================================================
-           STATS
-        ===================================================== */
-
-        .stats-grid {
-            display: grid;
-
-            grid-template-columns:
-                repeat(4, minmax(0, 1fr));
-
-            gap: 13px;
-
-            margin-bottom: 22px;
-        }
-
-        .stat-card {
-            background: #0b2418;
-
-            border:
-                1px solid #173f2b;
-
-            border-radius: 10px;
-
-            padding: 17px;
-
-            min-width: 0;
-        }
-
-        .stat-label {
-            color: #8eac9d;
-
-            font-size: 12px;
-            font-weight: 600;
-
-            margin-bottom: 8px;
-        }
-
-        .stat-value {
-            color: #ffffff;
-
-            font-size: 25px;
-            font-weight: 800;
-        }
-
-
-        /* =====================================================
-           COMMON CARD
-        ===================================================== */
-
-        .card {
-            background: #0b2418;
-
-            border:
-                1px solid #173f2b;
-
-            border-radius: 11px;
-
-            padding: 20px;
-
-            margin-bottom: 20px;
-
-            box-shadow:
-                0 6px 20px rgba(0, 0, 0, 0.12);
-        }
-
-        .card-header {
-            margin-bottom: 16px;
-        }
-
-        .card-title {
-            margin: 0;
-
-            font-size: 18px;
-            font-weight: 800;
-
-            color: #ffffff;
-        }
-
-        .card-description {
-            margin: 6px 0 0;
-
-            color: #8eac9d;
-
-            font-size: 12px;
-
-            line-height: 1.5;
-        }
-
-
-        /* =====================================================
-           SEARCH
-        ===================================================== */
-
-        .search-form {
-            width: 100%;
-        }
-
-        .search-grid {
-            display: grid;
-
-            grid-template-columns:
-                1fr 1fr auto;
-
-            gap: 11px;
-
-            align-items: end;
-        }
-
-        .field {
-            min-width: 0;
-        }
-
-        .field label {
-            display: block;
-
-            margin-bottom: 7px;
-
-            color: #a8c4b5;
-
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .field input {
-            width: 100%;
-
-            height: 43px;
-
-            padding: 0 12px;
-
-            border-radius: 7px;
-
-            border:
-                1px solid #28553d;
-
-            background: #071b12;
-
-            color: #ffffff;
-
-            outline: none;
-
-            font-size: 14px;
-
-            transition: 0.2s ease;
-        }
-
-        .field input::placeholder {
-            color: #607b6d;
-        }
-
-        .field input:focus {
-            border-color: #3f9b68;
-
-            box-shadow:
-                0 0 0 2px rgba(
-                    63,
-                    155,
-                    104,
-                    0.12
-                );
-        }
-
-        .search-btn {
-            height: 43px;
-
-            padding:
-                0 22px;
-
-            border: 0;
-
-            border-radius: 7px;
-
-            background: #16834c;
-
-            color: #ffffff;
-
-            cursor: pointer;
-
-            font-size: 13px;
-            font-weight: 800;
-
-            transition: 0.2s ease;
-        }
-
-        .search-btn:hover {
-            background: #1b9b5b;
-        }
-
-
-        /* =====================================================
-           MESSAGES
-        ===================================================== */
-
-        .message {
-            margin-top: 15px;
-
-            padding:
-                11px 13px;
-
-            border-radius: 7px;
-
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .message.error {
-            background: #3b1717;
-
-            border:
-                1px solid #6d2929;
-
-            color: #ffb1b1;
-        }
-
-        .message.success {
-            background: #123b27;
-
-            border:
-                1px solid #246541;
-
-            color: #a8efc4;
-        }
-
-
-        /* =====================================================
-           USER RESULT
-        ===================================================== */
-
-        .user-result {
-            margin-top: 20px;
-
-            padding: 17px;
-
-            border-radius: 9px;
-
-            background: #081f14;
-
-            border:
-                1px solid #1c4932;
-        }
-
-        .user-result-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            gap: 15px;
-
-            margin-bottom: 15px;
-        }
-
-        .user-result-title {
-            margin: 0;
-
-            font-size: 16px;
-            font-weight: 800;
-        }
-
-        .user-status {
-            display: inline-flex;
-
-            align-items: center;
-            justify-content: center;
-
-            padding:
-                5px 9px;
-
-            border-radius: 20px;
-
-            background: #123b27;
-
-            color: #a8efc4;
-
-            font-size: 11px;
-            font-weight: 800;
-        }
-
-        .user-info-grid {
-            display: grid;
-
-            grid-template-columns:
-                repeat(3, minmax(0, 1fr));
-
-            gap: 10px;
-
-            margin-bottom: 18px;
-        }
-
-        .user-info {
-            padding: 12px;
-
-            background: #0b281b;
-
-            border:
-                1px solid #173f2b;
-
-            border-radius: 7px;
-        }
-
-        .user-info-label {
-            color: #78988a;
-
-            font-size: 11px;
-
-            margin-bottom: 5px;
-        }
-
-        .user-info-value {
-            color: #ffffff;
-
-            font-size: 14px;
-            font-weight: 700;
-
-            overflow-wrap: anywhere;
-        }
-
-        .balance-box {
-            padding: 15px;
-
-            margin-bottom: 17px;
-
-            background: #0e3322;
-
-            border:
-                1px solid #246541;
-
-            border-radius: 8px;
-
-            text-align: center;
-        }
-
-        .balance-label {
-            color: #91b9a5;
-
-            font-size: 11px;
-            font-weight: 700;
-
-            text-transform: uppercase;
-
-            letter-spacing: 0.5px;
-        }
-
-        .balance-value {
-            margin-top: 5px;
-
-            color: #ffffff;
-
-            font-size: 27px;
-            font-weight: 900;
-        }
-
-
-        /* =====================================================
-           BALANCE ACTIONS
-        ===================================================== */
-
-        .balance-actions {
-            display: grid;
-
-            grid-template-columns:
-                1fr 1fr;
-
-            gap: 13px;
-        }
-
-        .balance-action {
-            padding: 15px;
-
-            border:
-                1px solid #173f2b;
-
-            border-radius: 8px;
-
-            background: #0b2418;
-        }
-
-        .balance-action h3 {
-            margin: 0 0 11px;
-
-            font-size: 14px;
-            font-weight: 800;
-        }
-
-        .balance-action.add h3 {
-            color: #7de5a6;
-        }
-
-        .balance-action.withdraw h3 {
-            color: #ff9b9b;
-        }
-
-        .balance-form {
-            display: flex;
-
-            gap: 9px;
-        }
-
-        .balance-form input {
-            flex: 1;
-
-            min-width: 0;
-
-            height: 42px;
-
-            padding:
-                0 11px;
-
-            border:
-                1px solid #28553d;
-
-            border-radius: 7px;
-
-            background: #071b12;
-
-            color: #ffffff;
-
-            outline: none;
-
-            font-size: 14px;
-        }
-
-        .balance-form input:focus {
-            border-color: #3f9b68;
-        }
-
-        .balance-form button {
-            min-width: 105px;
-
-            height: 42px;
-
-            padding:
-                0 13px;
-
-            border: 0;
-
-            border-radius: 7px;
-
-            color: #ffffff;
-
-            cursor: pointer;
-
-            font-size: 12px;
-            font-weight: 800;
-        }
-
-        .add-btn {
-            background: #16834c;
-        }
-
-        .add-btn:hover {
-            background: #1b9b5b;
-        }
-
-        .withdraw-btn {
-            background: #a83434;
-        }
-
-        .withdraw-btn:hover {
-            background: #c13c3c;
-        }
-
-
-        /* =====================================================
-           QUICK LINKS
-        ===================================================== */
-
-        .quick-grid {
-            display: grid;
-
-            grid-template-columns:
-                repeat(2, minmax(0, 1fr));
-
-            gap: 13px;
-        }
-
-        .quick-link {
-            display: flex;
-
-            align-items: center;
-            justify-content: space-between;
-
-            gap: 15px;
-
-            min-height: 70px;
-
-            padding:
-                14px 16px;
-
-            border:
-                1px solid #173f2b;
-
-            border-radius: 9px;
-
-            background: #081f14;
-
-            color: #ffffff;
-
-            text-decoration: none;
-
-            transition: 0.2s ease;
-        }
-
-        .quick-link:hover {
-            background: #0e2d1e;
-
-            border-color: #286043;
-        }
-
-        .quick-link-left {
-            min-width: 0;
-        }
-
-        .quick-link-title {
-            font-size: 14px;
-            font-weight: 800;
-        }
-
-        .quick-link-description {
-            margin-top: 4px;
-
-            color: #78988a;
-
-            font-size: 11px;
-        }
-
-        .quick-link-arrow {
-            color: #65c78e;
-
-            font-size: 18px;
-
-            flex-shrink: 0;
-        }
-
-
-        /* =====================================================
-           REFERRAL INFO
-        ===================================================== */
-
-        .referral-note {
-            margin-top: 15px;
-
-            padding:
-                12px 14px;
-
-            border-radius: 7px;
-
-            background: #102d20;
-
-            border:
-                1px solid #1e5136;
-
-            color: #a7cbb7;
-
-            font-size: 12px;
-
-            line-height: 1.6;
-        }
-
-        .referral-note strong {
-            color: #ffffff;
-        }
-
-
-        /* =====================================================
-           FOOTER
-        ===================================================== */
-
-        .footer {
-            text-align: center;
-
-            color: #557565;
-
-            font-size: 11px;
-
-            padding-top: 5px;
-        }
-
-
-        /* =====================================================
-           MOBILE
-        ===================================================== */
-
-        @media (max-width: 900px) {
-
-            .stats-grid {
-                grid-template-columns:
-                    repeat(2, minmax(0, 1fr));
-            }
-
-            .search-grid {
-                grid-template-columns:
-                    1fr 1fr;
-            }
-
-            .search-btn {
-                width: 100%;
-            }
-
-            .user-info-grid {
-                grid-template-columns:
-                    1fr 1fr;
-            }
-
-        }
-
-
-        @media (max-width: 650px) {
-
-            .topbar-inner {
-                min-height: 60px;
-
-                padding:
-                    9px 12px;
-            }
-
-            .brand-subtitle {
-                display: none;
-            }
-
-            .brand-title {
-                font-size: 17px;
-            }
-
-            .employee-area {
-                gap: 7px;
-            }
-
-            .employee-id {
-                display: none;
-            }
-
-            .logout-btn {
-                min-height: 35px;
-
-                padding:
-                    0 10px;
-
-                font-size: 11px;
-            }
-
-            .container {
-                padding:
-                    18px 12px 30px;
-            }
-
-            .page-title h1 {
-                font-size: 21px;
-            }
-
-            .page-title p {
-                font-size: 12px;
-            }
-
-            .stats-grid {
-                grid-template-columns:
-                    1fr 1fr;
-
-                gap: 9px;
-            }
-
-            .stat-card {
-                padding: 13px;
-            }
-
-            .stat-label {
-                font-size: 10px;
-            }
-
-            .stat-value {
-                font-size: 21px;
-            }
-
-            .card {
-                padding: 15px;
-
-                margin-bottom: 15px;
-            }
-
-            .card-title {
-                font-size: 16px;
-            }
-
-            .search-grid {
-                grid-template-columns:
-                    1fr;
-            }
-
-            .search-btn {
-                width: 100%;
-            }
-
-            .user-result {
-                padding: 13px;
-            }
-
-            .user-result-header {
-                align-items: flex-start;
-
-                flex-direction: column;
-
-                gap: 8px;
-            }
-
-            .user-info-grid {
-                grid-template-columns:
-                    1fr;
-            }
-
-            .balance-actions {
-                grid-template-columns:
-                    1fr;
-            }
-
-            .balance-form {
-                flex-direction: column;
-            }
-
-            .balance-form button {
-                width: 100%;
-            }
-
-            .quick-grid {
-                grid-template-columns:
-                    1fr;
-            }
-
-        }
-
-
-        @media (max-width: 380px) {
-
-            .stats-grid {
-                grid-template-columns:
-                    1fr;
-            }
-
-            .stat-card {
-                display: flex;
-
-                align-items: center;
-                justify-content: space-between;
-
-                gap: 10px;
-            }
-
-            .stat-label {
-                margin-bottom: 0;
-            }
-
-            .stat-value {
-                font-size: 20px;
-            }
-
-        }
-
-    </style>
+    <title>Employee Dashboard - CrickBet</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/employee.css"
+    >
 
 </head>
 
+<body class="employee-body">
 
-<body>
+<div class="employee-dashboard-page">
+
+    <main class="employee-dashboard-container">
 
 
-<!-- =========================================================
-     HEADER
-========================================================= -->
+        <!-- HEADER -->
 
-<header class="topbar">
+        <header class="employee-dashboard-header">
 
-    <div class="topbar-inner">
+            <div class="employee-dashboard-title">
 
-        <div class="brand">
+                <div class="employee-dashboard-brand">
+                    <span class="employee-dashboard-brand-icon">
+                        🏏
+                    </span>
 
-            <div class="brand-title">
-                CrickBet
+                    CrickBet Employee Portal
+                </div>
+
+                <h1>
+                    Employee Dashboard
+                </h1>
+
+                <p>
+                    Manage customer deposits and withdrawals
+                </p>
+
             </div>
 
-            <div class="brand-subtitle">
-                EMPLOYEE PORTAL
-            </div>
 
-        </div>
+            <!-- EMPLOYEE PROFILE -->
 
+            <div class="employee-profile">
 
-        <div class="employee-area">
+                <div class="employee-profile-icon">
+                    👤
+                </div>
 
-            <div class="employee-id">
-                Employee:
-                <strong>
-                    {{ employee.employee_id if employee else "Employee" }}
-                </strong>
-            </div>
+                <div class="employee-profile-info">
 
-            <a
-                href="/employee/logout"
-                class="logout-btn"
-            >
-                Logout
-            </a>
+                    <span>
+                        EMPLOYEE ID
+                    </span>
 
-        </div>
-
-    </div>
-
-</header>
-
-
-
-<!-- =========================================================
-     MAIN
-========================================================= -->
-
-<main class="container">
-
-
-    <!-- PAGE TITLE -->
-
-    <div class="page-title">
-
-        <h1>
-            Employee Dashboard
-        </h1>
-
-        <p>
-            Manage user balances, deposits and withdrawals.
-        </p>
-
-    </div>
-
-
-
-    <!-- =====================================================
-         STATISTICS
-    ====================================================== -->
-
-    <section class="stats-grid">
-
-
-        <div class="stat-card">
-
-            <div class="stat-label">
-                Pending Deposits
-            </div>
-
-            <div class="stat-value">
-                {{ pending_deposits or 0 }}
-            </div>
-
-        </div>
-
-
-        <div class="stat-card">
-
-            <div class="stat-label">
-                Completed Deposits
-            </div>
-
-            <div class="stat-value">
-                {{ completed_deposits or 0 }}
-            </div>
-
-        </div>
-
-
-        <div class="stat-card">
-
-            <div class="stat-label">
-                Pending Withdrawals
-            </div>
-
-            <div class="stat-value">
-                {{ pending_withdrawals or 0 }}
-            </div>
-
-        </div>
-
-
-        <div class="stat-card">
-
-            <div class="stat-label">
-                Completed Withdrawals
-            </div>
-
-            <div class="stat-value">
-                {{ completed_withdrawals or 0 }}
-            </div>
-
-        </div>
-
-
-    </section>
-
-
-
-    <!-- =====================================================
-         USER BALANCE
-    ====================================================== -->
-
-    <section class="card">
-
-
-        <div class="card-header">
-
-            <h2 class="card-title">
-                💰 User Balance
-            </h2>
-
-            <p class="card-description">
-                Search a user using their username or phone number,
-                then add or withdraw balance.
-            </p>
-
-        </div>
-
-
-
-        <!-- SEARCH FORM -->
-
-        <form
-            method="POST"
-            action="/employee/balance/search"
-            class="search-form"
-        >
-
-            <div class="search-grid">
-
-
-                <div class="field">
-
-                    <label for="username">
-                        Username
-                    </label>
-
-                    <input
-                        type="text"
-                        id="username"
-                        name="username"
-                        value="{{ search_username or '' }}"
-                        placeholder="Enter username"
-                        autocomplete="off"
-                    >
+                    <strong>
+                        {{ employee.employee_id }}
+                    </strong>
 
                 </div>
 
-
-
-                <div class="field">
-
-                    <label for="phone">
-                        Phone Number
-                    </label>
-
-                    <input
-                        type="text"
-                        id="phone"
-                        name="phone"
-                        value="{{ search_phone or '' }}"
-                        placeholder="Enter phone number"
-                        autocomplete="off"
-                    >
-
-                </div>
-
-
-
-                <button
-                    type="submit"
-                    class="search-btn"
+                <a
+                    href="/employee/logout"
+                    class="employee-dashboard-logout"
                 >
-                    Search User
-                </button>
-
+                    Logout
+                </a>
 
             </div>
 
-        </form>
+        </header>
 
 
+        <!-- STAT CARDS -->
 
-        <!-- ERROR -->
+        <div class="employee-stats">
 
-        {% if balance_error %}
+            <div class="employee-stat">
 
-            <div class="message error">
-                {{ balance_error }}
-            </div>
+                <div class="employee-stat-icon deposit">
+                    +
+                </div>
 
-        {% endif %}
+                <div class="employee-stat-text">
 
+                    <span>
+                        Deposits
+                    </span>
 
+                    <strong>
+                        Manage Deposits
+                    </strong>
 
-        <!-- SUCCESS -->
-
-        {% if balance_success == "add" %}
-
-            <div class="message success">
-                Balance added successfully.
-            </div>
-
-        {% elif balance_success == "withdraw" %}
-
-            <div class="message success">
-                Balance withdrawn successfully.
-            </div>
-
-        {% endif %}
-
-
-
-        <!-- =================================================
-             SEARCH RESULT
-        ================================================== -->
-
-        {% if searched_user %}
-
-            <div class="user-result">
-
-
-                <div class="user-result-header">
-
-                    <h3 class="user-result-title">
-                        User Found
-                    </h3>
-
-                    {% if searched_user.status %}
-
-                        <div class="user-status">
-                            {{ searched_user.status }}
-                        </div>
-
-                    {% endif %}
+                    <small>
+                        Verify customer payments
+                    </small>
 
                 </div>
 
+            </div>
 
 
-                <!-- USER DETAILS -->
+            <div class="employee-stat">
 
-                <div class="user-info-grid">
+                <!-- DEPOSITS -->
 
+                <div class="employee-stat">
 
-                    <div class="user-info">
-
-                        <div class="user-info-label">
-                            Username
-                        </div>
-
-                        <div class="user-info-value">
-                            {{ searched_user.username }}
-                        </div>
-
+                    <div class="employee-stat-icon deposit">
+                        +
                     </div>
 
+                    <div class="employee-stat-text">
 
-                    <div class="user-info">
+                        <span>
+                            Pending Deposits
+                        </span>
 
-                        <div class="user-info-label">
-                            Phone
-                        </div>
+                        <strong>
+                            {{ pending_deposits }}
+                        </strong>
 
-                        <div class="user-info-value">
-                            {{ searched_user.phone or "—" }}
-                        </div>
-
-                    </div>
-
-
-                    <div class="user-info">
-
-                        <div class="user-info-label">
-                            User ID
-                        </div>
-
-                        <div class="user-info-value">
-                            {{ searched_user.id }}
-                        </div>
-
-                    </div>
-
-
-                </div>
-
-
-
-                <!-- CURRENT BALANCE -->
-
-                <div class="balance-box">
-
-                    <div class="balance-label">
-                        Current Balance
-                    </div>
-
-                    <div class="balance-value">
-
-                        ₹{{ "%.2f"|format(
-                            searched_user.balance or 0
-                        ) }}
+                        <small>
+                            Waiting for verification
+                        </small>
 
                     </div>
 
                 </div>
 
+                <!-- WITHDRAWALS -->
+
+                <div class="employee-stat">
+
+                    <div class="employee-stat-icon withdrawal">
+                        -
+                    </div>
+                     
+                    <div class="employee-stat-text">
+
+                        <span>
+                            Pending Withdrawals
+                        </span>
+
+                        <strong>
+                            {{ pending_withdrawals }}
+                        </strong>
+
+                        <small>
+                            Waiting to be processed
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+   
+
+        <!-- DEPOSITS -->
+
+        <section class="employee-dashboard-section">
+
+            <div class="employee-section-title">
+
+                <h2>
+                    💰 Deposits
+                </h2>
+
+                <p>
+                    Review customer deposit requests and verify payments.
+                </p>
+
+            </div>
 
 
-                <!-- =================================================
-                     ADD / WITHDRAW
-                ================================================== -->
+            <div class="employee-action-grid">
 
-                <div class="balance-actions">
+                <a
+                    href="/employee/deposits"
+                    class="employee-action deposit"
+                >
 
+                    <div class="employee-action-icon">
+                        📥
+                    </div>
 
-                    <!-- ADD BALANCE -->
-
-                    <div class="balance-action add">
+                    <div class="employee-action-content">
 
                         <h3>
-                            Add Balance
+                            Pending Deposits
+                            <span class="employee-count-badge">
+                                {{ pending_deposits }}
+                            </span>
                         </h3>
 
-                        <form
-                            method="POST"
-                            action="/employee/balance/add"
-                            class="balance-form"
-                            onsubmit="
-                                return confirmAddBalance(this);
-                            "
-                        >
-
-                            <input
-                                type="hidden"
-                                name="user_id"
-                                value="{{ searched_user.id }}"
-                            >
-
-                            <input
-                                type="number"
-                                name="amount"
-                                min="0.01"
-                                step="0.01"
-                                placeholder="Enter amount"
-                                required
-                            >
-
-                            <button
-                                type="submit"
-                                class="add-btn"
-                            >
-                                Add Balance
-                            </button>
-
-                        </form>
+                        <p>
+                            View and process deposits waiting
+                            for verification.
+                        </p>
 
                     </div>
 
+                    <div class="employee-action-arrow">
+                        →
+                    </div>
+
+                </a>
 
 
-                    <!-- WITHDRAW BALANCE -->
+                <a
+                    href="/employee/deposits/done"
+                    class="employee-action completed"
+                >
 
-                    <div class="balance-action withdraw">
+                    <div class="employee-action-icon">
+                        ✅
+                    </div>
+
+                    <div class="employee-action-content">
 
                         <h3>
-                            Withdraw Balance
+                            Completed Deposits
+                            <span class="employee-count-badge completed">
+                                {{ completed_deposits }}
+                            </span>
                         </h3>
 
-                        <form
-                            method="POST"
-                            action="/employee/balance/withdraw"
-                            class="balance-form"
-                            onsubmit="
-                                return confirmWithdraw(this);
-                            "
-                        >
-
-                            <input
-                                type="hidden"
-                                name="user_id"
-                                value="{{ searched_user.id }}"
-                            >
-
-                            <input
-                                type="number"
-                                name="amount"
-                                min="0.01"
-                                step="0.01"
-                                placeholder="Enter amount"
-                                required
-                            >
-
-                            <button
-                                type="submit"
-                                class="withdraw-btn"
-                            >
-                                Withdraw
-                            </button>
-
-                        </form>
+                        <p>
+                            View all successfully completed
+                            deposit requests.
+                        </p>
 
                     </div>
 
+                    <div class="employee-action-arrow">
+                        →
+                    </div>
 
-                </div>
-
-
-
-                <!-- REFERRAL INFORMATION -->
-
-                <div class="referral-note">
-
-                    <strong>Referral:</strong>
-
-                    If this is the user's first qualifying
-                    deposit/add-balance and they were referred
-                    by another user, the backend automatically
-                    gives the applicable <strong>10% referral
-                    bonus</strong> to both the referred user and
-                    their referrer.
-
-                    The referrer can receive bonuses from
-                    multiple different referred users.
-
-                </div>
-
+                </a>
 
             </div>
 
-        {% endif %}
+        </section>
 
 
-    </section>
+        <!-- WITHDRAWALS -->
+
+        <section class="employee-dashboard-section">
+
+            <div class="employee-section-title">
+
+                <h2>
+                    🏦 Withdrawals
+                </h2>
+
+                <p>
+                    Review customer bank details and process withdrawals.
+                </p>
+
+            </div>
 
 
+            <div class="employee-action-grid">
 
-    <!-- =====================================================
-         REQUEST MANAGEMENT
-    ====================================================== -->
+                <a
+                    href="/employee/withdrawals"
+                    class="employee-action withdrawal"
+                >
 
-    <section class="card">
+                    <div class="employee-action-icon">
+                        📤
+                    </div>
+
+                    <div class="employee-action-content">
+
+                        <h3>
+                            Pending Withdrawals
+                            <span class="employee-count-badge withdrawal">
+                                {{ pending_withdrawals }}
+                            </span>
+                        </h3>
+
+                        <p>
+                            View withdrawal requests waiting
+                            to be processed.
+                        </p>
+
+                    </div>
+
+                    <div class="employee-action-arrow">
+                        →
+                    </div>
+
+                </a>
 
 
-        <div class="card-header">
+                <a
+                    href="/employee/withdrawals/done"
+                    class="employee-action completed"
+                >
 
-            <h2 class="card-title">
-                Request Management
-            </h2>
+                    <div class="employee-action-icon">
+                        ✅
+                    </div>
 
-            <p class="card-description">
-                Review pending requests and view completed requests.
-            </p>
+                    <div class="employee-action-content">
+
+                        <h3>
+                            Completed Withdrawals
+                            <span class="employee-count-badge completed">
+                                {{ completed_withdrawals }}
+                            </span>
+                        </h3>
+
+                        <p>
+                            View all successfully completed
+                            withdrawals.
+                        </p>
+
+                    </div>
+
+                    <div class="employee-action-arrow">
+                        →
+                    </div>
+
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- SECURITY -->
+
+        <div class="employee-security">
+
+            <div class="employee-security-icon">
+                🔐
+            </div>
+
+            <div>
+
+                <h3>
+                    Employee Access
+                </h3>
+
+                <p>
+                    This portal is restricted to authorized CrickBet
+                    employees. Employee accounts can only process
+                    customer deposit and withdrawal requests.
+                </p>
+
+            </div>
 
         </div>
 
+    </main>
 
-
-        <div class="quick-grid">
-
-
-            <!-- DEPOSITS -->
-
-            <a
-                href="/employee/deposits"
-                class="quick-link"
-            >
-
-                <div class="quick-link-left">
-
-                    <div class="quick-link-title">
-                        Deposit Requests
-                    </div>
-
-                    <div class="quick-link-description">
-                        View and approve pending deposits.
-                    </div>
-
-                </div>
-
-                <div class="quick-link-arrow">
-                    →
-                </div>
-
-            </a>
-
-
-
-            <!-- COMPLETED DEPOSITS -->
-
-            <a
-                href="/employee/deposits/done"
-                class="quick-link"
-            >
-
-                <div class="quick-link-left">
-
-                    <div class="quick-link-title">
-                        Completed Deposits
-                    </div>
-
-                    <div class="quick-link-description">
-                        View previously completed deposits.
-                    </div>
-
-                </div>
-
-                <div class="quick-link-arrow">
-                    →
-                </div>
-
-            </a>
-
-
-
-            <!-- WITHDRAWALS -->
-
-            <a
-                href="/employee/withdrawals"
-                class="quick-link"
-            >
-
-                <div class="quick-link-left">
-
-                    <div class="quick-link-title">
-                        Withdrawal Requests
-                    </div>
-
-                    <div class="quick-link-description">
-                        View and process pending withdrawals.
-                    </div>
-
-                </div>
-
-                <div class="quick-link-arrow">
-                    →
-                </div>
-
-            </a>
-
-
-
-            <!-- COMPLETED WITHDRAWALS -->
-
-            <a
-                href="/employee/withdrawals/done"
-                class="quick-link"
-            >
-
-                <div class="quick-link-left">
-
-                    <div class="quick-link-title">
-                        Completed Withdrawals
-                    </div>
-
-                    <div class="quick-link-description">
-                        View previously completed withdrawals.
-                    </div>
-
-                </div>
-
-                <div class="quick-link-arrow">
-                    →
-                </div>
-
-            </a>
-
-
-        </div>
-
-
-    </section>
-
-
-
-    <!-- FOOTER -->
-
-    <div class="footer">
-        CrickBet Employee Portal
-    </div>
-
-
-</main>
-
-
-
-<script>
-
-    /* =========================================================
-       ADD BALANCE CONFIRMATION
-    ========================================================= */
-
-    function confirmAddBalance(form) {
-
-        const input =
-            form.querySelector(
-                'input[name="amount"]'
-            );
-
-        const amount =
-            parseFloat(input.value);
-
-        if (
-            !Number.isFinite(amount) ||
-            amount <= 0
-        ) {
-            alert(
-                "Please enter a valid amount."
-            );
-
-            return false;
-        }
-
-        return confirm(
-            "Add ₹" +
-            amount.toFixed(2) +
-            " to this user's balance?"
-        );
-    }
-
-
-
-    /* =========================================================
-       WITHDRAW BALANCE CONFIRMATION
-    ========================================================= */
-
-    function confirmWithdraw(form) {
-
-        const input =
-            form.querySelector(
-                'input[name="amount"]'
-            );
-
-        const amount =
-            parseFloat(input.value);
-
-        if (
-            !Number.isFinite(amount) ||
-            amount <= 0
-        ) {
-            alert(
-                "Please enter a valid amount."
-            );
-
-            return false;
-        }
-
-        return confirm(
-            "Withdraw ₹" +
-            amount.toFixed(2) +
-            " from this user's balance?"
-        );
-    }
-
-
-
-    /* =========================================================
-       PREVENT DOUBLE SUBMISSION
-    ========================================================= */
-
-    document.addEventListener(
-        "submit",
-        function (event) {
-
-            const form =
-                event.target;
-
-            if (
-                !form.matches(
-                    ".balance-form"
-                )
-            ) {
-                return;
-            }
-
-            const button =
-                form.querySelector(
-                    "button[type='submit']"
-                );
-
-            if (!button) {
-                return;
-            }
-
-            setTimeout(
-                function () {
-
-                    button.disabled = true;
-
-                    button.style.opacity =
-                        "0.65";
-
-                    button.style.cursor =
-                        "not-allowed";
-
-                },
-                0
-            );
-
-        }
-    );
-
-</script>
-
+</div>
 
 </body>
 
