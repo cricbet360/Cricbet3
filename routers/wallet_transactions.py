@@ -39,10 +39,10 @@ os.makedirs(
 )
 
 
-MIN_DEPOSIT = Decimal("100.00")
+MIN_DEPOSIT = Decimal("500.00")
 MAX_DEPOSIT = Decimal("100000.00")
 
-MIN_WITHDRAW = Decimal("100.00")
+MIN_WITHDRAW = Decimal("500.00")
 MAX_WITHDRAW = Decimal("100000.00")
 
 MAX_FILE_SIZE = 5 * 1024 * 1024
@@ -431,9 +431,9 @@ async def submit_deposit(
 
         user_id=user.id,
 
-        amount=deposit_amount,
+        amount=float(deposit_amount),
 
-        screenshot_path=filepath,
+        payment_screenshot=filepath,
 
         utr_number=utr_number,
 

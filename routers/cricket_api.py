@@ -1008,3 +1008,31 @@ def clear_cricket_cache(
         ),
     }
 
+@router.get("/api/cricket/live/{game_id}")
+async def get_live_match(game_id: str):
+    """
+    Return the ProExch live stream URL for the selected match.
+
+    The game_id comes from the match the user clicked.
+    """
+
+    game_id = str(game_id).strip()
+
+    if not game_id:
+        return {
+            "success": False,
+            "live_available": False,
+            "live_url": None,
+            "message": "Game ID is required."
+        }
+
+    live_url = (
+        f"https://video.proexch.in/tv/v4/stream/{game_id}"
+    )
+
+    return {
+        "success": True,
+        "game_id": game_id,
+        "live_available": True,
+        "live_url": live_url
+    }

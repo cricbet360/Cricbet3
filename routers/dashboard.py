@@ -349,6 +349,21 @@ async def match_page(
     )
 
     # ------------------------------------------------------
+    # SCORE ID OF THIS SPECIFIC MATCH
+    #
+    # The scoreboard must come from the match that was
+    # tapped ("VIEW MATCH"). get_matches() already resolves
+    # score_id (falls back to game_id), so pass it to the page.
+    # ------------------------------------------------------
+
+    score_id = str(
+        selected_match.get(
+            "score_id"
+        )
+        or game_id
+    )
+
+    # ------------------------------------------------------
     # LOAD ODDS
     # ------------------------------------------------------
 
@@ -539,6 +554,8 @@ async def match_page(
 
         "event_id": event_id,
 
+        "score_id": score_id,
+
         "event_name": event_name,
 
         "team1": team1,
@@ -665,6 +682,11 @@ async def match_page(
     print(
         "Event ID:",
         event_id,
+    )
+
+    print(
+        "Score ID:",
+        score_id,
     )
 
     print(

@@ -20,6 +20,33 @@
             box-sizing: border-box;
         }
 
+        /*
+         * FIX: rules like `.batting-badge { display: inline-flex }`
+         * were overriding the `hidden` attribute, so BATTING was
+         * shown on both teams. This makes `hidden` always win.
+         */
+
+        [hidden] {
+            display: none !important;
+        }
+
+        .score-unavailable {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 120px;
+            border: 1px solid #205438;
+            border-radius: 11px;
+            background: #092116;
+            color: #719887;
+            font-size: 12px;
+        }
+
+        .score-stale-chip {
+            color: #f2d078;
+            border-color: #735e24;
+        }
+
         html,
         body {
             margin: 0;
@@ -1557,6 +1584,71 @@
 
 
 <!-- =========================================================
+     LIVE MATCH
+     ========================================================= -->
+
+<div id="liveMatchSection" class="live-match-section">
+
+    <!-- WATCH LIVE BUTTON -->
+
+    <button
+        type="button"
+        id="watchLiveBtn"
+        class="watch-live-btn"
+        onclick="openLiveMatch()"
+    >
+        <span class="live-dot"></span>
+        <span>WATCH LIVE</span>
+    </button>
+
+
+    <!-- LIVE VIDEO PLAYER -->
+
+    <div
+        id="livePlayerContainer"
+        class="live-player-container"
+        style="display: none;"
+    >
+
+        <div class="live-player-header">
+
+            <div class="live-player-title">
+                <span class="live-dot"></span>
+                <span>LIVE MATCH</span>
+            </div>
+
+            <button
+                type="button"
+                id="minimizeLiveBtn"
+                class="minimize-live-btn"
+                onclick="minimizeLiveMatch()"
+                title="Minimize"
+            >
+                −
+            </button>
+
+        </div>
+
+
+        <div class="live-player-frame-wrapper">
+
+            <iframe
+                id="liveMatchIframe"
+                class="live-match-iframe"
+                src=""
+                frameborder="0"
+                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                allowfullscreen
+                scrolling="no"
+            ></iframe>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =========================================================
      SELECTED MATCH SCOREBOARD ONLY
 ========================================================= -->
 
@@ -1760,6 +1852,17 @@
 
             </div>
 
+        </div>
+
+
+        <!-- SCORE UNAVAILABLE (does NOT replace the team panels) -->
+
+        <div
+            id="scoreUnavailable"
+            class="score-unavailable"
+            hidden
+        >
+            Live score unavailable
         </div>
 
 
@@ -1973,18 +2076,7 @@
 
         <!-- TECHNICAL -->
 
-        <details
-            class="score-technical"
-        >
-
-            <summary>
-                Match data / provider details
-            </summary>
-
-
-            <pre id="scoreTechnicalData">Loading...</pre>
-
-        </details>
+       
 
     </div>
 
@@ -2119,6 +2211,7 @@
         data-game-id="{{ match.game_id if match else '' }}"
         data-event-id="{{ match.event_id if match else '' }}"
         data-market-id="{{ match.market_id if match else '' }}"
+        data-score-id="{{ match.score_id if match else '' }}"
         data-event-name="{{ match.event_name if match else '' }}"
         data-team1="{{ match.team1 if match else '' }}"
         data-team2="{{ match.team2 if match else '' }}"
@@ -2272,6 +2365,11 @@ let marketId = "";
 let oddsLoading = false;
 let refreshTimer = null;
 let scoreboardTimer = null;
+
+let scoreId = "";
+let workingScoreId = "";
+let scoreboardLoading = false;
+let scoreboardRendered = false;
 
 let betSlipItems = [];
 
@@ -2607,6 +2705,10 @@ function readServerMatch() {
             data.marketId ||
             "",
 
+        score_id:
+            data.scoreId ||
+            "",
+
         event_name:
             data.eventName ||
             "",
@@ -2656,6 +2758,14 @@ function initializeMatch() {
     marketId =
         String(
             match.market_id ||
+            ""
+        );
+
+
+    scoreId =
+        String(
+            match.score_id ||
+            match.game_id ||
             ""
         );
 
@@ -5199,74 +5309,124 @@ async function loadMatchPageBalance() {
    ONLY CURRENT GAME_ID
 ========================================================= */
 
+function looksLikeScoreRecord(
+    object
+) {
+
+    return (
+        Object.prototype.hasOwnProperty.call(object, "Team1Name") ||
+        Object.prototype.hasOwnProperty.call(object, "Team2Name") ||
+        Object.prototype.hasOwnProperty.call(object, "Team1Score") ||
+        Object.prototype.hasOwnProperty.call(object, "Team2Score")
+    );
+}
+
+
 function getScoreRecord(
     payload
 ) {
 
+    /*
+     * FIX (this was why the scoreboard never showed).
+     *
+     * /api/cricket/score/{id} answers with:
+     *
+     * {
+     *   success: true,
+     *   score_id: "...",
+     *   data: {                          <- normalized by proexch_api.py
+     *     success: true,
+     *     source: "cricketbz",
+     *     scoreboard: { ..., raw_score: { Team1Name, ... } },
+     *     data:       { ..., raw_score: { Team1Name, ... } },
+     *     raw: { data: { Data: { Score: [ { Team1Name, ... } ] } } }
+     *   }
+     * }
+     *
+     * The old code looked for data.Data.Score[0] or data.score[0],
+     * which do not exist in that shape, so it always returned null.
+     *
+     * The page renders the RAW CricketBZ record (Team1Name,
+     * Team1OnlyScore, Player1Run ...). So we walk the response
+     * (shallowest first) until we find an object that looks like it.
+     */
+
     if (
         !payload ||
-        typeof payload !==
-            "object"
+        typeof payload !== "object"
     ) {
 
         return null;
     }
 
 
-    /*
-     * Exact provider structure:
-     *
-     * data
-     *   Data
-     *     Score[]
-     */
+    const queue = [
+        {
+            node: payload,
+            depth: 0
+        }
+    ];
+
+    const seen = new Set();
 
 
-    let root =
-        payload;
+    while (queue.length) {
+
+        const current =
+            queue.shift();
+
+        const node =
+            current.node;
 
 
-    if (
-        root.data &&
-        typeof root.data ===
-            "object"
-    ) {
+        if (
+            !node ||
+            typeof node !== "object" ||
+            seen.has(node)
+        ) {
 
-        root =
-            root.data;
-    }
-
-
-    if (
-        root.Data &&
-        typeof root.Data ===
-            "object"
-    ) {
-
-        root =
-            root.Data;
-    }
+            continue;
+        }
 
 
-    if (
-        Array.isArray(
-            root.Score
-        ) &&
-        root.Score.length
-    ) {
-
-        return root.Score[0];
-    }
+        seen.add(node);
 
 
-    if (
-        Array.isArray(
-            root.score
-        ) &&
-        root.score.length
-    ) {
+        if (
+            !Array.isArray(node) &&
+            looksLikeScoreRecord(node)
+        ) {
 
-        return root.score[0];
+            return node;
+        }
+
+
+        if (current.depth >= 7) {
+            continue;
+        }
+
+
+        const children =
+            Array.isArray(node)
+                ? node.slice(0, 20)
+                : Object.values(node);
+
+
+        children.forEach(
+            child => {
+
+                if (
+                    child &&
+                    typeof child === "object"
+                ) {
+
+                    queue.push({
+                        node: child,
+                        depth: current.depth + 1
+                    });
+                }
+            }
+        );
     }
 
 
@@ -6905,14 +7065,9 @@ function renderTechnicalData(
 ========================================================= */
 
 function renderScoreboard(
-    payload
+    score,
+    meta
 ) {
-
-    const score =
-        getScoreRecord(
-            payload
-        );
-
 
     if (!score) {
 
@@ -6924,6 +7079,28 @@ function renderScoreboard(
 
     const match =
         readServerMatch();
+
+
+    /*
+     * Show the real scoreboard, hide the "unavailable" box.
+     * The team panels are never destroyed any more, so a
+     * later successful poll can always fill them again.
+     */
+
+    const main =
+        document.getElementById(
+            "scoreboardMain"
+        );
+
+    if (main) {
+        main.hidden = false;
+    }
+
+    hideElement(
+        "scoreUnavailable"
+    );
+
+    scoreboardRendered = true;
 
 
     /*
@@ -6957,7 +7134,6 @@ function renderScoreboard(
             eventName
         );
 
-
         setText(
             "eventName",
             eventName
@@ -6966,7 +7142,8 @@ function renderScoreboard(
 
 
     /*
-     * Team names, flags, scores and overs.
+     * Teams: names, flags, scores, overs.
+     * Fallback to the selected match's own team names.
      */
 
     renderScoreTeam(
@@ -6977,7 +7154,6 @@ function renderScoreboard(
             : ""
     );
 
-
     renderScoreTeam(
         2,
         score,
@@ -6987,76 +7163,33 @@ function renderScoreboard(
     );
 
 
-    /*
-     * This is the important fix:
-     *
-     * CurrentInning "2"
-     * => only Team 2 is batting.
-     */
-
     renderBattingSide(
         score
     );
-
-
-    /*
-     * Stats.
-     */
 
     renderScoreStats(
         score
     );
 
-
-    /*
-     * Chase.
-     */
-
     renderChase(
         score
     );
-
-
-    /*
-     * Current over.
-     */
 
     renderCurrentOver(
         score
     );
 
-
-    /*
-     * Batters.
-     */
-
     renderBatters(
         score
     );
-
-
-    /*
-     * Bowler.
-     * If Bowler == "-" => entire section hidden.
-     */
 
     renderBowler(
         score
     );
 
-
-    /*
-     * Last six balls.
-     */
-
     renderLastSix(
         score
     );
-
-
-    /*
-     * Recent overs.
-     */
 
     renderRecentOvers(
         score
@@ -7064,8 +7197,20 @@ function renderScoreboard(
 
 
     /*
-     * Message / status / commentary.
+     * Hide the stats strip when it has nothing in it.
      */
+
+    const statsElement =
+        document.getElementById(
+            "scoreStats"
+        );
+
+    if (statsElement) {
+
+        statsElement.hidden =
+            statsElement.children.length === 0;
+    }
+
 
     renderTextSection(
         "scoreStatusSection",
@@ -7078,7 +7223,6 @@ function renderScoreboard(
         )
     );
 
-
     renderTextSection(
         "commentarySection",
         "scoreCommentary",
@@ -7089,7 +7233,6 @@ function renderScoreboard(
             ]
         )
     );
-
 
     renderTextSection(
         "messageSection",
@@ -7103,19 +7246,15 @@ function renderScoreboard(
     );
 
 
-    /*
-     * Provider metadata.
-     */
-
     renderScoreStatus(
         score,
-        payload
+        meta || {}
     );
 
-
-    renderTechnicalData(
-        payload
-    );
+    renderTechnicalData({
+        meta: meta || {},
+        score: score
+    });
 }
 
 
@@ -7125,27 +7264,56 @@ function renderScoreboard(
 
 function showScoreboardUnavailable() {
 
+    /*
+     * If we already showed a real score, KEEP it on screen
+     * and only flag it as delayed. A single failed poll must
+     * not wipe a working scoreboard.
+     */
+
+    if (scoreboardRendered) {
+
+        const info =
+            document.getElementById(
+                "scoreInfo"
+            );
+
+        if (
+            info &&
+            !info.querySelector(
+                ".score-stale-chip"
+            )
+        ) {
+
+            info.insertAdjacentHTML(
+                "beforeend",
+                '<div class="score-info-chip score-stale-chip">' +
+                    "Score delayed - retrying..." +
+                '</div>'
+            );
+        }
+
+        return;
+    }
+
+
+    /*
+     * Nothing rendered yet: hide the (empty) team panels and
+     * show the message. IMPORTANT: we do NOT touch innerHTML
+     * of the panels, so they keep working later.
+     */
+
     const main =
         document.getElementById(
             "scoreboardMain"
         );
 
-
     if (main) {
-
-        main.innerHTML =
-            '<div style="' +
-                'grid-column:1/-1;' +
-                'display:flex;' +
-                'align-items:center;' +
-                'justify-content:center;' +
-                'min-height:120px;' +
-                'color:#719887;' +
-                'font-size:12px;' +
-            '">' +
-                'Live score unavailable' +
-            '</div>';
+        main.hidden = true;
     }
+
+    showElement(
+        "scoreUnavailable"
+    );
 
 
     [
@@ -7171,7 +7339,6 @@ function showScoreboardUnavailable() {
             "scoreboardStatus"
         );
 
-
     if (badge) {
 
         badge.className =
@@ -7187,28 +7354,183 @@ function showScoreboardUnavailable() {
    LOAD SELECTED GAME SCORE
 ========================================================= */
 
+async function requestScore(
+    id
+) {
+
+    const response =
+        await fetch(
+            "/api/cricket/score/" +
+            encodeURIComponent(
+                id
+            ),
+            {
+                method:
+                    "GET",
+
+                credentials:
+                    "same-origin",
+
+                cache:
+                    "no-store",
+
+                headers: {
+                    Accept:
+                        "application/json"
+                }
+            }
+        );
+
+
+    /*
+     * Session expired -> go back to login instead of
+     * silently showing "score unavailable".
+     */
+
+    if (
+        response.status === 401
+    ) {
+
+        window.location.href =
+            "/login";
+
+        return null;
+    }
+
+
+    let payload = {};
+
+    try {
+
+        payload =
+            await response.json();
+
+    } catch (error) {
+
+        throw new Error(
+            "Invalid score JSON"
+        );
+    }
+
+
+    return {
+        ok: response.ok,
+        payload: payload
+    };
+}
+
+
+function buildScoreMeta(
+    payload,
+    usedId
+) {
+
+    const inner =
+        payload &&
+        payload.data &&
+        typeof payload.data === "object"
+            ? payload.data
+            : {};
+
+    /*
+     * CricketBZ's own envelope
+     * (source / cached / stale / responseTime / timestamp)
+     * is kept by the backend under data.raw.
+     */
+
+    const envelope =
+        inner.raw &&
+        typeof inner.raw === "object"
+            ? inner.raw
+            : {};
+
+    return {
+        source:
+            envelope.source ||
+            inner.source ||
+            (
+                payload
+                    ? payload.source
+                    : ""
+            ) ||
+            "",
+
+        cached:
+            envelope.cached,
+
+        stale:
+            envelope.stale,
+
+        responseTime:
+            envelope.responseTime ||
+            "",
+
+        timestamp:
+            envelope.timestamp ||
+            new Date().toISOString(),
+
+        score_id:
+            usedId
+    };
+}
+
+
 async function loadScoreboard() {
 
     /*
      * IMPORTANT:
      *
-     * We do NOT call /api/cricket/matches here.
+     * Only the match that was tapped is used here.
      *
-     * We do NOT load all matches.
+     * We never call /api/cricket/matches and never look at
+     * any other match. The score id comes from the server-side
+     * match record (data-score-id) of THIS page's match.
      *
-     * We only use the game_id of the
-     * match currently opened.
+     * CricketBZ URL is:  https://cricketbz.app/getScore/{game_id}
+     *
+     * Order tried:
+     *   1. the id that already worked for this match
+     *   2. this match's game_id
+     *   3. this match's score_id (only if it is different)
      */
 
-    const selectedGameId =
-        String(
-            gameId ||
-            MATCH_PATH_GAME_ID ||
-            ""
-        );
+    if (scoreboardLoading) {
+        return;
+    }
 
 
-    if (!selectedGameId) {
+    const candidates = [];
+
+    [
+        workingScoreId,
+        gameId,
+        MATCH_PATH_GAME_ID,
+        scoreId
+    ]
+    .forEach(
+        value => {
+
+            const id =
+                String(
+                    value || ""
+                ).trim();
+
+            if (
+                id &&
+                !candidates.includes(
+                    id
+                )
+            ) {
+
+                candidates.push(
+                    id
+                );
+            }
+        }
+    );
+
+
+    if (!candidates.length) {
 
         showScoreboardUnavailable();
 
@@ -7216,88 +7538,91 @@ async function loadScoreboard() {
     }
 
 
+    scoreboardLoading = true;
+
+
     try {
 
-        const response =
-            await fetch(
-                "/api/cricket/score/" +
-                encodeURIComponent(
-                    selectedGameId
-                ),
-                {
-                    method:
-                        "GET",
+        for (const id of candidates) {
 
-                    credentials:
-                        "same-origin",
-
-                    cache:
-                        "no-store",
-
-                    headers: {
-                        Accept:
-                            "application/json"
-                    }
-                }
-            );
+            let result = null;
 
 
-        let payload = {};
+            try {
+
+                result =
+                    await requestScore(
+                        id
+                    );
+
+            } catch (error) {
+
+                console.warn(
+                    "[SCOREBOARD] request failed for id",
+                    id,
+                    error
+                );
+
+                continue;
+            }
 
 
-        try {
+            /*
+             * null => redirected to login.
+             */
 
-            payload =
-                await response.json();
+            if (!result) {
+                return;
+            }
 
-        } catch (error) {
 
-            throw new Error(
-                "Invalid score JSON"
+            const record =
+                getScoreRecord(
+                    result.payload
+                );
+
+
+            if (record) {
+
+                workingScoreId =
+                    id;
+
+                console.log(
+                    "[SCOREBOARD] match:",
+                    gameId,
+                    "score id used:",
+                    id
+                );
+
+                renderScoreboard(
+                    record,
+                    buildScoreMeta(
+                        result.payload,
+                        id
+                    )
+                );
+
+                return;
+            }
+
+
+            console.warn(
+                "[SCOREBOARD] no score record for id",
+                id,
+                result.payload
             );
         }
 
 
-        if (
-            !response.ok ||
-            payload.success ===
-                false
-        ) {
-
-            throw new Error(
-                payload.detail ||
-                payload.message ||
-                "Score request failed"
-            );
-        }
-
-
-        console.log(
-            "[SCOREBOARD] selected game:",
-            selectedGameId
-        );
-
-
-        console.log(
-            "[SCOREBOARD] payload:",
-            payload
-        );
-
-
-        renderScoreboard(
-            payload
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "[SCOREBOARD]",
-            error
-        );
-
+        /*
+         * No candidate produced a score.
+         */
 
         showScoreboardUnavailable();
+
+    } finally {
+
+        scoreboardLoading = false;
     }
 }
 
@@ -7635,6 +7960,514 @@ document.addEventListener(
 
 </script>
 
+<script>
+
+/* =========================================================
+   CURRENT MATCH GAME ID
+   ========================================================= */
+
+const CURRENT_GAME_ID =
+    "{{ game_id | default('', true) }}";
+
+
+console.log(
+    "Current match game ID:",
+    CURRENT_GAME_ID
+);
+
+
+/* =========================================================
+   OPEN LIVE MATCH
+   ========================================================= */
+
+async function openLiveMatch() {
+
+    const gameId =
+        String(CURRENT_GAME_ID).trim();
+
+
+    /*
+     * Make sure the match page actually received
+     * the game ID.
+     */
+
+    if (!gameId) {
+
+        alert(
+            "Game ID not found for this match."
+        );
+
+        console.error(
+            "Live stream: game_id is missing."
+        );
+
+        return;
+    }
+
+
+    const button =
+        document.getElementById(
+            "watchLiveBtn"
+        );
+
+    const player =
+        document.getElementById(
+            "livePlayerContainer"
+        );
+
+    const iframe =
+        document.getElementById(
+            "liveMatchIframe"
+        );
+
+
+    /*
+     * Loading state
+     */
+
+    button.disabled = true;
+
+    button.innerHTML = `
+        <span class="live-dot"></span>
+        <span>LOADING LIVE...</span>
+    `;
+
+
+    try {
+
+        /*
+         * Ask our backend for the live URL.
+         *
+         * Example:
+         *
+         * /api/cricket/live/35887305
+         */
+
+        const response = await fetch(
+            `/api/cricket/live/${encodeURIComponent(gameId)}`,
+            {
+                method: "GET",
+
+                headers: {
+                    "Accept": "application/json"
+                },
+
+                cache: "no-store"
+            }
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `HTTP ${response.status}`
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !data.success ||
+            !data.live_url
+        ) {
+
+            throw new Error(
+                data.message ||
+                "Live stream is unavailable."
+            );
+
+        }
+
+
+        /*
+         * IMPORTANT:
+         *
+         * The backend has generated:
+         *
+         * https://video.proexch.in/tv/v4/stream/{game_id}
+         *
+         * using THIS match's game ID.
+         */
+
+        console.log(
+            "Opening live stream:",
+            data.live_url
+        );
+
+
+        /*
+         * Set iframe URL.
+         */
+
+        iframe.src =
+            data.live_url;
+
+
+        /*
+         * Hide WATCH LIVE button.
+         */
+
+        button.style.display =
+            "none";
+
+
+        /*
+         * Show iframe player.
+         */
+
+        player.style.display =
+            "block";
+
+
+        /*
+         * Scroll player into view.
+         */
+
+        setTimeout(() => {
+
+            player.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+
+        }, 100);
+
+
+    } catch (error) {
+
+        console.error(
+            "Live match error:",
+            error
+        );
+
+        alert(
+            error.message ||
+            "Unable to load live match."
+        );
+
+    } finally {
+
+        button.disabled = false;
+
+        button.innerHTML = `
+            <span class="live-dot"></span>
+            <span>WATCH LIVE</span>
+        `;
+
+    }
+}
+
+
+/* =========================================================
+   MINIMIZE LIVE MATCH
+   ========================================================= */
+
+function minimizeLiveMatch() {
+
+    const iframe =
+        document.getElementById(
+            "liveMatchIframe"
+        );
+
+    const player =
+        document.getElementById(
+            "livePlayerContainer"
+        );
+
+    const button =
+        document.getElementById(
+            "watchLiveBtn"
+        );
+
+
+    /*
+     * IMPORTANT:
+     *
+     * Clearing src stops the current stream completely.
+     */
+
+    iframe.src = "";
+
+
+    /*
+     * Hide player.
+     */
+
+    player.style.display =
+        "none";
+
+
+    /*
+     * Bring back WATCH LIVE button.
+     */
+
+    button.style.display =
+        "flex";
+}
+
+</script>
+
 </body>
 
 </html>
+
+<style>
+
+/* =========================================================
+   LIVE MATCH
+   ========================================================= */
+
+.live-match-section {
+    width: 100%;
+    margin: 12px 0;
+}
+
+
+/* =========================================================
+   WATCH LIVE BUTTON
+   ========================================================= */
+
+.watch-live-btn {
+    width: 100%;
+    min-height: 48px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: linear-gradient(
+        135deg,
+        #0f9d58,
+        #087f46
+    );
+
+    color: #ffffff;
+
+    font-size: 15px;
+    font-weight: 800;
+
+    letter-spacing: 0.4px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 9px;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 4px 14px rgba(0, 0, 0, 0.20);
+
+    transition:
+        transform 0.15s ease,
+        opacity 0.15s ease;
+}
+
+.watch-live-btn:hover {
+    transform: translateY(-1px);
+}
+
+.watch-live-btn:active {
+    transform: scale(0.98);
+}
+
+.watch-live-btn:disabled {
+    opacity: 0.65;
+    cursor: wait;
+}
+
+
+/* =========================================================
+   LIVE DOT
+   ========================================================= */
+
+.live-dot {
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+
+    background: #ff3b30;
+
+    display: inline-block;
+
+    box-shadow:
+        0 0 0 3px rgba(255, 59, 48, 0.18);
+
+    animation: livePulse 1.4s infinite;
+}
+
+@keyframes livePulse {
+
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.5;
+        transform: scale(0.82);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+/* =========================================================
+   PLAYER
+   ========================================================= */
+
+.live-player-container {
+    width: 100%;
+
+    background: #000;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 5px 20px rgba(0, 0, 0, 0.35);
+}
+
+
+/* =========================================================
+   PLAYER HEADER
+   ========================================================= */
+
+.live-player-header {
+    width: 100%;
+
+    min-height: 42px;
+
+    padding: 0 10px;
+
+    background: #101010;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+}
+
+
+.live-player-title {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    color: #fff;
+
+    font-size: 13px;
+
+    font-weight: 800;
+
+    letter-spacing: 0.4px;
+}
+
+.live-player-title .live-dot {
+    width: 7px;
+    height: 7px;
+}
+
+
+/* =========================================================
+   MINIMIZE
+   ========================================================= */
+
+.minimize-live-btn {
+    width: 34px;
+    height: 30px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    background: rgba(255, 255, 255, 0.10);
+
+    color: #fff;
+
+    font-size: 22px;
+
+    line-height: 1;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    cursor: pointer;
+}
+
+.minimize-live-btn:hover {
+    background: rgba(255, 255, 255, 0.20);
+}
+
+
+/* =========================================================
+   VIDEO
+   ========================================================= */
+
+.live-player-frame-wrapper {
+    width: 100%;
+
+    position: relative;
+
+    background: #000;
+
+    aspect-ratio: 16 / 9;
+
+    overflow: hidden;
+}
+
+
+.live-match-iframe {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    border: none;
+
+    background: #000;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .live-match-section {
+        margin: 10px 0;
+    }
+
+    .watch-live-btn {
+        min-height: 46px;
+        font-size: 14px;
+        border-radius: 8px;
+    }
+
+    .live-player-container {
+        border-radius: 8px;
+    }
+
+    .live-player-frame-wrapper {
+        aspect-ratio: 16 / 9;
+    }
+
+}
+
+</style>

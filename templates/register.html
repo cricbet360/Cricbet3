@@ -7,9 +7,8 @@
     <h2>Create Your Account</h2>
 
     <p class="card-subtitle">
-        Join CrickBet by verifying your email and mobile number.
+        Join CrickBet by verifying your mobile number.
     </p>
-
 
     {% if message %}
 
@@ -19,11 +18,14 @@
 
     {% endif %}
 
-
     <form
         method="POST"
         action="/register/send-otp"
     >
+
+        <!-- ============================================= -->
+        <!-- USERNAME -->
+        <!-- ============================================= -->
 
         <label>
             Username
@@ -34,9 +36,16 @@
             name="username"
             placeholder="Choose a username"
             minlength="3"
+            maxlength="50"
+            pattern="[A-Za-z0-9]+"
+            title="Username can contain letters and numbers only."
             required
         >
 
+
+        <!-- ============================================= -->
+        <!-- EMAIL -->
+        <!-- ============================================= -->
 
         <label>
             Email Address
@@ -46,9 +55,14 @@
             type="email"
             name="email"
             placeholder="you@example.com"
+            maxlength="100"
             required
         >
 
+
+        <!-- ============================================= -->
+        <!-- PHONE -->
+        <!-- ============================================= -->
 
         <label>
             Mobile Number
@@ -64,10 +78,44 @@
         >
 
 
+        <!-- ============================================= -->
+        <!-- REFERRAL CODE -->
+        <!-- ============================================= -->
+
+        <label>
+            Referral Code
+            <span style="opacity:0.65;">
+                (Optional)
+            </span>
+        </label>
+
+        <input
+            type="text"
+            name="referral_code"
+            id="referral_code"
+            placeholder="Enter referral code"
+            maxlength="20"
+            autocomplete="off"
+            value="{{ referral_code or '' }}"
+        >
+
+        <small
+            style="
+                display:block;
+                margin-top:6px;
+                opacity:0.7;
+            "
+        >
+            Enter a valid CrickBet referral code if someone referred you.
+        </small>
+
+
+        <!-- ============================================= -->
+        <!-- SEND OTP -->
+        <!-- ============================================= -->
+
         <button type="submit">
-
             Send Verification OTP
-
         </button>
 
     </form>
@@ -84,5 +132,24 @@
     </div>
 
 </div>
+
+
+<script>
+(function () {
+
+    const input = document.getElementById("referral_code");
+
+    if (!input) {
+        return;
+    }
+
+    input.addEventListener("input", function () {
+        this.value = this.value
+            .toUpperCase()
+            .replace(/[^A-Z0-9]/g, "");
+    });
+
+})();
+</script>
 
 {% endblock %}

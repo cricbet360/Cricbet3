@@ -1,1008 +1,1507 @@
-
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
 
-    <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<meta charset="UTF-8">
 
-    <title>My Profile - CricBet</title>
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    <style>
+<title>My Profile - CricBet</title>
 
-        /* =====================================================
-           RESET
-        ===================================================== */
+<style>
 
-        * {
-            box-sizing: border-box;
-        }
+    * {
+        box-sizing: border-box;
+    }
 
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            min-height: 100%;
-        }
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        min-height: 100%;
+    }
 
-        body {
-            font-family:
-                Inter,
-                Arial,
-                sans-serif;
+    body {
+        font-family:
+            Inter,
+            Arial,
+            sans-serif;
 
-            background: #07120d;
-            color: #e8f5ed;
-        }
+        background: #07120d;
 
-        /* =====================================================
-           TOP BAR
-        ===================================================== */
+        color: #e8f5ed;
+    }
+
+
+    /* =====================================================
+       TOP BAR
+    ===================================================== */
+
+    .topbar {
+
+        min-height: 64px;
+
+        padding: 0 24px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        background: #071a12;
+
+        border-bottom: 1px solid #173b2b;
+
+        color: white;
+    }
+
+
+    .brand {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 8px;
+
+        font-size: 21px;
+
+        font-weight: 900;
+
+        white-space: nowrap;
+    }
+
+
+    .brand-icon {
+        font-size: 20px;
+    }
+
+
+    .brand-text {
+        color: #ffffff;
+    }
+
+
+    .brand-accent {
+        color: #20c77a;
+    }
+
+
+    .top-actions {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 9px;
+    }
+
+
+    .top-actions a {
+
+        text-decoration: none;
+
+        color: white;
+    }
+
+
+    .balance {
+
+        padding: 8px 12px;
+
+        border-radius: 8px;
+
+        background: #10291e;
+
+        border: 1px solid #214a37;
+
+        color: #38d98a;
+
+        font-size: 14px;
+
+        font-weight: 900;
+    }
+
+
+    .top-button {
+
+        padding: 8px 12px;
+
+        border-radius: 8px;
+
+        border: none;
+
+        font-size: 13px;
+
+        font-weight: 800;
+
+        color: white;
+
+        text-decoration: none;
+
+        cursor: pointer;
+
+        transition: .2s ease;
+    }
+
+
+    .top-button:hover {
+
+        filter: brightness(1.08);
+
+        transform: translateY(-1px);
+    }
+
+
+    .deposit-button {
+        background: #159a60;
+    }
+
+
+    .withdraw-button {
+        background: #bd7b18;
+    }
+
+
+    /* =====================================================
+       MAIN PAGE
+    ===================================================== */
+
+    .page {
+
+        width: min(1100px, 100%);
+
+        margin: auto;
+
+        padding: 25px 18px 60px;
+    }
+
+
+    /* =====================================================
+       PAGE HEADER
+    ===================================================== */
+
+    .page-header {
+
+        margin-bottom: 18px;
+    }
+
+
+    .page-title {
+
+        margin: 0;
+
+        font-size: 25px;
+
+        font-weight: 900;
+
+        color: #e8f5ed;
+    }
+
+
+    .page-subtitle {
+
+        margin-top: 5px;
+
+        color: #8fa99b;
+
+        font-size: 13px;
+    }
+
+
+    /* =====================================================
+       MAIN PROFILE CARD
+    ===================================================== */
+
+    .profile-card {
+
+        background: #0b1c14;
+
+        border: 1px solid #193b2c;
+
+        border-radius: 14px;
+
+        padding: 22px;
+
+        box-shadow:
+            0 8px 30px
+            rgba(0, 0, 0, .18);
+    }
+
+
+    /* =====================================================
+       PROFILE HEADER
+    ===================================================== */
+
+    .profile-header {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 15px;
+
+        padding-bottom: 20px;
+
+        border-bottom: 1px solid #193b2c;
+    }
+
+
+    .avatar {
+
+        width: 58px;
+
+        height: 58px;
+
+        border-radius: 50%;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        background: #10291e;
+
+        border: 1px solid #214a37;
+
+        color: #20c77a;
+
+        font-size: 23px;
+
+        font-weight: 900;
+
+        flex-shrink: 0;
+    }
+
+
+    .profile-title {
+
+        margin: 0;
+
+        font-size: 24px;
+
+        line-height: 1.2;
+
+        color: #ffffff;
+    }
+
+
+    .username {
+
+        margin-top: 5px;
+
+        color: #8fa99b;
+
+        font-size: 14px;
+    }
+
+
+    /* =====================================================
+       BALANCE
+    ===================================================== */
+
+    .balance-card {
+
+        margin-top: 20px;
+
+        padding: 20px;
+
+        border-radius: 12px;
+
+        background: #10291e;
+
+        border: 1px solid #214a37;
+    }
+
+
+    .balance-label {
+
+        color: #7fdcad;
+
+        font-size: 13px;
+
+        font-weight: 700;
+    }
+
+
+    .balance-value {
+
+        margin-top: 5px;
+
+        color: #38d98a;
+
+        font-size: 30px;
+
+        font-weight: 900;
+    }
+
+
+    /* =====================================================
+       QUICK ACTIONS
+    ===================================================== */
+
+    .quick-actions {
+
+        margin-top: 16px;
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+        gap: 12px;
+    }
+
+
+    .quick-action {
+
+        border: none;
+
+        padding: 15px;
+
+        border-radius: 10px;
+
+        cursor: pointer;
+
+        font-size: 14px;
+
+        font-weight: 900;
+
+        transition: .2s ease;
+    }
+
+
+    .quick-action:hover {
+
+        transform: translateY(-1px);
+
+        filter: brightness(1.08);
+    }
+
+
+    .deposit-action {
+
+        background: #159a60;
+
+        color: white;
+    }
+
+
+    .withdraw-action {
+
+        background: #bd7b18;
+
+        color: white;
+    }
+
+
+    /* =====================================================
+       SECTION TITLE
+    ===================================================== */
+
+    .section-title {
+
+        margin: 24px 0 12px;
+
+        font-size: 17px;
+
+        font-weight: 900;
+
+        color: #e8f5ed;
+    }
+
+
+    /* =====================================================
+       REFERRAL CARD
+    ===================================================== */
+
+    .referral-card {
+
+        margin-top: 20px;
+
+        padding: 20px;
+
+        background:
+            linear-gradient(
+                145deg,
+                #0d2519,
+                #0a1b13
+            );
+
+        border: 1px solid #20563d;
+
+        border-radius: 14px;
+
+        overflow: hidden;
+    }
+
+
+    .referral-header {
+
+        display: flex;
+
+        align-items: flex-start;
+
+        justify-content: space-between;
+
+        gap: 15px;
+
+        margin-bottom: 18px;
+    }
+
+
+    .referral-title {
+
+        margin: 0;
+
+        color: #ffffff;
+
+        font-size: 18px;
+
+        font-weight: 900;
+    }
+
+
+    .referral-subtitle {
+
+        margin-top: 5px;
+
+        color: #8fa99b;
+
+        font-size: 13px;
+
+        line-height: 1.5;
+    }
+
+
+    .referral-badge {
+
+        flex-shrink: 0;
+
+        padding: 6px 10px;
+
+        border-radius: 999px;
+
+        background: #10291e;
+
+        border: 1px solid #2c6849;
+
+        color: #38d98a;
+
+        font-size: 11px;
+
+        font-weight: 900;
+
+        text-transform: uppercase;
+
+        letter-spacing: .4px;
+    }
+
+
+    /* =====================================================
+       REFERRAL CODE
+    ===================================================== */
+
+    .referral-box {
+
+        margin-top: 12px;
+    }
+
+
+    .referral-label {
+
+        display: block;
+
+        margin-bottom: 7px;
+
+        color: #7fdcad;
+
+        font-size: 12px;
+
+        font-weight: 800;
+    }
+
+
+    .referral-input-row {
+
+        display: flex;
+
+        gap: 8px;
+
+        width: 100%;
+    }
+
+
+    .referral-value {
+
+        flex: 1;
+
+        min-width: 0;
+
+        height: 46px;
+
+        padding: 0 14px;
+
+        display: flex;
+
+        align-items: center;
+
+        border-radius: 9px;
+
+        background: #071a12;
+
+        border: 1px solid #28563f;
+
+        color: #ffffff;
+
+        font-size: 14px;
+
+        font-weight: 900;
+
+        letter-spacing: .7px;
+
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+
+        white-space: nowrap;
+    }
+
+
+    .copy-button {
+
+        height: 46px;
+
+        padding: 0 15px;
+
+        border: none;
+
+        border-radius: 9px;
+
+        background: #159a60;
+
+        color: white;
+
+        font-size: 13px;
+
+        font-weight: 900;
+
+        cursor: pointer;
+
+        white-space: nowrap;
+
+        transition: .2s ease;
+    }
+
+
+    .copy-button:hover {
+
+        filter: brightness(1.08);
+
+        transform: translateY(-1px);
+    }
+
+
+    .copy-button.copied {
+
+        background: #286e4d;
+    }
+
+
+    .referral-help {
+
+        margin-top: 13px;
+
+        padding: 12px;
+
+        border-radius: 9px;
+
+        background: rgba(32, 199, 122, .06);
+
+        border: 1px solid #193b2c;
+
+        color: #9bb3a5;
+
+        font-size: 12px;
+
+        line-height: 1.55;
+    }
+
+
+    .referral-help strong {
+
+        color: #cfe9da;
+    }
+
+
+    /* =====================================================
+       ACCOUNT MENU
+    ===================================================== */
+
+    .menu {
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(
+                auto-fit,
+                minmax(210px, 1fr)
+            );
+
+        gap: 12px;
+    }
+
+
+    .menu a {
+
+        display: block;
+
+        padding: 18px;
+
+        background: #0b2117;
+
+        border: 1px solid #193b2c;
+
+        border-radius: 12px;
+
+        text-decoration: none;
+
+        color: #e8f5ed;
+
+        font-weight: 800;
+
+        transition: .2s ease;
+    }
+
+
+    .menu a:hover {
+
+        border-color: #20c77a;
+
+        transform: translateY(-1px);
+
+        background: #0e261b;
+
+        box-shadow:
+            0 5px 15px
+            rgba(0, 0, 0, .18);
+    }
+
+
+    .menu-icon {
+
+        font-size: 20px;
+
+        margin-bottom: 8px;
+    }
+
+
+    .menu-title {
+
+        font-size: 15px;
+
+        color: #ffffff;
+    }
+
+
+    .menu small {
+
+        display: block;
+
+        margin-top: 5px;
+
+        color: #8fa99b;
+
+        font-weight: 400;
+
+        line-height: 1.4;
+    }
+
+
+    /* =====================================================
+       ACCOUNT INFORMATION
+    ===================================================== */
+
+    .account-info {
+
+        margin-top: 20px;
+
+        background: #0b2117;
+
+        border: 1px solid #193b2c;
+
+        border-radius: 12px;
+
+        padding: 20px;
+    }
+
+
+    .account-info-title {
+
+        margin: 0 0 15px;
+
+        font-size: 17px;
+
+        font-weight: 900;
+
+        color: #ffffff;
+    }
+
+
+    .info-row {
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        padding: 12px 0;
+
+        border-bottom: 1px solid #173326;
+
+        gap: 15px;
+    }
+
+
+    .info-row:last-child {
+
+        border-bottom: none;
+
+        padding-bottom: 0;
+    }
+
+
+    .info-label {
+
+        color: #8fa99b;
+
+        font-size: 13px;
+    }
+
+
+    .info-value {
+
+        font-size: 14px;
+
+        font-weight: 800;
+
+        text-align: right;
+
+        word-break: break-word;
+
+        color: #e8f5ed;
+    }
+
+
+    .status {
+
+        color: #38d98a;
+    }
+
+
+    /* =====================================================
+       BOTTOM DASHBOARD BUTTON
+    ===================================================== */
+
+    .back-dashboard {
+
+        display: block;
+
+        margin-top: 20px;
+
+        padding: 13px 16px;
+
+        border-radius: 10px;
+
+        background: #10291e;
+
+        border: 1px solid #214a37;
+
+        color: #38d98a;
+
+        text-decoration: none;
+
+        text-align: center;
+
+        font-size: 14px;
+
+        font-weight: 900;
+
+        transition: .2s ease;
+    }
+
+
+    .back-dashboard:hover {
+
+        background: #143322;
+
+        border-color: #20c77a;
+    }
+
+
+    /* =====================================================
+       TOAST
+    ===================================================== */
+
+    .copy-toast {
+
+        position: fixed;
+
+        left: 50%;
+
+        bottom: 24px;
+
+        transform:
+            translateX(-50%)
+            translateY(15px);
+
+        padding: 11px 16px;
+
+        border-radius: 9px;
+
+        background: #10291e;
+
+        border: 1px solid #2d7651;
+
+        color: #ffffff;
+
+        font-size: 13px;
+
+        font-weight: 800;
+
+        opacity: 0;
+
+        pointer-events: none;
+
+        transition: .25s ease;
+
+        z-index: 9999;
+    }
+
+
+    .copy-toast.show {
+
+        opacity: 1;
+
+        transform:
+            translateX(-50%)
+            translateY(0);
+    }
+
+
+    /* =====================================================
+       MOBILE
+    ===================================================== */
+
+    @media (max-width: 700px) {
 
         .topbar {
 
-            min-height: 64px;
+            padding: 10px 12px;
 
-            padding: 0 24px;
+            gap: 10px;
 
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            background: #071a12;
-
-            border-bottom: 1px solid #173b2b;
-
-            color: white;
+            align-items: flex-start;
         }
 
-        .brand {
-
-            display: flex;
-            align-items: center;
-
-            gap: 8px;
-
-            font-size: 21px;
-            font-weight: 900;
-
-            white-space: nowrap;
-        }
-
-        .brand-icon {
-            font-size: 20px;
-        }
-
-        .brand-text {
-            color: #ffffff;
-        }
-
-        .brand-accent {
-            color: #20c77a;
-        }
 
         .top-actions {
 
-            display: flex;
-            align-items: center;
+            flex-wrap: wrap;
 
-            gap: 9px;
+            justify-content: flex-end;
+
+            gap: 5px;
         }
 
-        .top-actions a {
 
-            text-decoration: none;
-            color: white;
+        .brand {
+
+            font-size: 18px;
+
+            padding-top: 7px;
         }
+
 
         .balance {
 
-            padding: 8px 12px;
-
-            border-radius: 8px;
-
-            background: #10291e;
-
-            border: 1px solid #214a37;
-
-            color: #38d98a;
-
-            font-size: 14px;
-            font-weight: 900;
-        }
-
-        .top-button {
-
-            padding: 8px 12px;
-
-            border-radius: 8px;
-
-            border: none;
-
-            font-size: 13px;
-            font-weight: 800;
-
-            color: white;
-
-            text-decoration: none;
-
-            cursor: pointer;
-
-            transition: .2s ease;
-        }
-
-        .top-button:hover {
-
-            filter: brightness(1.08);
-
-            transform: translateY(-1px);
-        }
-
-        .deposit-button {
-
-            background: #159a60;
-        }
-
-        .withdraw-button {
-
-            background: #bd7b18;
-        }
-
-        /* =====================================================
-           MAIN PAGE
-        ===================================================== */
-
-        .page {
-
-            width: min(1100px, 100%);
-
-            margin: auto;
-
-            padding: 25px 18px 60px;
-        }
-
-        /* =====================================================
-           PAGE HEADER
-        ===================================================== */
-
-        .page-header {
-
-            margin-bottom: 18px;
-        }
-
-        .page-title {
-
-            margin: 0;
-
-            font-size: 25px;
-
-            font-weight: 900;
-
-            color: #e8f5ed;
-        }
-
-        .page-subtitle {
-
-            margin-top: 5px;
-
-            color: #8fa99b;
-
-            font-size: 13px;
-        }
-
-        /* =====================================================
-           MAIN PROFILE CARD
-        ===================================================== */
-
-        .profile-card {
-
-            background: #0b1c14;
-
-            border: 1px solid #193b2c;
-
-            border-radius: 14px;
-
-            padding: 22px;
-
-            box-shadow:
-                0 8px 30px
-                rgba(0, 0, 0, .18);
-        }
-
-        /* =====================================================
-           PROFILE HEADER
-        ===================================================== */
-
-        .profile-header {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 15px;
-
-            padding-bottom: 20px;
-
-            border-bottom: 1px solid #193b2c;
-        }
-
-        .avatar {
-
-            width: 58px;
-            height: 58px;
-
-            border-radius: 50%;
-
-            display: flex;
-
-            align-items: center;
-            justify-content: center;
-
-            background: #10291e;
-
-            border: 1px solid #214a37;
-
-            color: #20c77a;
-
-            font-size: 23px;
-
-            font-weight: 900;
-
-            flex-shrink: 0;
-        }
-
-        .profile-title {
-
-            margin: 0;
-
-            font-size: 24px;
-
-            line-height: 1.2;
-
-            color: #ffffff;
-        }
-
-        .username {
-
-            margin-top: 5px;
-
-            color: #8fa99b;
-
-            font-size: 14px;
-        }
-
-        /* =====================================================
-           BALANCE
-        ===================================================== */
-
-        .balance-card {
-
-            margin-top: 20px;
-
-            padding: 20px;
-
-            border-radius: 12px;
-
-            background: #10291e;
-
-            border: 1px solid #214a37;
-        }
-
-        .balance-label {
-
-            color: #7fdcad;
-
-            font-size: 13px;
-
-            font-weight: 700;
-        }
-
-        .balance-value {
-
-            margin-top: 5px;
-
-            color: #38d98a;
-
-            font-size: 30px;
-
-            font-weight: 900;
-        }
-
-        /* =====================================================
-           QUICK ACTIONS
-        ===================================================== */
-
-        .quick-actions {
-
-            margin-top: 16px;
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(2, 1fr);
-
-            gap: 12px;
-        }
-
-        .quick-action {
-
-            border: none;
-
-            padding: 15px;
-
-            border-radius: 10px;
-
-            cursor: pointer;
-
-            font-size: 14px;
-
-            font-weight: 900;
-
-            transition: .2s ease;
-        }
-
-        .quick-action:hover {
-
-            transform: translateY(-1px);
-
-            filter: brightness(1.08);
-        }
-
-        .deposit-action {
-
-            background: #159a60;
-
-            color: white;
-        }
-
-        .withdraw-action {
-
-            background: #bd7b18;
-
-            color: white;
-        }
-
-        /* =====================================================
-           SECTION TITLE
-        ===================================================== */
-
-        .section-title {
-
-            margin: 24px 0 12px;
-
-            font-size: 17px;
-
-            font-weight: 900;
-
-            color: #e8f5ed;
-        }
-
-        /* =====================================================
-           MENU
-        ===================================================== */
-
-        .menu {
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(
-                    auto-fit,
-                    minmax(210px, 1fr)
-                );
-
-            gap: 12px;
-        }
-
-        .menu a {
-
-            display: block;
-
-            padding: 18px;
-
-            background: #0b2117;
-
-            border: 1px solid #193b2c;
-
-            border-radius: 12px;
-
-            text-decoration: none;
-
-            color: #e8f5ed;
-
-            font-weight: 800;
-
-            transition: .2s ease;
-        }
-
-        .menu a:hover {
-
-            border-color: #20c77a;
-
-            transform: translateY(-1px);
-
-            background: #0e261b;
-
-            box-shadow:
-                0 5px 15px
-                rgba(0, 0, 0, .18);
-        }
-
-        .menu-icon {
-
-            font-size: 20px;
-
-            margin-bottom: 8px;
-        }
-
-        .menu-title {
-
-            font-size: 15px;
-
-            color: #ffffff;
-        }
-
-        .menu small {
-
-            display: block;
-
-            margin-top: 5px;
-
-            color: #8fa99b;
-
-            font-weight: 400;
-
-            line-height: 1.4;
-        }
-
-        /* =====================================================
-           ACCOUNT INFORMATION
-        ===================================================== */
-
-        .account-info {
-
-            margin-top: 20px;
-
-            background: #0b2117;
-
-            border: 1px solid #193b2c;
-
-            border-radius: 12px;
-
-            padding: 20px;
-        }
-
-        .account-info-title {
-
-            margin: 0 0 15px;
-
-            font-size: 17px;
-
-            font-weight: 900;
-
-            color: #ffffff;
-        }
-
-        .info-row {
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            padding: 12px 0;
-
-            border-bottom: 1px solid #173326;
-
-            gap: 15px;
-        }
-
-        .info-row:last-child {
-
-            border-bottom: none;
-
-            padding-bottom: 0;
-        }
-
-        .info-label {
-
-            color: #8fa99b;
-
-            font-size: 13px;
-        }
-
-        .info-value {
-
-            font-size: 14px;
-
-            font-weight: 800;
+            width: 100%;
 
             text-align: right;
 
-            word-break: break-word;
-
-            color: #e8f5ed;
+            order: -1;
         }
 
-        .status {
 
-            color: #38d98a;
+        .top-button {
+
+            padding: 7px 9px;
+
+            font-size: 12px;
         }
 
-        /* =====================================================
-           BOTTOM DASHBOARD BUTTON
-        ===================================================== */
 
-        .back-dashboard {
+        .page {
 
-            display: block;
+            padding: 15px 10px 40px;
+        }
 
-            margin-top: 20px;
 
-            padding: 13px 16px;
+        .profile-card {
 
-            border-radius: 10px;
+            padding: 17px;
+        }
 
-            background: #10291e;
 
-            border: 1px solid #214a37;
+        .page-title {
 
-            color: #38d98a;
+            font-size: 22px;
+        }
 
-            text-decoration: none;
+
+        .profile-title {
+
+            font-size: 22px;
+        }
+
+
+        .quick-actions {
+
+            grid-template-columns: 1fr;
+        }
+
+
+        .referral-header {
+
+            flex-direction: column;
+        }
+
+
+        .referral-badge {
+
+            align-self: flex-start;
+        }
+
+
+        .referral-input-row {
+
+            flex-direction: column;
+        }
+
+
+        .referral-value {
+
+            width: 100%;
+        }
+
+
+        .copy-button {
+
+            width: 100%;
+        }
+
+    }
+
+
+    @media (max-width: 430px) {
+
+        .topbar {
+
+            flex-direction: column;
+
+            align-items: stretch;
+        }
+
+
+        .brand {
+
+            justify-content: center;
 
             text-align: center;
-
-            font-size: 14px;
-
-            font-weight: 900;
-
-            transition: .2s ease;
         }
 
-        .back-dashboard:hover {
 
-            background: #143322;
+        .top-actions {
 
-            border-color: #20c77a;
+            justify-content: center;
         }
 
-        /* =====================================================
-           MOBILE
-        ===================================================== */
 
-        @media (max-width: 700px) {
+        .balance {
 
-            .topbar {
-
-                padding: 10px 12px;
-
-                gap: 10px;
-
-                align-items: flex-start;
-            }
-
-            .top-actions {
-
-                flex-wrap: wrap;
-
-                justify-content: flex-end;
-
-                gap: 5px;
-            }
-
-            .brand {
-
-                font-size: 18px;
-
-                padding-top: 7px;
-            }
-
-            .balance {
-
-                width: 100%;
-
-                text-align: right;
-
-                order: -1;
-            }
-
-            .top-button {
-
-                padding: 7px 9px;
-
-                font-size: 12px;
-            }
-
-            .page {
-
-                padding: 15px 10px 40px;
-            }
-
-            .profile-card {
-
-                padding: 17px;
-            }
-
-            .page-title {
-
-                font-size: 22px;
-            }
-
-            .profile-title {
-
-                font-size: 22px;
-            }
-
-            .quick-actions {
-
-                grid-template-columns: 1fr;
-            }
-
+            text-align: center;
         }
 
-        @media (max-width: 430px) {
 
-            .topbar {
+        .info-row {
 
-                flex-direction: column;
+            align-items: flex-start;
 
-                align-items: stretch;
-            }
+            flex-direction: column;
 
-            .brand {
-
-                justify-content: center;
-
-                text-align: center;
-            }
-
-            .top-actions {
-
-                justify-content: center;
-            }
-
-            .balance {
-
-                text-align: center;
-            }
-
-            .info-row {
-
-                align-items: flex-start;
-
-                flex-direction: column;
-
-                gap: 4px;
-            }
-
-            .info-value {
-
-                text-align: left;
-            }
-
+            gap: 4px;
         }
 
-    </style>
+
+        .info-value {
+
+            text-align: left;
+        }
+
+
+        .referral-card {
+
+            padding: 16px;
+        }
+
+    }
+
+</style>
+
 
 </head>
-
 
 <body>
 
 <header class="topbar">
 
-    <div class="brand">
 
-        <span class="brand-icon">🏏</span>
+<div class="brand">
 
-        <span class="brand-text">
-            CRIC<span class="brand-accent">BET</span>
-        </span>
+    <span class="brand-icon">🏏</span>
 
-    </div>
+    <span class="brand-text">
+        CRIC<span class="brand-accent">BET</span>
+    </span>
 
-
-    <div class="top-actions">
-
-        <span class="balance">
-            ₹{{ "%.2f"|format(user.balance or 0) }}
-        </span>
+</div>
 
 
-        <button
-            class="top-button deposit-button"
-            onclick="openWhatsApp('deposit')"
-        >
-            Deposit
-        </button>
+<div class="top-actions">
+
+    <span class="balance">
+        ₹{{ "%.2f"|format(user.balance or 0) }}
+    </span>
 
 
-        <button
-            class="top-button withdraw-button"
-            onclick="openWhatsApp('withdraw')"
-        >
-            Withdraw
-        </button>
+    <button
+        class="top-button deposit-button"
+        onclick="openWhatsApp('deposit')"
+    >
+        Deposit
+    </button>
 
 
-        <a
-            href="/dashboard"
-            class="top-button"
-        >
-            Dashboard
-        </a>
+    <button
+        class="top-button withdraw-button"
+        onclick="openWhatsApp('withdraw')"
+    >
+        Withdraw
+    </button>
 
 
-        <a
-            href="/logout"
-            class="top-button"
-        >
-            Logout
-        </a>
+    <a
+        href="/dashboard"
+        class="top-button"
+    >
+        Dashboard
+    </a>
 
-    </div>
+
+    <a
+        href="/logout"
+        class="top-button"
+    >
+        Logout
+    </a>
+
+</div>
+
 
 </header>
-
 
 <main class="page">
 
 
-    <div class="page-header">
+<div class="page-header">
 
-        <h1 class="page-title">
-            My Profile
-        </h1>
+    <h1 class="page-title">
+        My Profile
+    </h1>
 
-        <div class="page-subtitle">
-            Manage your CricBet account
+    <div class="page-subtitle">
+        Manage your CricBet account
+    </div>
+
+</div>
+
+
+<section class="profile-card">
+
+
+    <!-- =================================================
+         PROFILE HEADER
+    ================================================== -->
+
+    <div class="profile-header">
+
+        <div class="avatar">
+            {{ (user.username or "U")[0]|upper }}
+        </div>
+
+
+        <div>
+
+            <h2 class="profile-title">
+                {{ user.username }}
+            </h2>
+
+            <div class="username">
+                Your CricBet account
+            </div>
+
         </div>
 
     </div>
 
 
-    <section class="profile-card">
+    <!-- =================================================
+         BALANCE
+    ================================================== -->
+
+    <div class="balance-card">
+
+        <div class="balance-label">
+            Available Balance
+        </div>
+
+        <div class="balance-value">
+            ₹{{ "%.2f"|format(user.balance or 0) }}
+        </div>
+
+    </div>
 
 
-        <!-- PROFILE HEADER -->
+    <!-- =================================================
+         QUICK ACTIONS
+    ================================================== -->
 
-        <div class="profile-header">
+    <div class="quick-actions">
 
-            <div class="avatar">
+        <button
+            class="quick-action deposit-action"
+            onclick="openWhatsApp('deposit')"
+        >
+            💰 Deposit
+        </button>
 
-                {{ (user.username or "U")[0]|upper }}
 
-            </div>
+        <button
+            class="quick-action withdraw-action"
+            onclick="openWhatsApp('withdraw')"
+        >
+            💸 Withdraw
+        </button>
 
+    </div>
+
+
+    <!-- =================================================
+         REFERRAL PROGRAM
+    ================================================== -->
+
+    <h3 class="section-title">
+        Referral Program
+    </h3>
+
+
+    <section class="referral-card">
+
+        <div class="referral-header">
 
             <div>
 
-                <h2 class="profile-title">
-                    {{ user.username }}
-                </h2>
+                <h3 class="referral-title">
+                    Invite Friends
+                </h3>
 
-                <div class="username">
-                    Your CricBet account
+                <div class="referral-subtitle">
+                    Share your referral code with friends and family.
                 </div>
 
+            </div>
+
+
+            <div class="referral-badge">
+                Your Code
             </div>
 
         </div>
 
 
-        <!-- BALANCE -->
+        {% if user.referral_code %}
 
-        <div class="balance-card">
+            <div class="referral-box">
 
-            <div class="balance-label">
-                Available Balance
-            </div>
-
-            <div class="balance-value">
-                ₹{{ "%.2f"|format(user.balance or 0) }}
-            </div>
-
-        </div>
-
-
-        <!-- QUICK ACTIONS -->
-
-        <div class="quick-actions">
-
-            <button
-                class="quick-action deposit-action"
-                onclick="openWhatsApp('deposit')"
-            >
-                💰 Deposit
-            </button>
-
-
-            <button
-                class="quick-action withdraw-action"
-                onclick="openWhatsApp('withdraw')"
-            >
-                💸 Withdraw
-            </button>
-
-        </div>
-
-
-        <!-- ACCOUNT MENU -->
-
-        <h3 class="section-title">
-            Account
-        </h3>
-
-
-        <div class="menu">
-
-
-            <a href="/my-bets">
-
-                <div class="menu-icon">
-                    🎟️
-                </div>
-
-                <div class="menu-title">
-                    My Bets
-                </div>
-
-                <small>
-                    View your betting history
-                </small>
-
-            </a>
-
-
-            <a href="/profit-loss">
-
-                <div class="menu-icon">
-                    📊
-                </div>
-
-                <div class="menu-title">
-                    Profit &amp; Loss
-                </div>
-
-                <small>
-                    View your betting performance
-                </small>
-
-            </a>
-
-
-            <a href="/account-statement">
-
-                <div class="menu-icon">
-                    💳
-                </div>
-
-                <div class="menu-title">
-                    Account Statement
-                </div>
-
-                <small>
-                    Deposits, withdrawals and account adjustments
-                </small>
-
-            </a>
-
-
-            <a href="/game-rules">
-
-                <div class="menu-icon">
-                    📖
-                </div>
-
-                <div class="menu-title">
-                    Game Rules
-                </div>
-
-                <small>
-                    Read CricBet rules
-                </small>
-
-            </a>
-
-
-        </div>
-
-
-        <!-- ACCOUNT INFORMATION -->
-
-        <h3 class="section-title">
-            Account Information
-        </h3>
-
-
-        <div class="account-info">
-
-
-            <div class="info-row">
-
-                <span class="info-label">
-                    Username
+                <span class="referral-label">
+                    Referral Code
                 </span>
 
-                <span class="info-value">
-                    {{ user.username }}
-                </span>
+
+                <div class="referral-input-row">
+
+                    <div
+                        class="referral-value"
+                        id="referralCode"
+                    >
+                        {{ user.referral_code }}
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="copy-button"
+                        id="copyCodeButton"
+                        onclick="copyReferralCode()"
+                    >
+                        Copy Code
+                    </button>
+
+                </div>
 
             </div>
 
 
-            {% if user.email %}
+            <div class="referral-help">
 
-            <div class="info-row">
+                <strong>How it works:</strong>
 
-                <span class="info-label">
-                    Email
-                </span>
-
-                <span class="info-value">
-                    {{ user.email }}
-                </span>
+                Share your referral code with another user.
+                When they register using your code, the referral
+                relationship is saved to their account.
 
             </div>
 
-            {% endif %}
+        {% else %}
 
+            <div class="referral-help">
 
-            {% if user.phone %}
-
-            <div class="info-row">
-
-                <span class="info-label">
-                    Phone
-                </span>
-
-                <span class="info-value">
-                    {{ user.phone }}
-                </span>
+                Your referral code is currently unavailable.
+                Please contact support.
 
             </div>
 
-            {% endif %}
-
-
-            <div class="info-row">
-
-                <span class="info-label">
-                    Account Status
-                </span>
-
-                <span class="info-value status">
-                    {{ user.status or "Active" }}
-                </span>
-
-            </div>
-
-
-        </div>
-
-
-        <!-- DASHBOARD -->
-
-        <a
-            href="/dashboard"
-            class="back-dashboard"
-        >
-            ← Back to Dashboard
-        </a>
-
+        {% endif %}
 
     </section>
 
 
+    <!-- =================================================
+         ACCOUNT MENU
+    ================================================== -->
+
+    <h3 class="section-title">
+        Account
+    </h3>
+
+
+    <div class="menu">
+
+
+        <a href="/my-bets">
+
+            <div class="menu-icon">
+                🎟️
+            </div>
+
+            <div class="menu-title">
+                My Bets
+            </div>
+
+            <small>
+                View your betting history
+            </small>
+
+        </a>
+
+
+        <a href="/profit-loss">
+
+            <div class="menu-icon">
+                📊
+            </div>
+
+            <div class="menu-title">
+                Profit &amp; Loss
+            </div>
+
+            <small>
+                View your betting performance
+            </small>
+
+        </a>
+
+
+        <a href="/account-statement">
+
+            <div class="menu-icon">
+                💳
+            </div>
+
+            <div class="menu-title">
+                Account Statement
+            </div>
+
+            <small>
+                Deposits, withdrawals and account adjustments
+            </small>
+
+        </a>
+
+
+        <a href="/game-rules">
+
+            <div class="menu-icon">
+                📖
+            </div>
+
+            <div class="menu-title">
+                Game Rules
+            </div>
+
+            <small>
+                Read CricBet rules
+            </small>
+
+        </a>
+
+
+    </div>
+
+
+    <!-- =================================================
+         ACCOUNT INFORMATION
+    ================================================== -->
+
+    <h3 class="section-title">
+        Account Information
+    </h3>
+
+
+    <div class="account-info">
+
+        <div class="info-row">
+
+            <span class="info-label">
+                Username
+            </span>
+
+            <span class="info-value">
+                {{ user.username }}
+            </span>
+
+        </div>
+
+
+        {% if user.email %}
+
+        <div class="info-row">
+
+            <span class="info-label">
+                Email
+            </span>
+
+            <span class="info-value">
+                {{ user.email }}
+            </span>
+
+        </div>
+
+        {% endif %}
+
+
+        {% if user.phone %}
+
+        <div class="info-row">
+
+            <span class="info-label">
+                Phone
+            </span>
+
+            <span class="info-value">
+                {{ user.phone }}
+            </span>
+
+        </div>
+
+        {% endif %}
+
+
+        <div class="info-row">
+
+            <span class="info-label">
+                Referral Code
+            </span>
+
+            <span class="info-value">
+                {{ user.referral_code or "Not available" }}
+            </span>
+
+        </div>
+
+
+        <div class="info-row">
+
+            <span class="info-label">
+                Account Status
+            </span>
+
+            <span class="info-value status">
+                {{ user.status or "Active" }}
+            </span>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =================================================
+         DASHBOARD
+    ================================================== -->
+
+    <a
+        href="/dashboard"
+        class="back-dashboard"
+    >
+        ← Back to Dashboard
+    </a>
+
+
+</section>
+
+
 </main>
 
+<!-- =========================================================
+     COPY TOAST
+========================================================= -->
+
+<div
+    class="copy-toast"
+    id="copyToast"
+>
+    Copied successfully
+</div>
 
 <script>
 
@@ -1041,17 +1540,196 @@
             encodeURIComponent(message);
 
 
-        /*
-           Using location.href instead of window.open()
-           makes the redirect more reliable on mobile browsers.
-        */
-
         window.location.href = url;
 
     }
 
-</script>
 
+    /* =========================================================
+       COPY TO CLIPBOARD
+    ========================================================= */
+
+    async function copyText(
+        text,
+        button,
+        originalText
+    ) {
+
+        try {
+
+            if (
+                navigator.clipboard &&
+                window.isSecureContext
+            ) {
+
+                await navigator.clipboard.writeText(
+                    text
+                );
+
+            } else {
+
+                const textarea =
+                    document.createElement("textarea");
+
+                textarea.value = text;
+
+                textarea.style.position = "fixed";
+
+                textarea.style.left = "-999999px";
+
+                document.body.appendChild(
+                    textarea
+                );
+
+                textarea.focus();
+
+                textarea.select();
+
+                document.execCommand(
+                    "copy"
+                );
+
+                textarea.remove();
+
+            }
+
+
+            button.textContent = "Copied";
+
+            button.classList.add(
+                "copied"
+            );
+
+
+            showCopyToast();
+
+
+            setTimeout(
+                function () {
+
+                    button.textContent =
+                        originalText;
+
+                    button.classList.remove(
+                        "copied"
+                    );
+
+                },
+                1600
+            );
+
+
+        } catch (error) {
+
+            showCopyToast(
+                "Unable to copy. Please copy manually."
+            );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       COPY REFERRAL CODE
+    ========================================================= */
+
+    function copyReferralCode() {
+
+        const codeElement =
+            document.getElementById(
+                "referralCode"
+            );
+
+        const button =
+            document.getElementById(
+                "copyCodeButton"
+            );
+
+
+        if (
+            !codeElement ||
+            !button
+        ) {
+
+            return;
+
+        }
+
+
+        const code =
+            codeElement.textContent.trim();
+
+
+        if (!code) {
+
+            return;
+
+        }
+
+
+        copyText(
+            code,
+            button,
+            "Copy Code"
+        );
+
+    }
+
+
+    /* =========================================================
+       TOAST
+    ========================================================= */
+
+    let toastTimer = null;
+
+
+    function showCopyToast(
+        message = "Copied successfully"
+    ) {
+
+        const toast =
+            document.getElementById(
+                "copyToast"
+            );
+
+
+        if (!toast) {
+
+            return;
+
+        }
+
+
+        toast.textContent =
+            message;
+
+
+        toast.classList.add(
+            "show"
+        );
+
+
+        clearTimeout(
+            toastTimer
+        );
+
+
+        toastTimer =
+            setTimeout(
+                function () {
+
+                    toast.classList.remove(
+                        "show"
+                    );
+
+                },
+                1800
+            );
+
+    }
+
+</script>
 
 </body>
 
