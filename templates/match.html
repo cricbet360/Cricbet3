@@ -1584,6 +1584,78 @@
 
 
 <!-- =========================================================
+     MAIN MATCH PAGE
+========================================================= -->
+
+<div class="page">
+
+    <a
+        href="/dashboard"
+        class="account-back"
+    >
+        ← Back to Cricket
+    </a>
+
+
+    <section class="match-header">
+
+        <div
+            id="eventName"
+            class="event-name"
+        >
+            {{ match.event_name if match else "Cricket Match" }}
+        </div>
+
+
+        <div class="teams">
+
+            <div
+                id="team1"
+                class="team"
+            >
+                {{ match.team1 if match else "" }}
+            </div>
+
+
+            <div class="vs">
+                VS
+            </div>
+
+
+            <div
+                id="team2"
+                class="team"
+            >
+                {{ match.team2 if match else "" }}
+            </div>
+
+        </div>
+
+
+        <div class="match-info">
+
+            <span
+                id="matchStatus"
+                class="badge"
+            >
+                Loading
+            </span>
+
+
+            <span
+                id="matchTime"
+                class="badge"
+            >
+                --
+            </span>
+
+        </div>
+
+    </section>
+
+
+
+<!-- =========================================================
      LIVE MATCH
      ========================================================= -->
 
@@ -2083,75 +2155,6 @@
 </section>
 
 
-<!-- =========================================================
-     MAIN MATCH PAGE
-========================================================= -->
-
-<div class="page">
-
-    <a
-        href="/dashboard"
-        class="account-back"
-    >
-        ← Back to Cricket
-    </a>
-
-
-    <section class="match-header">
-
-        <div
-            id="eventName"
-            class="event-name"
-        >
-            {{ match.event_name if match else "Cricket Match" }}
-        </div>
-
-
-        <div class="teams">
-
-            <div
-                id="team1"
-                class="team"
-            >
-                {{ match.team1 if match else "" }}
-            </div>
-
-
-            <div class="vs">
-                VS
-            </div>
-
-
-            <div
-                id="team2"
-                class="team"
-            >
-                {{ match.team2 if match else "" }}
-            </div>
-
-        </div>
-
-
-        <div class="match-info">
-
-            <span
-                id="matchStatus"
-                class="badge"
-            >
-                Loading
-            </span>
-
-
-            <span
-                id="matchTime"
-                class="badge"
-            >
-                --
-            </span>
-
-        </div>
-
-    </section>
 
 
     <!-- =====================================================
