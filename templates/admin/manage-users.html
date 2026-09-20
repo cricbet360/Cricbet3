@@ -1,182 +1,381 @@
+
 {% extends "base.html" %}
 
 {% block content %}
 
 <style>
 
-    .users-page {
-        width: 100%;
-        max-width: 1100px;
+    .admin-page {
+        max-width: 1400px;
         margin: 0 auto;
+        padding: 25px 18px 50px;
     }
 
-
-    .users-header {
-        text-align: center;
-        margin-bottom: 25px;
+    .admin-header {
+        margin-bottom: 22px;
     }
 
-
-    .users-header h1 {
-        margin-bottom: 8px;
-    }
-
-
-    .users-header p {
-        opacity: 0.7;
+    .admin-header h1 {
         margin: 0;
+        font-size: 28px;
+        font-weight: 900;
     }
 
+    .admin-header p {
+        margin: 7px 0 0;
+        opacity: 0.65;
+    }
 
-    .search-card,
-    .result-card,
-    .reset-card {
-        background: rgba(255,255,255,0.03);
-        border: 1px solid rgba(255,255,255,0.10);
-        border-radius: 12px;
-        padding: 20px;
+    .back-button {
+        display: inline-block;
+        margin-bottom: 18px;
+        padding: 10px 14px;
+        border-radius: 9px;
+        text-decoration: none;
+        color: #38d98a;
+        background: #10291e;
+        border: 1px solid #214a37;
+        font-weight: 800;
+    }
+
+    .search-box {
+        background: #111827;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 14px;
+        padding: 18px;
         margin-bottom: 20px;
     }
-
 
     .search-form {
         display: flex;
         gap: 10px;
     }
 
-
     .search-form input {
         flex: 1;
         min-width: 0;
-        padding: 12px;
-        border-radius: 8px;
-        border: 1px solid rgba(255,255,255,0.15);
+        padding: 13px 14px;
+        border-radius: 9px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: #0f172a;
+        color: white;
+        outline: none;
     }
 
+    .search-form input:focus {
+        border-color: #00d26a;
+    }
 
     .search-form button {
-        padding: 12px 20px;
-        border-radius: 8px;
-        border: none;
+        padding: 13px 20px;
+        border: 0;
+        border-radius: 9px;
+        background: #00d26a;
+        color: #06150d;
+        font-weight: 900;
         cursor: pointer;
-        font-weight: 800;
     }
 
+    .clear-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 16px;
+        border-radius: 9px;
+        text-decoration: none;
+        background: #1f2937;
+        color: white;
+        border: 1px solid rgba(255,255,255,0.08);
+    }
 
-    .user-table-wrapper {
-        width: 100%;
+    .message {
+        padding: 13px 15px;
+        border-radius: 10px;
+        margin-bottom: 18px;
+        border: 1px solid rgba(0,210,106,0.25);
+        background: rgba(0,210,106,0.08);
+        color: #6ff0ae;
+    }
+
+    .users-table-wrapper {
         overflow-x: auto;
+        background: #111827;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 14px;
     }
 
-
-    .user-table {
+    .users-table {
         width: 100%;
-        min-width: 750px;
         border-collapse: collapse;
+        min-width: 850px;
     }
 
-
-    .user-table th,
-    .user-table td {
-        padding: 12px;
+    .users-table th,
+    .users-table td {
+        padding: 14px 15px;
         text-align: left;
-        border-bottom: 1px solid rgba(255,255,255,0.08);
+        border-bottom: 1px solid rgba(255,255,255,0.06);
     }
 
+    .users-table th {
+        color: #9ca3af;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
 
-    .user-table th {
-        font-size: 13px;
+    .users-table td {
+        font-size: 14px;
+    }
+
+    .users-table tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .user-name {
+        font-weight: 900;
+        color: white;
+    }
+
+    .user-phone {
         opacity: 0.7;
+        font-size: 12px;
+        margin-top: 3px;
     }
 
+    .balance {
+        color: #45e798;
+        font-weight: 900;
+    }
+
+    .status {
+        display: inline-block;
+        padding: 5px 9px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 800;
+        background: rgba(0,210,106,0.10);
+        color: #45e798;
+    }
+
+    .view-button {
+        display: inline-block;
+        padding: 8px 12px;
+        border-radius: 8px;
+        background: #172235;
+        color: white;
+        border: 1px solid rgba(255,255,255,0.08);
+        text-decoration: none;
+        font-weight: 800;
+        margin-right: 5px;
+    }
 
     .reset-button {
         padding: 8px 12px;
-        border: none;
-        border-radius: 7px;
+        border-radius: 8px;
+        border: 1px solid rgba(0,210,106,0.25);
+        background: #10291e;
+        color: #38d98a;
+        font-weight: 900;
         cursor: pointer;
+    }
+
+    .details-card {
+        margin-top: 22px;
+        background: #111827;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 14px;
+        padding: 20px;
+    }
+
+    .details-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .details-header h2 {
+        margin: 0;
+        font-size: 22px;
+    }
+
+    .details-header p {
+        margin: 5px 0 0;
+        opacity: 0.6;
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 22px;
+    }
+
+    .stat-card {
+        padding: 16px;
+        border-radius: 11px;
+        background: #0f172a;
+        border: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .stat-label {
+        font-size: 12px;
+        opacity: 0.6;
+        margin-bottom: 7px;
+    }
+
+    .stat-value {
+        font-size: 21px;
+        font-weight: 900;
+        color: #45e798;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 24px;
+    }
+
+    .info-item {
+        padding: 13px;
+        border-radius: 9px;
+        background: rgba(255,255,255,0.025);
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .info-label {
+        display: block;
+        font-size: 11px;
+        opacity: 0.55;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+    }
+
+    .info-value {
         font-weight: 800;
+        word-break: break-word;
     }
 
-
-    .reset-card {
-        border-color: rgba(32,199,122,0.35);
+    .section-title {
+        margin: 25px 0 12px;
+        font-size: 17px;
+        font-weight: 900;
     }
 
-
-    .reset-card h3 {
-        margin-top: 0;
+    .history-wrapper {
+        overflow-x: auto;
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 10px;
     }
 
+    .history-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 650px;
+    }
+
+    .history-table th,
+    .history-table td {
+        padding: 11px 12px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        text-align: left;
+        font-size: 13px;
+    }
+
+    .history-table th {
+        font-size: 11px;
+        opacity: 0.55;
+        text-transform: uppercase;
+    }
+
+    .history-table tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .amount {
+        font-weight: 900;
+        color: #45e798;
+    }
+
+    .empty {
+        padding: 18px;
+        text-align: center;
+        opacity: 0.55;
+    }
+
+    .reset-box {
+        margin-top: 22px;
+        padding: 18px;
+        border-radius: 12px;
+        background: rgba(0,210,106,0.06);
+        border: 1px solid rgba(0,210,106,0.20);
+    }
+
+    .reset-box-title {
+        font-weight: 900;
+        margin-bottom: 8px;
+    }
 
     .reset-link-row {
         display: flex;
         gap: 8px;
     }
 
-
     .reset-link-input {
         flex: 1;
         min-width: 0;
-        padding: 11px;
+        padding: 12px;
         border-radius: 8px;
-        border: 1px solid rgba(255,255,255,0.15);
-        font-size: 13px;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: #0f172a;
+        color: white;
     }
-
 
     .copy-button {
-        padding: 11px 15px;
-        border: none;
+        padding: 0 16px;
+        border: 0;
         border-radius: 8px;
+        background: #00d26a;
+        color: #06150d;
+        font-weight: 900;
         cursor: pointer;
-        font-weight: 800;
     }
 
-
-    .expiry-note {
-        margin-top: 10px;
-        font-size: 13px;
-        opacity: 0.7;
+    .reset-warning {
+        margin-top: 9px;
+        font-size: 12px;
+        opacity: 0.65;
+        line-height: 1.5;
     }
 
+    @media (max-width: 800px) {
 
-    .success-message {
-        padding: 12px 14px;
-        border-radius: 8px;
-        margin-bottom: 15px;
-        background: rgba(32,199,122,0.10);
-        border: 1px solid rgba(32,199,122,0.25);
-    }
-
-
-    .error-message {
-        padding: 12px 14px;
-        border-radius: 8px;
-        margin-bottom: 15px;
-        background: rgba(220,53,69,0.10);
-        border: 1px solid rgba(220,53,69,0.25);
-    }
-
-
-    .back-button {
-        display: inline-block;
-        margin-bottom: 20px;
-        text-decoration: none;
-        padding: 10px 14px;
-        border-radius: 8px;
-        border: 1px solid rgba(255,255,255,0.12);
-    }
-
-
-    @media (max-width: 650px) {
+        .admin-page {
+            padding: 18px 12px 35px;
+        }
 
         .search-form {
             flex-direction: column;
         }
 
-        .search-form button {
-            width: 100%;
+        .search-form button,
+        .clear-button {
+            min-height: 44px;
+        }
+
+        .details-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .details-header {
+            flex-direction: column;
         }
 
         .reset-link-row {
@@ -184,47 +383,54 @@
         }
 
         .copy-button {
-            width: 100%;
+            min-height: 44px;
+        }
+    }
+
+    @media (max-width: 450px) {
+
+        .details-grid {
+            grid-template-columns: 1fr;
         }
 
+        .admin-header h1 {
+            font-size: 23px;
+        }
     }
 
 </style>
 
 
-<div class="users-page">
+<div class="admin-page">
+
+    <a href="/admin/dashboard" class="back-button">
+        ← Back to Admin Dashboard
+    </a>
 
 
-    <!-- =====================================================
-         HEADER
-    ====================================================== -->
+    <div class="admin-header">
 
-    <div class="users-header">
-
-        <h1>
-            👥 Manage Users
-        </h1>
+        <h1>👥 Manage Users</h1>
 
         <p>
-            Search users by username or phone number.
+            Search users, view account activity and generate password reset links.
         </p>
 
     </div>
 
 
-    <a
-        href="/admin/dashboard"
-        class="back-button"
-    >
-        ← Back to Admin Dashboard
-    </a>
+    {% if message %}
+
+    <div class="message">
+        {{ message }}
+    </div>
+
+    {% endif %}
 
 
-    <!-- =====================================================
-         SEARCH
-    ====================================================== -->
+    <!-- SEARCH -->
 
-    <div class="search-card">
+    <div class="search-box">
 
         <form
             method="GET"
@@ -235,242 +441,617 @@
             <input
                 type="text"
                 name="q"
-                value="{{ query or '' }}"
-                placeholder="Search username or phone number..."
+                value="{{ q or '' }}"
+                placeholder="Search by username or phone number..."
                 autocomplete="off"
             >
 
-            <button
-                type="submit"
-            >
+            <button type="submit">
                 🔍 Search
             </button>
+
+            {% if q %}
+
+            <a
+                href="/admin/users"
+                class="clear-button"
+            >
+                Clear
+            </a>
+
+            {% endif %}
 
         </form>
 
     </div>
 
 
-    <!-- =====================================================
-         MESSAGE
-    ====================================================== -->
+    <!-- USER LIST -->
 
-    {% if message %}
+    <div class="users-table-wrapper">
 
-        <div class="success-message">
-            {{ message }}
-        </div>
+        <table class="users-table">
 
-    {% endif %}
+            <thead>
+
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Balance</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% if users %}
+
+                    {% for user in users %}
+
+                    <tr>
+
+                        <td>
+                            #{{ user.id }}
+                        </td>
+
+                        <td>
+
+                            <div class="user-name">
+                                {{ user.username }}
+                            </div>
+
+                            <div class="user-phone">
+                                {{ user.phone }}
+                            </div>
+
+                        </td>
+
+                        <td>
+                            {{ user.email }}
+                        </td>
+
+                        <td class="balance">
+                            ₹{{ "%.2f"|format(user.balance or 0) }}
+                        </td>
+
+                        <td>
+
+                            <span class="status">
+                                {{ user.status or "Active" }}
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <a
+                                href="/admin/users/{{ user.id }}"
+                                class="view-button"
+                            >
+                                View Details
+                            </a>
 
 
-    <!-- =====================================================
-         GENERATED RESET LINK
-    ====================================================== -->
+                            <form
+                                method="POST"
+                                action="/admin/users/{{ user.id }}/generate-reset-link"
+                                style="display:inline;"
+                            >
 
-    {% if reset_link and reset_user %}
+                                <input
+                                    type="hidden"
+                                    name="q"
+                                    value="{{ q or '' }}"
+                                >
 
-    <div class="reset-card">
+                                <button
+                                    type="submit"
+                                    class="reset-button"
+                                >
+                                    🔑 Reset Password
+                                </button>
 
-        <h3>
-            🔐 Password Reset Link
-        </h3>
+                            </form>
 
-        <p>
-            User:
-            <strong>
-                {{ reset_user.username }}
-            </strong>
+                        </td>
 
-            {% if reset_user.phone %}
-                — {{ reset_user.phone }}
-            {% endif %}
-        </p>
+                    </tr>
 
+                    {% endfor %}
 
-        <div class="reset-link-row">
+                {% else %}
 
-            <input
-                type="text"
-                id="resetLink"
-                class="reset-link-input"
-                value="{{ reset_link }}"
-                readonly
-            >
+                    <tr>
 
-            <button
-                type="button"
-                class="copy-button"
-                onclick="copyResetLink()"
-            >
-                📋 Copy Link
-            </button>
+                        <td
+                            colspan="6"
+                            class="empty"
+                        >
+                            No users found.
+                        </td>
 
-        </div>
+                    </tr>
 
+                {% endif %}
 
-        <div class="expiry-note">
+            </tbody>
 
-            ⏱ This link expires in
-            <strong>
-                30 minutes
-            </strong>.
-
-            It can only be used once.
-
-            Generating another link for this user
-            invalidates this link.
-
-        </div>
+        </table>
 
     </div>
 
-    {% endif %}
 
+    {% if selected_user and user_details %}
 
-    <!-- =====================================================
-         SEARCH RESULTS
-    ====================================================== -->
+    <!-- USER DETAILS -->
 
-    <div class="result-card">
+    <div class="details-card">
 
-        <h3>
-            Search Results
-        </h3>
+        <div class="details-header">
 
+            <div>
 
-        {% if query %}
+                <h2>
+                    👤 {{ selected_user.username }}
+                </h2>
 
-            {% if users %}
-
-            <div class="user-table-wrapper">
-
-                <table class="user-table">
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                ID
-                            </th>
-
-                            <th>
-                                Username
-                            </th>
-
-                            <th>
-                                Phone
-                            </th>
-
-                            <th>
-                                Email
-                            </th>
-
-                            <th>
-                                Balance
-                            </th>
-
-                            <th>
-                                Status
-                            </th>
-
-                            <th>
-                                Action
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody>
-
-                        {% for user in users %}
-
-                        <tr>
-
-                            <td>
-                                {{ user.id }}
-                            </td>
-
-                            <td>
-                                <strong>
-                                    {{ user.username }}
-                                </strong>
-                            </td>
-
-                            <td>
-                                {{ user.phone }}
-                            </td>
-
-                            <td>
-                                {{ user.email }}
-                            </td>
-
-                            <td>
-                                ₹{{ "%.2f"|format(user.balance or 0) }}
-                            </td>
-
-                            <td>
-                                {{ user.status or "Active" }}
-                            </td>
-
-                            <td>
-
-                                <form
-                                    method="POST"
-                                    action="/admin/users/{{ user.id }}/generate-reset-link"
-                                >
-
-                                    <input
-                                        type="hidden"
-                                        name="q"
-                                        value="{{ query }}"
-                                    >
-
-                                    <button
-                                        type="submit"
-                                        class="reset-button"
-                                    >
-                                        🔐 Reset Password
-                                    </button>
-
-                                </form>
-
-                            </td>
-
-                        </tr>
-
-                        {% endfor %}
-
-                    </tbody>
-
-                </table>
+                <p>
+                    User ID #{{ selected_user.id }}
+                </p>
 
             </div>
 
-            {% else %}
+        </div>
 
-                <p>
-                    No user found for:
-                    <strong>
-                        {{ query }}
-                    </strong>
-                </p>
 
-            {% endif %}
+        <!-- STATISTICS -->
+
+        <div class="details-grid">
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Current Balance
+                </div>
+
+                <div class="stat-value">
+                    ₹{{ "%.2f"|format(selected_user.balance or 0) }}
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Total Deposits
+                </div>
+
+                <div class="stat-value">
+                    ₹{{ "%.2f"|format(user_details.total_deposits) }}
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Total Withdrawals
+                </div>
+
+                <div class="stat-value">
+                    ₹{{ "%.2f"|format(user_details.total_withdrawals) }}
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Completed Deposits
+                </div>
+
+                <div class="stat-value">
+                    ₹{{ "%.2f"|format(user_details.completed_deposits) }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACCOUNT INFORMATION -->
+
+        <h3 class="section-title">
+            Account Information
+        </h3>
+
+        <div class="info-grid">
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    Username
+                </span>
+
+                <span class="info-value">
+                    {{ selected_user.username }}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    User ID
+                </span>
+
+                <span class="info-value">
+                    #{{ selected_user.id }}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    Phone
+                </span>
+
+                <span class="info-value">
+                    {{ selected_user.phone }}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    Email
+                </span>
+
+                <span class="info-value">
+                    {{ selected_user.email }}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    Status
+                </span>
+
+                <span class="info-value">
+                    {{ selected_user.status or "Active" }}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    Referral Code
+                </span>
+
+                <span class="info-value">
+                    {{ selected_user.referral_code or "—" }}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    First Deposit
+                </span>
+
+                <span class="info-value">
+                    {{ "Completed" if selected_user.first_deposit_completed else "Not completed" }}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    Referral Bonus
+                </span>
+
+                <span class="info-value">
+                    {{ "Paid" if selected_user.referral_bonus_paid else "Not paid" }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- PASSWORD RESET -->
+
+        <h3 class="section-title">
+            🔑 Password Reset
+        </h3>
+
+
+        <form
+            method="POST"
+            action="/admin/users/{{ selected_user.id }}/generate-reset-link"
+        >
+
+            <input
+                type="hidden"
+                name="q"
+                value="{{ q or '' }}"
+            >
+
+            <button
+                type="submit"
+                class="reset-button"
+                style="padding:12px 16px;"
+            >
+                Generate New Password Reset Link
+            </button>
+
+        </form>
+
+
+        {% if reset_link %}
+
+        <div class="reset-box">
+
+            <div class="reset-box-title">
+                ✅ Password Reset Link Generated
+            </div>
+
+            <div class="reset-link-row">
+
+                <input
+                    id="resetLink"
+                    class="reset-link-input"
+                    type="text"
+                    value="{{ reset_link }}"
+                    readonly
+                >
+
+                <button
+                    type="button"
+                    class="copy-button"
+                    onclick="copyResetLink()"
+                >
+                    Copy Link
+                </button>
+
+            </div>
+
+            <div class="reset-warning">
+
+                This link expires in
+                {{ reset_expires_at.strftime("%d %b %Y, %I:%M %p") }}
+                and can only be used once.
+
+                Generating another reset link for this user
+                immediately invalidates the previous link.
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- DEPOSITS -->
+
+        <h3 class="section-title">
+            💰 Deposit History
+        </h3>
+
+        {% if user_details.deposits %}
+
+        <div class="history-wrapper">
+
+            <table class="history-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for item in user_details.deposits %}
+
+                    <tr>
+
+                        <td class="amount">
+                            ₹{{ "%.2f"|format(
+                                item.amount
+                                if item.amount is defined and item.amount is not none
+                                else item.requested_amount
+                                if item.requested_amount is defined and item.requested_amount is not none
+                                else 0
+                            ) }}
+                        </td>
+
+                        <td>
+                            {{ item.status if item.status is defined else "Unknown" }}
+                        </td>
+
+                        <td>
+                            {{ item.created_at if item.created_at is defined else "—" }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
 
         {% else %}
 
-            <p>
-                Enter a username or phone number above
-                to search for a user.
-            </p>
+        <div class="empty">
+            No deposit records found.
+        </div>
+
+        {% endif %}
+
+
+        <!-- WITHDRAWALS -->
+
+        <h3 class="section-title">
+            💸 Withdrawal History
+        </h3>
+
+        {% if user_details.withdrawals %}
+
+        <div class="history-wrapper">
+
+            <table class="history-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for item in user_details.withdrawals %}
+
+                    <tr>
+
+                        <td class="amount">
+                            ₹{{ "%.2f"|format(
+                                item.amount
+                                if item.amount is defined and item.amount is not none
+                                else item.requested_amount
+                                if item.requested_amount is defined and item.requested_amount is not none
+                                else 0
+                            ) }}
+                        </td>
+
+                        <td>
+                            {{ item.status if item.status is defined else "Unknown" }}
+                        </td>
+
+                        <td>
+                            {{ item.created_at if item.created_at is defined else "—" }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="empty">
+            No withdrawal records found.
+        </div>
+
+        {% endif %}
+
+
+        <!-- TRANSACTIONS -->
+
+        <h3 class="section-title">
+            📊 Account Transactions
+        </h3>
+
+        {% if user_details.transactions %}
+
+        <div class="history-wrapper">
+
+            <table class="history-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Description</th>
+                        <th>Date</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for item in user_details.transactions %}
+
+                    <tr>
+
+                        <td>
+                            {{ item.type if item.type is defined else "Transaction" }}
+                        </td>
+
+                        <td class="amount">
+                            ₹{{ "%.2f"|format(
+                                item.amount
+                                if item.amount is defined and item.amount is not none
+                                else 0
+                            ) }}
+                        </td>
+
+                        <td>
+                            {{ item.description if item.description is defined else "—" }}
+                        </td>
+
+                        <td>
+                            {{ item.created_at if item.created_at is defined else "—" }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="empty">
+            No transaction records found.
+        </div>
 
         {% endif %}
 
     </div>
+
+    {% endif %}
 
 </div>
 
@@ -480,46 +1061,52 @@
 function copyResetLink() {
 
     const input =
-        document.getElementById(
-            "resetLink"
-        );
+        document.getElementById("resetLink");
 
     if (!input) {
         return;
     }
 
+    navigator.clipboard
+        .writeText(input.value)
+        .then(function () {
 
-    input.select();
-    input.setSelectionRange(
-        0,
-        99999
-    );
+            const button =
+                document.querySelector(".copy-button");
 
+            if (button) {
 
-    navigator.clipboard.writeText(
-        input.value
-    )
-    .then(function () {
+                const original =
+                    button.textContent;
 
-        alert(
-            "Reset link copied."
-        );
+                button.textContent =
+                    "Copied ✓";
 
-    })
-    .catch(function () {
+                setTimeout(function () {
+                    button.textContent =
+                        original;
+                }, 1800);
+            }
 
-        document.execCommand(
-            "copy"
-        );
+        })
+        .catch(function () {
 
-        alert(
-            "Reset link copied."
-        );
+            input.select();
+            input.setSelectionRange(
+                0,
+                99999
+            );
 
-    });
+            document.execCommand("copy");
 
+            alert(
+                "Reset link copied to clipboard."
+            );
+
+        });
 }
 
 </script>
 
 {% endblock %}
+

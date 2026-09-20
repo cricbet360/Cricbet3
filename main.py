@@ -81,6 +81,8 @@ from routers.password_reset import (
     router as password_reset_router
 )
 
+from routers.admin_users import router as admin_users_router
+
 # ============================================================
 # FASTAPI APP
 # ============================================================
@@ -243,6 +245,8 @@ app.include_router(
 )
 
 app.include_router(bets_router)
+
 app.include_router(
     password_reset_router
 )
+app.include_router(admin_users_router)

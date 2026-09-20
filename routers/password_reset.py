@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session
 from database.database import get_db
 
 from models.user import User
-from models.password_reset_token import PasswordResetToken
+from models.password_reset_tokens import PasswordResetToken
 
 from auth.password import (
     hash_password,
