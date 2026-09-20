@@ -1,10 +1,6 @@
-import os
 import re
 import secrets
 import string
-import requests
-
-from datetime import datetime, timedelta
 
 from fastapi import (
     APIRouter,
@@ -14,15 +10,11 @@ from fastapi import (
 )
 
 from fastapi.responses import RedirectResponse
-
 from fastapi.templating import Jinja2Templates
-
 from sqlalchemy.orm import Session
 
 from database.database import get_db
-
 from models.user import User
-
 from models.wallet import Wallet
 
 from auth.password import (
@@ -39,23 +31,10 @@ templates = Jinja2Templates(
 
 
 # ============================================================
-# 2FACTOR CONFIGURATION
-# ============================================================
-
-TWO_FACTOR_API_KEY = os.getenv(
-    "TWO_FACTOR_API_KEY",
-    ""
-).strip()
-
-OTP_TEMPLATE_NAME = "OTP1"
-
-
-# ============================================================
 # REFERRAL CONFIGURATION
 # ============================================================
 
 REFERRAL_CODE_PREFIX = "CB"
-
 REFERRAL_CODE_LENGTH = 8
 
 REFERRAL_ALPHABET = (
@@ -71,7 +50,6 @@ REFERRAL_ALPHABET = (
 def generate_referral_code(
     db: Session
 ):
-
     while True:
 
         random_part = "".join(
@@ -101,7 +79,7 @@ def generate_referral_code(
 
 
 # ============================================================
-# VALIDATE / FIND REFERRER
+# FIND REFERRER BY REFERRAL CODE
 # ============================================================
 
 def get_referrer_by_code(
@@ -122,14 +100,46 @@ def get_referrer_by_code(
     return (
         db.query(User)
         .filter(
-            User.referral_code
-            == normalized_code
+            User.referral_code == normalized_code
         )
         .first()
     )
 
 
+# ============================================================
+# COMMON REGISTER SESSION CLEANUP
+# ============================================================
 
+def clear_registration_session(
+    request: Request
+):
+
+    session_keys = [
+        "registration_username",
+        "registration_email",
+        "registration_phone",
+        "registration_referrer_id",
+        "registration_referral_code",
+        "terms_accepted",
+
+        # Remove any old OTP-related session values
+        # left over from the previous system.
+        "phone_verified",
+        "phone_otp_session_id",
+        "otp_expiry",
+
+        # Old password-reset OTP values
+        "password_reset_user_id",
+        "password_reset_otp_session_id",
+        "password_reset_expiry",
+        "password_reset_verified",
+    ]
+
+    for key in session_keys:
+        request.session.pop(
+            key,
+            None
+        )
 
 
 # ============================================================
@@ -141,14 +151,12 @@ def validate_username(
 ):
 
     if len(username) < 4:
-
         return (
             False,
             "Username must contain at least 4 characters."
         )
 
     if len(username) > 50:
-
         return (
             False,
             "Username is too long."
@@ -158,7 +166,6 @@ def validate_username(
         r"[A-Za-z0-9]+",
         username
     ):
-
         return (
             False,
             "Username can contain letters and numbers only."
@@ -209,7 +216,6 @@ def validate_password(
 ):
 
     if len(password) < 8:
-
         return (
             False,
             "Password must contain at least 8 characters."
@@ -219,7 +225,6 @@ def validate_password(
         r"[A-Z]",
         password
     ):
-
         return (
             False,
             "Password must contain at least one uppercase letter."
@@ -229,7 +234,6 @@ def validate_password(
         r"[a-z]",
         password
     ):
-
         return (
             False,
             "Password must contain at least one lowercase letter."
@@ -239,7 +243,6 @@ def validate_password(
         r"\d",
         password
     ):
-
         return (
             False,
             "Password must contain at least one number."
@@ -249,7 +252,6 @@ def validate_password(
         r"[^A-Za-z0-9]",
         password
     ):
-
         return (
             False,
             "Password must contain at least one special character."
@@ -270,10 +272,14 @@ async def register_page(
     request: Request
 ):
 
-    referral_code = request.query_params.get(
-        "ref",
-        ""
-    ).strip().upper()
+    referral_code = (
+        request.query_params.get(
+            "ref",
+            ""
+        )
+        .strip()
+        .upper()
+    )
 
     return templates.TemplateResponse(
         request=request,
@@ -285,11 +291,19 @@ async def register_page(
 
 
 # ============================================================
-# SEND REGISTRATION OTP
+# REGISTER
+#
+# IMPORTANT:
+# The old endpoint was /register/send-otp.
+# We keep that URL so your existing register.html
+# continues to work, but it NO LONGER sends OTP.
+#
+# Also support POST /register.
 # ============================================================
 
+@router.post("/register")
 @router.post("/register/send-otp")
-async def send_registration_otp(
+async def process_registration(
 
     request: Request,
 
@@ -302,17 +316,42 @@ async def send_registration_otp(
     referral_code: str = Form(""),
 
     db: Session = Depends(get_db),
-
 ):
 
     username = username.strip()
 
-    email = email.strip().lower()
+    email = (
+        email
+        .strip()
+        .lower()
+    )
 
     phone = phone.strip()
 
     referral_code = (
-        referral_code.strip().upper()
+        referral_code
+        .strip()
+        .upper()
+    )
+
+
+    # ========================================================
+    # CLEAR OLD REGISTRATION STATE
+    # ========================================================
+
+    request.session.pop(
+        "terms_accepted",
+        None
+    )
+
+    request.session.pop(
+        "registration_referrer_id",
+        None
+    )
+
+    request.session.pop(
+        "registration_referral_code",
+        None
     )
 
 
@@ -348,7 +387,8 @@ async def send_registration_otp(
             context={
                 "message":
                     "Please enter a valid email address.",
-                "referral_code": referral_code,
+                "referral_code":
+                    referral_code,
             }
         )
 
@@ -365,7 +405,8 @@ async def send_registration_otp(
             context={
                 "message":
                     "Please enter a valid 10-digit mobile number.",
-                "referral_code": referral_code,
+                "referral_code":
+                    referral_code,
             }
         )
 
@@ -390,7 +431,8 @@ async def send_registration_otp(
             context={
                 "message":
                     "Username already exists.",
-                "referral_code": referral_code,
+                "referral_code":
+                    referral_code,
             }
         )
 
@@ -415,7 +457,8 @@ async def send_registration_otp(
             context={
                 "message":
                     "Email address is already registered.",
-                "referral_code": referral_code,
+                "referral_code":
+                    referral_code,
             }
         )
 
@@ -440,14 +483,23 @@ async def send_registration_otp(
             context={
                 "message":
                     "Phone number is already registered.",
-                "referral_code": referral_code,
+                "referral_code":
+                    referral_code,
             }
         )
 
 
     # ========================================================
-    # VALIDATE REFERRAL CODE
+    # OPTIONAL REFERRAL CODE
+    #
+    # Blank referral code:
+    #     Continue normally.
+    #
+    # Entered referral code:
+    #     It MUST exist.
     # ========================================================
+
+    referrer = None
 
     if referral_code:
 
@@ -487,6 +539,9 @@ async def send_registration_otp(
             )
 
 
+        # Save the referrer temporarily until
+        # password creation is completed.
+
         request.session[
             "registration_referrer_id"
         ] = referrer.id
@@ -496,43 +551,11 @@ async def send_registration_otp(
         ] = referrer.referral_code
 
 
-    else:
-
-        request.session.pop(
-            "registration_referrer_id",
-            None
-        )
-
-        request.session.pop(
-            "registration_referral_code",
-            None
-        )
-
-
-    # ========================================================
-    # SEND OTP
-    # ========================================================
-
-    otp_sent, result = send_phone_otp_api(
-        phone
-    )
-
-    if not otp_sent:
-
-        return templates.TemplateResponse(
-            request=request,
-            name="register.html",
-            context={
-                "message":
-                    f"Unable to send OTP: {result}",
-                "referral_code":
-                    referral_code,
-            }
-        )
-
-
     # ========================================================
     # SAVE REGISTRATION DATA
+    #
+    # NO OTP IS SENT HERE.
+    # NO PHONE VERIFICATION IS REQUIRED.
     # ========================================================
 
     request.session[
@@ -547,26 +570,15 @@ async def send_registration_otp(
         "registration_phone"
     ] = phone
 
-    request.session[
-        "phone_otp_session_id"
-    ] = result
 
-    expiry_time = (
-        datetime.now()
-        + timedelta(minutes=10)
-    )
-
-    request.session[
-        "otp_expiry"
-    ] = expiry_time.isoformat()
-
+    # ========================================================
+    # GO DIRECTLY TO TERMS/DISCLAIMER
+    # ========================================================
 
     return RedirectResponse(
-        url="/register/verify-otp",
+        url="/register/disclaimer",
         status_code=303
     )
-
-
 
 
 # ============================================================
@@ -578,8 +590,22 @@ async def disclaimer_page(
     request: Request
 ):
 
-    if not request.session.get(
-        "phone_verified"
+    username = request.session.get(
+        "registration_username"
+    )
+
+    email = request.session.get(
+        "registration_email"
+    )
+
+    phone = request.session.get(
+        "registration_phone"
+    )
+
+    if (
+        not username
+        or not email
+        or not phone
     ):
 
         return RedirectResponse(
@@ -587,12 +613,17 @@ async def disclaimer_page(
             status_code=303
         )
 
+
     return templates.TemplateResponse(
         request=request,
         name="disclaimer.html",
         context={}
     )
 
+
+# ============================================================
+# ACCEPT DISCLAIMER
+# ============================================================
 
 @router.post("/register/disclaimer")
 async def accept_disclaimer(
@@ -603,14 +634,29 @@ async def accept_disclaimer(
 
 ):
 
-    if not request.session.get(
-        "phone_verified"
+    username = request.session.get(
+        "registration_username"
+    )
+
+    email = request.session.get(
+        "registration_email"
+    )
+
+    phone = request.session.get(
+        "registration_phone"
+    )
+
+    if (
+        not username
+        or not email
+        or not phone
     ):
 
         return RedirectResponse(
             url="/register",
             status_code=303
         )
+
 
     if accept_terms != "yes":
 
@@ -644,16 +690,27 @@ async def create_password_page(
     request: Request
 ):
 
-    phone_verified = request.session.get(
-        "phone_verified"
+    username = request.session.get(
+        "registration_username"
+    )
+
+    email = request.session.get(
+        "registration_email"
+    )
+
+    phone = request.session.get(
+        "registration_phone"
     )
 
     terms_accepted = request.session.get(
         "terms_accepted"
     )
 
+
     if (
-        not phone_verified
+        not username
+        or not email
+        or not phone
         or not terms_accepted
     ):
 
@@ -661,6 +718,7 @@ async def create_password_page(
             url="/register",
             status_code=303
         )
+
 
     return templates.TemplateResponse(
         request=request,
@@ -686,17 +744,9 @@ async def create_user_account(
 
 ):
 
-    if not request.session.get(
-        "phone_verified"
-    ) or not request.session.get(
-        "terms_accepted"
-    ):
-
-        return RedirectResponse(
-            url="/register",
-            status_code=303
-        )
-
+    # ========================================================
+    # REGISTRATION SESSION
+    # ========================================================
 
     username = request.session.get(
         "registration_username"
@@ -708,6 +758,10 @@ async def create_user_account(
 
     phone = request.session.get(
         "registration_phone"
+    )
+
+    terms_accepted = request.session.get(
+        "terms_accepted"
     )
 
     referrer_id = request.session.get(
@@ -723,6 +777,7 @@ async def create_user_account(
         not username
         or not email
         or not phone
+        or not terms_accepted
     ):
 
         return RedirectResponse(
@@ -732,7 +787,7 @@ async def create_user_account(
 
 
     # ========================================================
-    # PASSWORD
+    # PASSWORD MATCH
     # ========================================================
 
     if password != confirm_password:
@@ -746,6 +801,10 @@ async def create_user_account(
             }
         )
 
+
+    # ========================================================
+    # PASSWORD VALIDATION
+    # ========================================================
 
     valid, message = validate_password(
         password
@@ -798,6 +857,9 @@ async def create_user_account(
 
     # ========================================================
     # RE-CHECK REFERRER
+    #
+    # This prevents a referral relationship from becoming
+    # invalid between signup and final account creation.
     # ========================================================
 
     referrer = None
@@ -812,13 +874,22 @@ async def create_user_account(
             .first()
         )
 
-        if (
-            not referrer
-            or (
-                stored_referral_code
-                and referrer.referral_code
-                != stored_referral_code
+
+        if not referrer:
+
+            return templates.TemplateResponse(
+                request=request,
+                name="create-password.html",
+                context={
+                    "message":
+                        "The referral code is no longer valid. Please register again."
+                }
             )
+
+
+        if (
+            stored_referral_code
+            and referrer.referral_code != stored_referral_code
         ):
 
             return templates.TemplateResponse(
@@ -826,16 +897,16 @@ async def create_user_account(
                 name="create-password.html",
                 context={
                     "message":
-                        "The referral code is no longer valid. Please register again without the referral code."
+                        "The referral code is no longer valid. Please register again."
                 }
             )
 
 
     # ========================================================
-    # GENERATE UNIQUE CODE FOR NEW USER
+    # GENERATE NEW USER'S OWN REFERRAL CODE
     # ========================================================
 
-    referral_code = generate_referral_code(
+    new_referral_code = generate_referral_code(
         db
     )
 
@@ -845,18 +916,13 @@ async def create_user_account(
     # ========================================================
 
     new_user = User(
-
         username=username,
-
         email=email,
-
         phone=phone,
-
         password=hash_password(
             password
         ),
-
-        referral_code=referral_code,
+        referral_code=new_referral_code,
 
         referred_by_user_id=(
             referrer.id
@@ -865,20 +931,45 @@ async def create_user_account(
         ),
 
         first_deposit_completed=False,
-
         referral_bonus_paid=False,
-
     )
-
-
-    db.add(new_user)
 
 
     try:
 
+        db.add(
+            new_user
+        )
+
+        # Get new_user.id before creating wallet
+        db.flush()
+
+
+        # ====================================================
+        # CREATE WALLET
+        # ====================================================
+
+        wallet = Wallet(
+            user_id=new_user.id,
+            balance=0.0,
+            exposure=0.0,
+        )
+
+        db.add(
+            wallet
+        )
+
+
+        # ====================================================
+        # COMMIT BOTH USER + WALLET TOGETHER
+        # ====================================================
+
         db.commit()
 
-        db.refresh(new_user)
+        db.refresh(
+            new_user
+        )
+
 
     except Exception:
 
@@ -895,74 +986,17 @@ async def create_user_account(
 
 
     # ========================================================
-    # CREATE WALLET
-    # ========================================================
-
-    wallet = Wallet(
-
-        user_id=new_user.id,
-
-        balance=0.0,
-
-        exposure=0.0,
-
-    )
-
-    db.add(wallet)
-
-
-    try:
-
-        db.commit()
-
-    except Exception:
-
-        db.rollback()
-
-        return templates.TemplateResponse(
-            request=request,
-            name="create-password.html",
-            context={
-                "message":
-                    "Account was created, but wallet setup failed."
-            }
-        )
-
-
-    # ========================================================
     # CLEAR REGISTRATION SESSION
     # ========================================================
 
-    session_keys = [
-
-        "registration_username",
-
-        "registration_email",
-
-        "registration_phone",
-
-        "registration_referrer_id",
-
-        "registration_referral_code",
-
-        "phone_verified",
-
-        "terms_accepted",
-
-        "phone_otp_session_id",
-
-        "otp_expiry",
-
-    ]
+    clear_registration_session(
+        request
+    )
 
 
-    for key in session_keys:
-
-        request.session.pop(
-            key,
-            None
-        )
-
+    # ========================================================
+    # LOGIN PAGE
+    # ========================================================
 
     return RedirectResponse(
         url="/login",
@@ -999,13 +1033,17 @@ async def login_user(
 
 ):
 
+    username = username.strip()
+
+
     user = (
         db.query(User)
         .filter(
-            User.username == username.strip()
+            User.username == username
         )
         .first()
     )
+
 
     if not user:
 
@@ -1034,6 +1072,10 @@ async def login_user(
         )
 
 
+    # ========================================================
+    # LOGIN SESSION
+    # ========================================================
+
     request.session[
         "user_id"
     ] = user.id
@@ -1047,6 +1089,12 @@ async def login_user(
 
 # ============================================================
 # FORGOT PASSWORD
+#
+# NO OTP
+# NO PHONE VERIFICATION
+# NO PASSWORD RESET FORM
+#
+# The user is instructed to contact Admin through WhatsApp.
 # ============================================================
 
 @router.get("/forgot-password")
@@ -1058,212 +1106,4 @@ async def forgot_password_page(
         request=request,
         name="forgot-password.html",
         context={}
-    )
-
-
-@router.post("/forgot-password")
-async def send_password_reset_otp(
-
-    request: Request,
-
-    phone: str = Form(...),
-
-    db: Session = Depends(get_db)
-
-):
-
-    phone = phone.strip()
-
-
-    user = (
-        db.query(User)
-        .filter(
-            User.phone == phone
-        )
-        .first()
-    )
-
-    if not user:
-
-        return templates.TemplateResponse(
-            request=request,
-            name="forgot-password.html",
-            context={
-                "message":
-                    "No account was found with this phone number.",
-                "phone":
-                    phone,
-            }
-        )
-
-
-    otp_sent, result = send_phone_otp_api(
-        phone
-    )
-
-    if not otp_sent:
-
-        return templates.TemplateResponse(
-            request=request,
-            name="forgot-password.html",
-            context={
-                "message":
-                    f"Unable to send OTP: {result}",
-                "phone":
-                    phone,
-            }
-        )
-
-
-    request.session[
-        "password_reset_user_id"
-    ] = user.id
-
-    request.session[
-        "password_reset_otp_session_id"
-    ] = result
-
-    expiry = (
-        datetime.now()
-        + timedelta(minutes=10)
-    )
-
-    request.session[
-        "password_reset_expiry"
-    ] = expiry.isoformat()
-
-
-    return RedirectResponse(
-        url="/verify-reset-otp",
-        status_code=303
-    )
-
-
-
-
-# ============================================================
-# RESET PASSWORD PAGE
-# ============================================================
-
-@router.get("/reset-password")
-async def reset_password_page(
-    request: Request
-):
-
-    if not request.session.get(
-        "password_reset_verified"
-    ):
-
-        return RedirectResponse(
-            url="/forgot-password",
-            status_code=303
-        )
-
-
-    return templates.TemplateResponse(
-        request=request,
-        name="reset-password.html",
-        context={}
-    )
-
-
-# ============================================================
-# RESET PASSWORD
-# ============================================================
-
-@router.post("/reset-password")
-async def reset_password(
-
-    request: Request,
-
-    password: str = Form(...),
-
-    confirm_password: str = Form(...),
-
-    db: Session = Depends(get_db)
-
-):
-
-    verified = request.session.get(
-        "password_reset_verified"
-    )
-
-    user_id = request.session.get(
-        "password_reset_user_id"
-    )
-
-
-    if not verified or not user_id:
-
-        return RedirectResponse(
-            url="/forgot-password",
-            status_code=303
-        )
-
-
-    valid, message = validate_password(
-        password
-    )
-
-    if not valid:
-
-        return templates.TemplateResponse(
-            request=request,
-            name="reset-password.html",
-            context={
-                "message": message
-            }
-        )
-
-
-    if password != confirm_password:
-
-        return templates.TemplateResponse(
-            request=request,
-            name="reset-password.html",
-            context={
-                "message":
-                    "Passwords do not match."
-            }
-        )
-
-
-    user = (
-        db.query(User)
-        .filter(
-            User.id == user_id
-        )
-        .first()
-    )
-
-
-    if not user:
-
-        return RedirectResponse(
-            url="/forgot-password",
-            status_code=303
-        )
-
-
-    user.password = hash_password(
-        password
-    )
-
-    db.commit()
-
-
-    request.session.pop(
-        "password_reset_user_id",
-        None
-    )
-
-    request.session.pop(
-        "password_reset_verified",
-        None
-    )
-
-
-    return RedirectResponse(
-        url="/login",
-        status_code=303
     )
