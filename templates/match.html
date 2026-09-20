@@ -7447,34 +7447,7 @@ function buildScoreMeta(
             ? inner.raw
             : {};
 
-    return {
-        source:
-            envelope.source ||
-            inner.source ||
-            (
-                payload
-                    ? payload.source
-                    : ""
-            ) ||
-            "",
-
-        cached:
-            envelope.cached,
-
-        stale:
-            envelope.stale,
-
-        responseTime:
-            envelope.responseTime ||
-            "",
-
-        timestamp:
-            envelope.timestamp ||
-            new Date().toISOString(),
-
-        score_id:
-            usedId
-    };
+   
 }
 
 
