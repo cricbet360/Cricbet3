@@ -4,6 +4,7 @@
 
 <div class="container">
 
+
     <!-- =================================================
          ADMIN HEADER
     ================================================== -->
@@ -21,6 +22,7 @@
 
     </div>
 
+
     <hr>
 
 
@@ -30,38 +32,119 @@
 
     <div class="feature-grid">
 
-        <div class="feature-card">
-            <h3>👥 Users</h3>
-            <p>Manage Users</p>
-        </div>
+
+        <!-- USERS -->
+
+        <a
+            href="/admin/users"
+            class="feature-card"
+            style="
+                text-decoration: none;
+                color: inherit;
+                display: block;
+                cursor: pointer;
+            "
+        >
+
+            <h3>
+                👥 Users
+            </h3>
+
+            <p>
+                Manage Users
+            </p>
+
+            <p>
+                Search users by username or phone number.
+            </p>
+
+            <p>
+                <strong>
+                    Open User Management →
+                </strong>
+            </p>
+
+        </a>
+
+
+        <!-- SPORTS -->
 
         <div class="feature-card">
-            <h3>🏏 Sports</h3>
-            <p>Manage Sports</p>
+
+            <h3>
+                🏏 Sports
+            </h3>
+
+            <p>
+                Manage Sports
+            </p>
+
         </div>
+
+
+        <!-- MATCHES -->
 
         <div class="feature-card">
-            <h3>🏆 Matches</h3>
-            <p>Manage Matches</p>
+
+            <h3>
+                🏆 Matches
+            </h3>
+
+            <p>
+                Manage Matches
+            </p>
+
         </div>
+
+
+        <!-- MARKETS -->
 
         <div class="feature-card">
-            <h3>🎯 Markets</h3>
-            <p>Manage Markets</p>
+
+            <h3>
+                🎯 Markets
+            </h3>
+
+            <p>
+                Manage Markets
+            </p>
+
         </div>
+
+
+        <!-- WALLETS -->
 
         <div class="feature-card">
-            <h3>💰 Wallets</h3>
-            <p>Manage Wallets</p>
+
+            <h3>
+                💰 Wallets
+            </h3>
+
+            <p>
+                Manage Wallets
+            </p>
+
         </div>
+
+
+        <!-- REPORTS -->
 
         <div class="feature-card">
-            <h3>📊 Reports</h3>
-            <p>Reports & Statistics</p>
+
+            <h3>
+                📊 Reports
+            </h3>
+
+            <p>
+                Reports & Statistics
+            </p>
+
         </div>
 
 
-        <!-- DEPOSITS -->
+        <!-- =================================================
+             DEPOSITS
+        ================================================== -->
 
         <a
             href="/admin/deposits"
@@ -74,7 +157,9 @@
             "
         >
 
-            <h3>💰 Deposits</h3>
+            <h3>
+                💰 Deposits
+            </h3>
 
             <p>
                 View all customer deposits
@@ -82,12 +167,13 @@
 
             <p>
                 <strong>
-                    Pending: {{ pending_deposits }}
+                    Pending: {{ pending_deposits | default(0) }}
                 </strong>
             </p>
 
             <p>
-                Completed: {{ completed_deposits }}
+                Completed:
+                {{ completed_deposits | default(0) }}
             </p>
 
             <p>
@@ -99,7 +185,9 @@
         </a>
 
 
-        <!-- WITHDRAWALS -->
+        <!-- =================================================
+             WITHDRAWALS
+        ================================================== -->
 
         <a
             href="/admin/withdrawals"
@@ -112,7 +200,9 @@
             "
         >
 
-            <h3>🏦 Withdrawals</h3>
+            <h3>
+                🏦 Withdrawals
+            </h3>
 
             <p>
                 View all customer withdrawals
@@ -120,12 +210,14 @@
 
             <p>
                 <strong>
-                    Pending: {{ pending_withdrawals }}
+                    Pending:
+                    {{ pending_withdrawals | default(0) }}
                 </strong>
             </p>
 
             <p>
-                Completed: {{ completed_withdrawals }}
+                Completed:
+                {{ completed_withdrawals | default(0) }}
             </p>
 
             <p>
@@ -148,6 +240,7 @@
 
     <div class="employee-management">
 
+
         <div style="
             text-align: center;
             margin-bottom: 25px;
@@ -169,7 +262,9 @@
 
         <div class="feature-card">
 
-            <h3>➕ Create Employee</h3>
+            <h3>
+                ➕ Create Employee
+            </h3>
 
             <form
                 method="POST"
@@ -248,7 +343,10 @@
             style="margin-top: 20px;"
         >
 
-            <h3>📋 Existing Employees</h3>
+            <h3>
+                📋 Existing Employees
+            </h3>
+
 
             {% if employees %}
 
@@ -329,9 +427,11 @@
                                 padding: 10px;
                                 border-bottom: 1px solid #eee;
                             ">
+
                                 <strong>
                                     {{ employee.employee_id }}
                                 </strong>
+
                             </td>
 
 
@@ -357,7 +457,9 @@
                                 padding: 10px;
                                 border-bottom: 1px solid #eee;
                             ">
+
                                 {{ employee.created_at or "-" }}
+
                             </td>
 
 

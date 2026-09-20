@@ -77,7 +77,9 @@ from employee.auth import (
 from employee.routes import (
     router as employee_router
 )
-
+from routers.password_reset import (
+    router as password_reset_router
+)
 
 # ============================================================
 # FASTAPI APP
@@ -241,3 +243,6 @@ app.include_router(
 )
 
 app.include_router(bets_router)
+app.include_router(
+    password_reset_router
+)
