@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -96,9 +98,35 @@ app = FastAPI(
 # SESSION MIDDLEWARE
 # ============================================================
 
+#
+# SESSION_SECRET      Long random string, set in the server's .env file.
+#                     Anyone who knows it can forge login cookies, so it
+#                     must never be committed to the code.
+#
+# SESSION_HTTPS_ONLY  "true" on the live site (HTTPS) so the cookie is
+#                     only ever sent over an encrypted connection.
+#                     Leave unset/"false" for local http://localhost use.
+
+_INSECURE_DEFAULT_SECRET = "crickbet_super_secret_key_change_this"
+
+SESSION_SECRET = os.getenv(
+    "SESSION_SECRET",
+    _INSECURE_DEFAULT_SECRET
+)
+
+if SESSION_SECRET == _INSECURE_DEFAULT_SECRET:
+    print(
+        "[SECURITY] SESSION_SECRET is not set - using the insecure "
+        "default. Set it in .env before exposing this site publicly."
+    )
+
 app.add_middleware(
     SessionMiddleware,
-    secret_key="crickbet_super_secret_key_change_this"
+    secret_key=SESSION_SECRET,
+    same_site="lax",
+    https_only=os.getenv(
+        "SESSION_HTTPS_ONLY", "false"
+    ).strip().lower() in ("1", "true", "yes"),
 )
 
 

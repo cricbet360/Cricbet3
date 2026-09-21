@@ -1,0 +1,36 @@
+[Unit]
+Description=CricBet (FastAPI via uvicorn)
+After=network.target
+
+[Service]
+Type=simple
+User=cricbet
+Group=cricbet
+WorkingDirectory=/opt/cricbet
+EnvironmentFile=/opt/cricbet/.env
+
+# /run/cricbet is created (owned by the service user) on start and
+# removed on stop. The app listens on a UNIX SOCKET inside it, so no
+# TCP port is opened for the app at all - only nginx can reach it.
+RuntimeDirectory=cricbet
+RuntimeDirectoryMode=0755
+
+# 2 workers: some routes call the ProExch API synchronously, so a second
+# worker keeps the site responsive while one is waiting on it.
+# --forwarded-allow-ips=* is safe here because the only thing that can
+# talk to this socket is nginx on this same machine.
+ExecStart=/opt/cricbet/venv/bin/uvicorn main:app \
+    --uds /run/cricbet/cricbet.sock \
+    --workers 2 \
+    --proxy-headers \
+    --forwarded-allow-ips=*
+
+Restart=always
+RestartSec=3
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

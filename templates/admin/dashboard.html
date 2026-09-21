@@ -1,535 +1,530 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
+{% extends "base.html" %}
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+{% block content %}
 
-    <title>CricBet - Cricket</title>
+<div class="container">
 
-    <link rel="stylesheet" href="/static/css/dashboard.css?v=34" />
-    <style>
-      /* =========================================================
-   TOPBAR ACCOUNT / HAMBURGER MENU
-========================================================= */
 
-      .topbar-right {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 10px;
-        flex-wrap: nowrap;
-      }
+    <!-- =================================================
+         ADMIN HEADER
+    ================================================== -->
 
-      /* Balance */
+    <div style="
+        text-align: center;
+        margin-bottom: 30px;
+    ">
 
-      .topbar-right .balance {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        justify-content: center;
-        flex-shrink: 0;
-        white-space: nowrap;
-      }
+        <h1 style="
+            margin-bottom: 8px;
+        ">
+            🏏 CrickBet Admin Panel
+        </h1>
 
-      .topbar-right .balance-label {
-        font-size: 10px;
-        line-height: 12px;
-        text-transform: uppercase;
-      }
-
-      .topbar-right .balance-value {
-        white-space: nowrap;
-      }
-
-      /* Deposit / Withdraw */
-
-      .topbar-right .topbar-action {
-        flex-shrink: 0;
-        white-space: nowrap;
-      }
-
-      /* =========================================================
-   HAMBURGER
-========================================================= */
-
-      .account-menu {
-        position: relative;
-        flex-shrink: 0;
-      }
-
-      .account-menu-toggle {
-        width: 42px;
-        height: 38px;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-
-        gap: 4px;
-
-        padding: 0;
-
-        border: 1px solid #28533e;
-        border-radius: 6px;
-
-        background: #102c20;
-        cursor: pointer;
-      }
-
-      .account-menu-toggle:hover {
-        background: #17412d;
-      }
-
-      .account-menu-toggle span {
-        display: block;
-
-        width: 18px;
-        height: 2px;
-
-        background: #ffffff;
-
-        border-radius: 2px;
-
-        transition:
-          transform 0.2s ease,
-          opacity 0.2s ease;
-      }
-
-      /* Hamburger -> X */
-
-      .account-menu-toggle[aria-expanded="true"] span:nth-child(1) {
-        transform: translateY(6px) rotate(45deg);
-      }
-
-      .account-menu-toggle[aria-expanded="true"] span:nth-child(2) {
-        opacity: 0;
-      }
-
-      .account-menu-toggle[aria-expanded="true"] span:nth-child(3) {
-        transform: translateY(-6px) rotate(-45deg);
-      }
-
-      /* =========================================================
-   PROFILE / LOGOUT DROPDOWN
-========================================================= */
-
-      .account-menu-dropdown {
-        position: absolute;
-
-        top: calc(100% + 8px);
-        right: 0;
-
-        min-width: 145px;
-
-        display: none;
-        flex-direction: column;
-
-        padding: 6px;
-
-        background: #092519;
-
-        border: 1px solid #28533e;
-        border-radius: 7px;
-
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
-
-        z-index: 9999;
-      }
-
-      .account-menu-dropdown.open {
-        display: flex;
-      }
-
-      .account-menu-dropdown a {
-        display: flex;
-        align-items: center;
-
-        min-height: 36px;
-
-        padding: 0 12px;
-
-        text-decoration: none;
-
-        border-radius: 5px;
-
-        white-space: nowrap;
-      }
-
-      /* Profile */
-
-      .account-menu-dropdown .profile-link {
-        color: #dce9e3;
-      }
-
-      .account-menu-dropdown .profile-link:hover {
-        background: #143c29;
-      }
-
-      /* Logout */
-
-      .account-menu-dropdown .logout {
-        color: #ffaaaa;
-      }
-
-      .account-menu-dropdown .logout:hover {
-        background: #321817;
-      }
-
-      /* =========================================================
-   MOBILE
-========================================================= */
-
-      @media (max-width: 700px) {
-        .topbar {
-          width: 100%;
-        }
-
-        .topbar-right {
-          width: auto;
-
-          display: flex;
-
-          flex-direction: row;
-
-          align-items: center;
-
-          justify-content: flex-end;
-
-          gap: 6px;
-
-          flex-wrap: nowrap;
-        }
-
-        /* Balance stays on the same line */
-
-        .topbar-right .balance {
-          flex-shrink: 1;
-          min-width: 0;
-
-          align-items: flex-end;
-        }
-
-        .topbar-right .balance-label {
-          font-size: 8px;
-        }
-
-        .topbar-right .balance-value {
-          font-size: 12px;
-        }
-
-        /* Buttons */
-
-        .topbar-right .topbar-action {
-          height: 36px;
-
-          padding: 0 12px;
-
-          font-size: 11px;
-
-          flex-shrink: 1;
-        }
-
-        /* Hamburger */
-
-        .account-menu-toggle {
-          width: 38px;
-          height: 36px;
-
-          flex-shrink: 0;
-        }
-
-        /* Hide old exposed links if any remain */
-
-        .topbar-right > .profile-link,
-        .topbar-right > .logout {
-          display: none;
-        }
-      }
-    </style>
-
-    <script src="/static/js/dashboard.js?v=35" defer></script>
-  </head>
-
-  <body>
-    <!-- =====================================================
-     TOP BAR
-===================================================== -->
-
-    <header class="topbar">
-      <div class="brand">
-        <span class="brand-icon">🏏</span>
-
-        <span class="brand-text">
-          CRIC<span class="brand-accent">BET</span>
-        </span>
-      </div>
-
-      <div class="topbar-right">
-        <!-- BALANCE -->
-        <div class="balance">
-          <span class="balance-label"> Balance </span>
-
-          <span id="balance" class="balance-value"> ₹0.00 </span>
-        </div>
-
-        <!-- DEPOSIT -->
-        <button
-          type="button"
-          id="depositBtn"
-          class="topbar-action deposit-action"
-        >
-          Deposit
-        </button>
-
-        <!-- WITHDRAW -->
-        <button
-          type="button"
-          id="withdrawBtn"
-          class="topbar-action withdraw-action"
-        >
-          Withdraw
-        </button>
-
-        <!-- HAMBURGER -->
-        <div class="account-menu">
-          <button
-            type="button"
-            id="accountMenuToggle"
-            class="account-menu-toggle"
-            aria-expanded="false"
-            aria-controls="accountMenuDropdown"
-            aria-label="Open account menu"
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-
-          <!-- PROFILE + LOGOUT DROPDOWN -->
-          <div
-            id="accountMenuDropdown"
-            class="account-menu-dropdown"
-            aria-hidden="true"
-          >
-            <a href="/profile" class="profile-link"> Profile </a>
-
-            <a href="/logout" class="logout"> Logout </a>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <!-- =====================================================
-     MAIN NAVIGATION
-===================================================== -->
-
-    <nav class="main-mode-nav">
-      <button
-        type="button"
-        class="mode-tab"
-        onclick="window.location.href = '/dashboard'"
-      >
-        HOME
-      </button>
-
-      <button type="button" class="mode-tab active">CRICKET</button>
-    </nav>
-
-    <!-- =====================================================
-     MAIN CONTENT
-===================================================== -->
-
-    <main class="sportsbook-container">
-      <section class="sportsbook-header">
-        <div class="sport-title">
-          <div class="sport-icon">🏏</div>
-
-          <div>
-            <h2>Cricket</h2>
-
-            <p>Live &amp; upcoming cricket matches</p>
-          </div>
-        </div>
-
-        <div class="sport-filters">
-          <button type="button" class="sport-filter active" data-filter="all">
-            All
-          </button>
-
-          <button type="button" class="sport-filter" data-filter="live">
-            Live
-          </button>
-
-          <button type="button" class="sport-filter" data-filter="upcoming">
-            Upcoming
-          </button>
-        </div>
-      </section>
-
-      <!-- =================================================
-         MATCHES
-    ================================================= -->
-
-      <section class="matches-wrapper">
-        <div class="odds-header">
-          <div class="match-column">Match</div>
-
-          <div class="odds-column-header back-header">BACK</div>
-
-          <div class="odds-column-header lay-header">LAY</div>
-
-          <div class="odds-column-header draw-header">DRAW</div>
-        </div>
-
-        <div id="matches">
-          <div class="empty-state">
-            <div class="empty-state-icon">🏏</div>
-
-            <div class="empty-state-title">Loading cricket matches...</div>
-
-            <div class="empty-state-text">Fetching live cricket data.</div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <!-- =====================================================
-     BET SLIP
-===================================================== -->
-
-    <div id="betslip" class="betslip" hidden aria-hidden="true">
-      <div class="betslip-header">
-        <div>
-          <h2>Bet Slip</h2>
-
-          <span id="betslipSubtitle"> My Bets </span>
-        </div>
-
-        <button
-          type="button"
-          id="betslipClose"
-          class="betslip-close"
-          aria-label="Minimize bet slip"
-          title="Minimize"
-        >
-          ×
-        </button>
-      </div>
-
-      <div id="betslipContent" class="betslip-content">
-        <div class="betslip-empty">
-          <div class="betslip-empty-icon">🎟️</div>
-
-          <h3>Loading bets...</h3>
-
-          <p>Loading your betting history.</p>
-        </div>
-      </div>
-
-      <div class="betslip-footer">
-        <div class="betslip-balance">
-          <span> Balance </span>
-
-          <strong id="betslipBalance" class="balance-value"> ₹0.00 </strong>
-        </div>
-
-        <!--
-            Kept for compatibility with the existing dashboard.
-            Actual bet placement continues through the match page.
-        -->
-
-        <button
-          type="button"
-          id="placeBetButton"
-          class="place-bet-button"
-          disabled
-        >
-          PLACE BET
-        </button>
-      </div>
     </div>
 
-    <!-- =====================================================
-     BET SLIP OPEN BUTTON
-===================================================== -->
 
-    <button
-      type="button"
-      id="mobileBetslipButton"
-      class="mobile-betslip-button"
-      aria-label="Open bet slip"
-      aria-controls="betslip"
-    >
-      <span> BET SLIP </span>
+    <hr>
 
-      <span id="betslipCount" class="betslip-count"> 0 </span>
-    </button>
 
-    <script>
-      (function () {
-        function initAccountMenu() {
-          const toggle = document.getElementById("accountMenuToggle");
-          const dropdown = document.getElementById("accountMenuDropdown");
+    <!-- =================================================
+         ADMIN FEATURES
+    ================================================== -->
 
-          if (!toggle || !dropdown) return;
+    <div class="feature-grid">
 
-          // Prevent duplicate initialization if the page/script is loaded twice.
-          if (toggle.dataset.menuInitialized === "true") return;
-          toggle.dataset.menuInitialized = "true";
 
-          function closeMenu() {
-            toggle.setAttribute("aria-expanded", "false");
-            toggle.setAttribute("aria-label", "Open account menu");
-            dropdown.classList.remove("open");
-            dropdown.setAttribute("aria-hidden", "true");
-          }
+        <!-- USERS -->
 
-          function openMenu() {
-            toggle.setAttribute("aria-expanded", "true");
-            toggle.setAttribute("aria-label", "Close account menu");
-            dropdown.classList.add("open");
-            dropdown.setAttribute("aria-hidden", "false");
-          }
-
-          toggle.addEventListener("click", function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-
-            if (toggle.getAttribute("aria-expanded") === "true") {
-              closeMenu();
-            } else {
-              openMenu();
+        <a
+            href="/admin/users"
+            class="feature-card"
+            .feature-card {
+                text-decoration: none;
+                color: inherit;
             }
-          });
+           
+        >
 
-          // Don't let clicking inside the dropdown immediately close it.
-          dropdown.addEventListener("click", function (event) {
-            event.stopPropagation();
-          });
+            <h3>
+                👥 Users
+            </h3>
 
-          // Close when clicking elsewhere.
-          document.addEventListener("click", function () {
-            closeMenu();
-          });
+            <p>
+                Manage Users
+            </p>
 
-          // Close with Escape.
-          document.addEventListener("keydown", function (event) {
-            if (event.key === "Escape") {
-              closeMenu();
-            }
-          });
-        }
+        
 
-        // This script is placed near the end of <body>, but this also works
-        // if the document has already finished loading.
-        if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", initAccountMenu);
-        } else {
-          initAccountMenu();
-        }
-      })();
-    </script>
-  </body>
-</html>
+        </a>
+
+
+        <!-- SPORTS -->
+
+        <div class="feature-card">
+
+            <h3>
+                🏏 Sports
+            </h3>
+
+            <p>
+                Manage Sports
+            </p>
+
+        </div>
+
+
+        <!-- MATCHES -->
+
+        <div class="feature-card">
+
+            <h3>
+                🏆 Matches
+            </h3>
+
+            <p>
+                Manage Matches
+            </p>
+
+        </div>
+
+
+        <!-- MARKETS -->
+
+        <div class="feature-card">
+
+            <h3>
+                🎯 Markets
+            </h3>
+
+            <p>
+                Manage Markets
+            </p>
+
+        </div>
+
+
+        <!-- WALLETS -->
+
+        <div class="feature-card">
+
+            <h3>
+                💰 Wallets
+            </h3>
+
+            <p>
+                Manage Wallets
+            </p>
+
+        </div>
+
+
+        <!-- REPORTS -->
+
+        <div class="feature-card">
+
+            <h3>
+                📊 Reports
+            </h3>
+
+            <p>
+                Reports & Statistics
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             DEPOSITS
+        ================================================== -->
+
+        <a
+            href="/admin/deposits"
+            class="feature-card"
+            style="
+                text-decoration: none;
+                color: inherit;
+                display: block;
+                cursor: pointer;
+            "
+        >
+
+            <h3>
+                💰 Deposits
+            </h3>
+
+            <p>
+                View all customer deposits
+            </p>
+
+            <p>
+                <strong>
+                    Pending: {{ pending_deposits | default(0) }}
+                </strong>
+            </p>
+
+            <p>
+                Completed:
+                {{ completed_deposits | default(0) }}
+            </p>
+
+            <p>
+                <strong>
+                    View All Deposits →
+                </strong>
+            </p>
+
+        </a>
+
+
+        <!-- =================================================
+             WITHDRAWALS
+        ================================================== -->
+
+        <a
+            href="/admin/withdrawals"
+            class="feature-card"
+            style="
+                text-decoration: none;
+                color: inherit;
+                display: block;
+                cursor: pointer;
+            "
+        >
+
+            <h3>
+                🏦 Withdrawals
+            </h3>
+
+            <p>
+                View all customer withdrawals
+            </p>
+
+            <p>
+                <strong>
+                    Pending:
+                    {{ pending_withdrawals | default(0) }}
+                </strong>
+            </p>
+
+            <p>
+                Completed:
+                {{ completed_withdrawals | default(0) }}
+            </p>
+
+            <p>
+                <strong>
+                    View All Withdrawals →
+                </strong>
+            </p>
+
+        </a>
+
+    </div>
+
+
+    <hr>
+
+
+    <!-- =================================================
+         EMPLOYEE MANAGEMENT
+    ================================================== -->
+
+    <div class="employee-management">
+
+
+        <div style="
+            text-align: center;
+            margin-bottom: 25px;
+        ">
+
+            <h2>
+                👨‍💼 Employee Management
+            </h2>
+
+            <p>
+                Create and manage employees who will process
+                deposits and withdrawals.
+            </p>
+
+        </div>
+
+
+        <!-- CREATE EMPLOYEE -->
+
+        <div class="feature-card">
+
+            <h3>
+                ➕ Create Employee
+            </h3>
+
+            <form
+                method="POST"
+                action="/admin/employees/create"
+            >
+
+                <div style="margin-bottom: 15px;">
+
+                    <label for="employee_id">
+                        Employee ID
+                    </label>
+
+                    <br>
+
+                    <input
+                        type="text"
+                        id="employee_id"
+                        name="employee_id"
+                        placeholder="EMP001"
+                        maxlength="50"
+                        required
+                        style="
+                            padding: 10px;
+                            width: 250px;
+                            margin-top: 5px;
+                        "
+                    >
+
+                </div>
+
+
+                <div style="margin-bottom: 15px;">
+
+                    <label for="employee_password">
+                        Password
+                    </label>
+
+                    <br>
+
+                    <input
+                        type="password"
+                        id="employee_password"
+                        name="password"
+                        placeholder="Enter password"
+                        minlength="6"
+                        required
+                        style="
+                            padding: 10px;
+                            width: 250px;
+                            margin-top: 5px;
+                        "
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    style="
+                        padding: 10px 18px;
+                        cursor: pointer;
+                    "
+                >
+                    Create Employee
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- EXISTING EMPLOYEES -->
+
+        <div
+            class="feature-card"
+            style="margin-top: 20px;"
+        >
+
+            <h3>
+                📋 Existing Employees
+            </h3>
+
+
+            {% if employees %}
+
+            <div style="overflow-x: auto;">
+
+                <table
+                    style="
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-top: 15px;
+                    "
+                >
+
+                    <thead>
+
+                        <tr>
+
+                            <th style="
+                                text-align: left;
+                                padding: 10px;
+                                border-bottom: 1px solid #ddd;
+                            ">
+                                ID
+                            </th>
+
+                            <th style="
+                                text-align: left;
+                                padding: 10px;
+                                border-bottom: 1px solid #ddd;
+                            ">
+                                Employee ID
+                            </th>
+
+                            <th style="
+                                text-align: left;
+                                padding: 10px;
+                                border-bottom: 1px solid #ddd;
+                            ">
+                                Status
+                            </th>
+
+                            <th style="
+                                text-align: left;
+                                padding: 10px;
+                                border-bottom: 1px solid #ddd;
+                            ">
+                                Created
+                            </th>
+
+                            <th style="
+                                text-align: left;
+                                padding: 10px;
+                                border-bottom: 1px solid #ddd;
+                            ">
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for employee in employees %}
+
+                        <tr>
+
+                            <td style="
+                                padding: 10px;
+                                border-bottom: 1px solid #eee;
+                            ">
+                                {{ employee.id }}
+                            </td>
+
+
+                            <td style="
+                                padding: 10px;
+                                border-bottom: 1px solid #eee;
+                            ">
+
+                                <strong>
+                                    {{ employee.employee_id }}
+                                </strong>
+
+                            </td>
+
+
+                            <td style="
+                                padding: 10px;
+                                border-bottom: 1px solid #eee;
+                            ">
+
+                                {% if employee.status == "Active" %}
+
+                                    🟢 Active
+
+                                {% else %}
+
+                                    🔴 Inactive
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td style="
+                                padding: 10px;
+                                border-bottom: 1px solid #eee;
+                            ">
+
+                                {{ employee.created_at or "-" }}
+
+                            </td>
+
+
+                            <td style="
+                                padding: 10px;
+                                border-bottom: 1px solid #eee;
+                            ">
+
+                                {% if employee.status == "Active" %}
+
+                                <form
+                                    method="POST"
+                                    action="/admin/employees/{{ employee.id }}/deactivate"
+                                    style="display: inline;"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        style="
+                                            padding: 7px 12px;
+                                            cursor: pointer;
+                                        "
+                                    >
+                                        Deactivate
+                                    </button>
+
+                                </form>
+
+                                {% else %}
+
+                                <form
+                                    method="POST"
+                                    action="/admin/employees/{{ employee.id }}/activate"
+                                    style="display: inline;"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        style="
+                                            padding: 7px 12px;
+                                            cursor: pointer;
+                                        "
+                                    >
+                                        Activate
+                                    </button>
+
+                                </form>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+                <p>
+                    No employees created yet.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
