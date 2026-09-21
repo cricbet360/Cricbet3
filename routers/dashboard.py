@@ -394,14 +394,14 @@ async def match_page(
             odds_error = str(exc)
 
             print(
-                "[CRICKET] PROEXCH ODDS ERROR:",
+                "[CRICKET]  ODDS ERROR:",
                 odds_error,
             )
 
     else:
 
         odds_error = (
-            "ProExch did not provide a market ID."
+            "Did not provide a market ID."
         )
 
         print(
@@ -733,6 +733,7 @@ async def match_page(
         context={
             "user": user,
             "match": match,
+            "game_id": game_id,
             "error": odds_error,
         },
     )

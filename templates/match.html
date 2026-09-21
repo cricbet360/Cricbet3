@@ -2912,9 +2912,7 @@
 
         html += '<div class="odd-price">';
 
-        if (marketType === "FANCY" || marketType === "SESSION") {
-          html += side === "BACK" ? "YES " : "NO ";
-        }
+
 
         html += numericPrice.toFixed(2);
 
@@ -4809,131 +4807,127 @@
    ========================================================= */
 
       const CURRENT_GAME_ID = "{{ game_id | default('', true) }}";
-
       console.log("Current match game ID:", CURRENT_GAME_ID);
 
       /* =========================================================
    OPEN LIVE MATCH
    ========================================================= */
 
-      async function openLiveMatch() {
-        const gameId = String(CURRENT_GAME_ID).trim();
+async function openLiveMatch() {
+  const gameId = String(CURRENT_GAME_ID).trim();
 
-        /*
-         * Make sure the match page actually received
-         * the game ID.
-         */
+  if (!gameId) {
+    alert("Game ID not found for this match.");
 
-        if (!gameId) {
-          alert("Game ID not found for this match.");
+    console.error(
+      "Live stream: game_id is missing."
+    );
 
-          console.error("Live stream: game_id is missing.");
+    return;
+  }
 
-          return;
-        }
+  const button = document.getElementById(
+    "watchLiveBtn"
+  );
 
-        const button = document.getElementById("watchLiveBtn");
+  const player = document.getElementById(
+    "livePlayerContainer"
+  );
 
-        const player = document.getElementById("livePlayerContainer");
+  const iframe = document.getElementById(
+    "liveMatchIframe"
+  );
 
-        const iframe = document.getElementById("liveMatchIframe");
+  if (!button || !player || !iframe) {
+    console.error(
+      "Live player elements not found."
+    );
 
-        /*
-         * Loading state
-         */
+    return;
+  }
 
-        button.disabled = true;
+  /*
+   * Disable button while opening stream.
+   */
+  button.disabled = true;
 
-        button.innerHTML = `
-        <span class="live-dot"></span>
-        <span>LOADING LIVE...</span>
+  button.innerHTML = `
+    <span class="live-dot"></span>
+    <span>LOADING LIVE...</span>
+  `;
+
+  try {
+    /*
+     * Direct ProExch TV stream.
+     *
+     * The game ID automatically comes from
+     * the match currently opened by the user.
+     *
+     * Example:
+     *
+     * gameId = 36095117
+     *
+     * iframe URL becomes:
+     *
+     * https://video.proexch.in/tv/v4/stream/36095117
+     */
+
+    const streamUrl =
+      `https://video.proexch.in/tv/v4/stream/${encodeURIComponent(gameId)}`;
+
+    console.log(
+      "Opening ProExch live stream:",
+      streamUrl
+    );
+
+    /*
+     * Set the iframe directly to the ProExch
+     * stream URL.
+     */
+    iframe.src = streamUrl;
+
+    /*
+     * Hide WATCH LIVE button.
+     */
+    button.style.display = "none";
+
+    /*
+     * Show video player.
+     */
+    player.style.display = "block";
+
+    /*
+     * Scroll player into view.
+     */
+    setTimeout(() => {
+      player.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }, 100);
+
+  } catch (error) {
+
+    console.error(
+      "Live match error:",
+      error
+    );
+
+    alert(
+      error.message ||
+      "Unable to load live match."
+    );
+
+  } finally {
+
+    button.disabled = false;
+
+    button.innerHTML = `
+      <span class="live-dot"></span>
+      <span>WATCH LIVE</span>
     `;
-
-        try {
-          /*
-           * Ask our backend for the live URL.
-           *
-           * Example:
-           *
-           * /api/cricket/live/35887305
-           */
-
-          const response = await fetch(
-            `/api/cricket/live/${encodeURIComponent(gameId)}`,
-            {
-              method: "GET",
-
-              headers: {
-                Accept: "application/json",
-              },
-
-              cache: "no-store",
-            },
-          );
-
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-          }
-
-          const data = await response.json();
-
-          if (!data.success || !data.live_url) {
-            throw new Error(data.message || "Live stream is unavailable.");
-          }
-
-          /*
-           * IMPORTANT:
-           *
-           * The backend has generated:
-           *
-           * https://video.proexch.in/tv/v4/stream/{game_id}
-           *
-           * using THIS match's game ID.
-           */
-
-          console.log("Opening live stream:", data.live_url);
-
-          /*
-           * Set iframe URL.
-           */
-
-          iframe.src = data.live_url;
-
-          /*
-           * Hide WATCH LIVE button.
-           */
-
-          button.style.display = "none";
-
-          /*
-           * Show iframe player.
-           */
-
-          player.style.display = "block";
-
-          /*
-           * Scroll player into view.
-           */
-
-          setTimeout(() => {
-            player.scrollIntoView({
-              behavior: "smooth",
-              block: "center",
-            });
-          }, 100);
-        } catch (error) {
-          console.error("Live match error:", error);
-
-          alert(error.message || "Unable to load live match.");
-        } finally {
-          button.disabled = false;
-
-          button.innerHTML = `
-            <span class="live-dot"></span>
-            <span>WATCH LIVE</span>
-        `;
-        }
-      }
+  }
+}
 
       /* =========================================================
    MINIMIZE LIVE MATCH
