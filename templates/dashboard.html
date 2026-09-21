@@ -1,331 +1,439 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
 
-<head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>CricBet - Cricket</title>
 
-    <link
-        rel="stylesheet"
-        href="/static/css/dashboard.css?v=34"
-    >
+    <link rel="stylesheet" href="/static/css/dashboard.css?v=34" />
+    <style>
+      /* =========================================================
+   TOPBAR ACCOUNT / HAMBURGER MENU
+========================================================= */
 
-    <script
-        src="/static/js/dashboard.js?v=34"
-        defer
-    ></script>
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+        flex-wrap: nowrap;
+      }
 
-</head>
+      /* Balance */
 
+      .topbar-right .balance {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: center;
+        flex-shrink: 0;
+        white-space: nowrap;
+      }
 
-<body>
+      .topbar-right .balance-label {
+        font-size: 10px;
+        line-height: 12px;
+        text-transform: uppercase;
+      }
 
+      .topbar-right .balance-value {
+        white-space: nowrap;
+      }
 
-<!-- =====================================================
+      /* Deposit / Withdraw */
+
+      .topbar-right .topbar-action {
+        flex-shrink: 0;
+        white-space: nowrap;
+      }
+
+      /* =========================================================
+   HAMBURGER
+========================================================= */
+
+      .account-menu {
+        position: relative;
+        flex-shrink: 0;
+      }
+
+      .account-menu-toggle {
+        width: 42px;
+        height: 38px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+
+        gap: 4px;
+
+        padding: 0;
+
+        border: 1px solid #28533e;
+        border-radius: 6px;
+
+        background: #102c20;
+        cursor: pointer;
+      }
+
+      .account-menu-toggle:hover {
+        background: #17412d;
+      }
+
+      .account-menu-toggle span {
+        display: block;
+
+        width: 18px;
+        height: 2px;
+
+        background: #ffffff;
+
+        border-radius: 2px;
+
+        transition:
+          transform 0.2s ease,
+          opacity 0.2s ease;
+      }
+
+      /* Hamburger -> X */
+
+      .account-menu-toggle[aria-expanded="true"] span:nth-child(1) {
+        transform: translateY(6px) rotate(45deg);
+      }
+
+      .account-menu-toggle[aria-expanded="true"] span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .account-menu-toggle[aria-expanded="true"] span:nth-child(3) {
+        transform: translateY(-6px) rotate(-45deg);
+      }
+
+      /* =========================================================
+   PROFILE / LOGOUT DROPDOWN
+========================================================= */
+
+      .account-menu-dropdown {
+        position: absolute;
+
+        top: calc(100% + 8px);
+        right: 0;
+
+        min-width: 145px;
+
+        display: none;
+        flex-direction: column;
+
+        padding: 6px;
+
+        background: #092519;
+
+        border: 1px solid #28533e;
+        border-radius: 7px;
+
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+
+        z-index: 9999;
+      }
+
+      .account-menu-dropdown.open {
+        display: flex;
+      }
+
+      .account-menu-dropdown a {
+        display: flex;
+        align-items: center;
+
+        min-height: 36px;
+
+        padding: 0 12px;
+
+        text-decoration: none;
+
+        border-radius: 5px;
+
+        white-space: nowrap;
+      }
+
+      /* Profile */
+
+      .account-menu-dropdown .profile-link {
+        color: #dce9e3;
+      }
+
+      .account-menu-dropdown .profile-link:hover {
+        background: #143c29;
+      }
+
+      /* Logout */
+
+      .account-menu-dropdown .logout {
+        color: #ffaaaa;
+      }
+
+      .account-menu-dropdown .logout:hover {
+        background: #321817;
+      }
+
+      /* =========================================================
+   MOBILE
+========================================================= */
+
+      @media (max-width: 700px) {
+        .topbar {
+          width: 100%;
+        }
+
+        .topbar-right {
+          width: auto;
+
+          display: flex;
+
+          flex-direction: row;
+
+          align-items: center;
+
+          justify-content: flex-end;
+
+          gap: 6px;
+
+          flex-wrap: nowrap;
+        }
+
+        /* Balance stays on the same line */
+
+        .topbar-right .balance {
+          flex-shrink: 1;
+          min-width: 0;
+
+          align-items: flex-end;
+        }
+
+        .topbar-right .balance-label {
+          font-size: 8px;
+        }
+
+        .topbar-right .balance-value {
+          font-size: 12px;
+        }
+
+        /* Buttons */
+
+        .topbar-right .topbar-action {
+          height: 36px;
+
+          padding: 0 12px;
+
+          font-size: 11px;
+
+          flex-shrink: 1;
+        }
+
+        /* Hamburger */
+
+        .account-menu-toggle {
+          width: 38px;
+          height: 36px;
+
+          flex-shrink: 0;
+        }
+
+        /* Hide old exposed links if any remain */
+
+        .topbar-right > .profile-link,
+        .topbar-right > .logout {
+          display: none;
+        }
+      }
+    </style>
+
+    <script src="/static/js/dashboard.js?v=34" defer></script>
+  </head>
+
+  <body>
+    <!-- =====================================================
      TOP BAR
 ===================================================== -->
 
-<header class="topbar">
-
-    <div class="brand">
-
+    <header class="topbar">
+      <div class="brand">
         <span class="brand-icon">🏏</span>
 
         <span class="brand-text">
-            CRIC<span class="brand-accent">BET</span>
+          CRIC<span class="brand-accent">BET</span>
         </span>
+      </div>
 
-    </div>
-
-
-    <div class="topbar-right">
-
-
+      <div class="topbar-right">
+        <!-- BALANCE -->
         <div class="balance">
+          <span class="balance-label"> Balance </span>
 
-            <span class="balance-label">
-                Balance
-            </span>
-
-            <span
-                id="balance"
-                class="balance-value"
-            >
-                ₹0.00
-            </span>
-
+          <span id="balance" class="balance-value"> ₹0.00 </span>
         </div>
 
-
+        <!-- DEPOSIT -->
         <button
-            type="button"
-            id="depositBtn"
-            class="topbar-action deposit-action"
+          type="button"
+          id="depositBtn"
+          class="topbar-action deposit-action"
         >
-            Deposit
+          Deposit
         </button>
 
-
+        <!-- WITHDRAW -->
         <button
-            type="button"
-            id="withdrawBtn"
-            class="topbar-action withdraw-action"
+          type="button"
+          id="withdrawBtn"
+          class="topbar-action withdraw-action"
         >
-            Withdraw
+          Withdraw
         </button>
 
+        <!-- HAMBURGER -->
+        <div class="account-menu">
+          <button
+            type="button"
+            id="accountMenuToggle"
+            class="account-menu-toggle"
+            aria-expanded="false"
+            aria-controls="accountMenuDropdown"
+            aria-label="Open account menu"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
 
-        <a
-            href="/profile"
-            class="profile-link"
-        >
-            Profile
-        </a>
+          <!-- PROFILE + LOGOUT DROPDOWN -->
+          <div
+            id="accountMenuDropdown"
+            class="account-menu-dropdown"
+            aria-hidden="true"
+          >
+            <a href="/profile" class="profile-link"> Profile </a>
 
+            <a href="/logout" class="logout"> Logout </a>
+          </div>
+        </div>
+      </div>
+    </header>
 
-        <a
-            href="/logout"
-            class="logout"
-        >
-            Logout
-        </a>
-
-    </div>
-
-</header>
-
-
-<!-- =====================================================
+    <!-- =====================================================
      MAIN NAVIGATION
 ===================================================== -->
 
-<nav class="main-mode-nav">
-
-    <button
+    <nav class="main-mode-nav">
+      <button
         type="button"
         class="mode-tab"
-        onclick="window.location.href='/dashboard'"
-    >
+        onclick="window.location.href = '/dashboard'"
+      >
         HOME
-    </button>
+      </button>
 
+      <button type="button" class="mode-tab active">CRICKET</button>
+    </nav>
 
-    <button
-        type="button"
-        class="mode-tab active"
-    >
-        CRICKET
-    </button>
-
-</nav>
-
-
-<!-- =====================================================
+    <!-- =====================================================
      MAIN CONTENT
 ===================================================== -->
 
-<main class="sportsbook-container">
-
-
-    <section class="sportsbook-header">
-
+    <main class="sportsbook-container">
+      <section class="sportsbook-header">
         <div class="sport-title">
+          <div class="sport-icon">🏏</div>
 
-            <div class="sport-icon">
-                🏏
-            </div>
+          <div>
+            <h2>Cricket</h2>
 
-
-            <div>
-
-                <h2>
-                    Cricket
-                </h2>
-
-                <p>
-                    Live &amp; upcoming cricket matches
-                </p>
-
-            </div>
-
+            <p>Live &amp; upcoming cricket matches</p>
+          </div>
         </div>
-
 
         <div class="sport-filters">
+          <button type="button" class="sport-filter active" data-filter="all">
+            All
+          </button>
 
-            <button
-                type="button"
-                class="sport-filter active"
-                data-filter="all"
-            >
-                All
-            </button>
+          <button type="button" class="sport-filter" data-filter="live">
+            Live
+          </button>
 
-
-            <button
-                type="button"
-                class="sport-filter"
-                data-filter="live"
-            >
-                Live
-            </button>
-
-
-            <button
-                type="button"
-                class="sport-filter"
-                data-filter="upcoming"
-            >
-                Upcoming
-            </button>
-
+          <button type="button" class="sport-filter" data-filter="upcoming">
+            Upcoming
+          </button>
         </div>
+      </section>
 
-    </section>
-
-
-    <!-- =================================================
+      <!-- =================================================
          MATCHES
     ================================================= -->
 
-    <section class="matches-wrapper">
-
+      <section class="matches-wrapper">
         <div class="odds-header">
+          <div class="match-column">Match</div>
 
-            <div class="match-column">
-                Match
-            </div>
+          <div class="odds-column-header back-header">BACK</div>
 
+          <div class="odds-column-header lay-header">LAY</div>
 
-            <div class="odds-column-header back-header">
-                BACK
-            </div>
-
-
-            <div class="odds-column-header lay-header">
-                LAY
-            </div>
-
-
-            <div class="odds-column-header draw-header">
-                DRAW
-            </div>
-
+          <div class="odds-column-header draw-header">DRAW</div>
         </div>
-
 
         <div id="matches">
+          <div class="empty-state">
+            <div class="empty-state-icon">🏏</div>
 
-            <div class="empty-state">
+            <div class="empty-state-title">Loading cricket matches...</div>
 
-                <div class="empty-state-icon">
-                    🏏
-                </div>
-
-                <div class="empty-state-title">
-                    Loading cricket matches...
-                </div>
-
-                <div class="empty-state-text">
-                    Fetching live cricket data.
-                </div>
-
-            </div>
-
+            <div class="empty-state-text">Fetching live cricket data.</div>
+          </div>
         </div>
+      </section>
+    </main>
 
-    </section>
-
-</main>
-
-
-<!-- =====================================================
+    <!-- =====================================================
      BET SLIP
 ===================================================== -->
 
-<div
-    id="betslip"
-    class="betslip"
-    hidden
-    aria-hidden="true"
->
-
-    <div class="betslip-header">
-
+    <div id="betslip" class="betslip" hidden aria-hidden="true">
+      <div class="betslip-header">
         <div>
+          <h2>Bet Slip</h2>
 
-            <h2>
-                Bet Slip
-            </h2>
-
-            <span id="betslipSubtitle">
-                My Bets
-            </span>
-
+          <span id="betslipSubtitle"> My Bets </span>
         </div>
-
 
         <button
-            type="button"
-            id="betslipClose"
-            class="betslip-close"
-            aria-label="Minimize bet slip"
-            title="Minimize"
+          type="button"
+          id="betslipClose"
+          class="betslip-close"
+          aria-label="Minimize bet slip"
+          title="Minimize"
         >
-            ×
+          ×
         </button>
+      </div>
 
-    </div>
-
-
-    <div
-        id="betslipContent"
-        class="betslip-content"
-    >
-
+      <div id="betslipContent" class="betslip-content">
         <div class="betslip-empty">
+          <div class="betslip-empty-icon">🎟️</div>
 
-            <div class="betslip-empty-icon">
-                🎟️
-            </div>
+          <h3>Loading bets...</h3>
 
-            <h3>
-                Loading bets...
-            </h3>
-
-            <p>
-                Loading your betting history.
-            </p>
-
+          <p>Loading your betting history.</p>
         </div>
+      </div>
 
-    </div>
-
-
-    <div class="betslip-footer">
-
+      <div class="betslip-footer">
         <div class="betslip-balance">
+          <span> Balance </span>
 
-            <span>
-                Balance
-            </span>
-
-            <strong
-                id="betslipBalance"
-                class="balance-value"
-            >
-                ₹0.00
-            </strong>
-
+          <strong id="betslipBalance" class="balance-value"> ₹0.00 </strong>
         </div>
-
 
         <!--
             Kept for compatibility with the existing dashboard.
@@ -333,45 +441,30 @@
         -->
 
         <button
-            type="button"
-            id="placeBetButton"
-            class="place-bet-button"
-            disabled
+          type="button"
+          id="placeBetButton"
+          class="place-bet-button"
+          disabled
         >
-            PLACE BET
+          PLACE BET
         </button>
-
+      </div>
     </div>
 
-</div>
-
-
-<!-- =====================================================
+    <!-- =====================================================
      BET SLIP OPEN BUTTON
 ===================================================== -->
 
-<button
-    type="button"
-    id="mobileBetslipButton"
-    class="mobile-betslip-button"
-    aria-label="Open bet slip"
-    aria-controls="betslip"
->
-
-    <span>
-        BET SLIP
-    </span>
-
-
-    <span
-        id="betslipCount"
-        class="betslip-count"
+    <button
+      type="button"
+      id="mobileBetslipButton"
+      class="mobile-betslip-button"
+      aria-label="Open bet slip"
+      aria-controls="betslip"
     >
-        0
-    </span>
+      <span> BET SLIP </span>
 
-</button>
-
-
-</body>
+      <span id="betslipCount" class="betslip-count"> 0 </span>
+    </button>
+  </body>
 </html>
