@@ -466,5 +466,70 @@
 
       <span id="betslipCount" class="betslip-count"> 0 </span>
     </button>
+
+    <script>
+      (function () {
+        function initAccountMenu() {
+          const toggle = document.getElementById("accountMenuToggle");
+          const dropdown = document.getElementById("accountMenuDropdown");
+
+          if (!toggle || !dropdown) return;
+
+          // Prevent duplicate initialization if the page/script is loaded twice.
+          if (toggle.dataset.menuInitialized === "true") return;
+          toggle.dataset.menuInitialized = "true";
+
+          function closeMenu() {
+            toggle.setAttribute("aria-expanded", "false");
+            toggle.setAttribute("aria-label", "Open account menu");
+            dropdown.classList.remove("open");
+            dropdown.setAttribute("aria-hidden", "true");
+          }
+
+          function openMenu() {
+            toggle.setAttribute("aria-expanded", "true");
+            toggle.setAttribute("aria-label", "Close account menu");
+            dropdown.classList.add("open");
+            dropdown.setAttribute("aria-hidden", "false");
+          }
+
+          toggle.addEventListener("click", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (toggle.getAttribute("aria-expanded") === "true") {
+              closeMenu();
+            } else {
+              openMenu();
+            }
+          });
+
+          // Don't let clicking inside the dropdown immediately close it.
+          dropdown.addEventListener("click", function (event) {
+            event.stopPropagation();
+          });
+
+          // Close when clicking elsewhere.
+          document.addEventListener("click", function () {
+            closeMenu();
+          });
+
+          // Close with Escape.
+          document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+              closeMenu();
+            }
+          });
+        }
+
+        // This script is placed near the end of <body>, but this also works
+        // if the document has already finished loading.
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", initAccountMenu);
+        } else {
+          initAccountMenu();
+        }
+      })();
+    </script>
   </body>
 </html>
