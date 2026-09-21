@@ -14,6 +14,14 @@ const BALANCE_REFRESH_MS = 15000;
 
 const ODDS_BATCH_SIZE = 5;
 
+/*
+ * A match whose scheduled start has passed but which the provider
+ * has not yet marked live (toss delay, rain delay, provider lag) is
+ * still shown for this long as "STARTING". After that it is treated
+ * as a past match and hidden. Set to 0 to hide it immediately.
+ */
+const STARTING_GRACE_MS = 30 * 60 * 1000;
+
 let allMatches = [];
 let currentFilter = "all";
 
@@ -234,6 +242,300 @@ function formatDate(value) {
 
 
 /* =========================================================
+   MATCH TIME PARSING
+
+   The provider's event time can arrive in several shapes.
+   Everything below turns it into epoch milliseconds so that
+   filtering ("is this today?", "has it started?") and sorting
+   work on real moments in time, not on strings.
+
+   Supported:
+     - epoch seconds / milliseconds
+     - 2026-09-22T19:30:00Z / +05:30 / 2026-09-22 19:30:00
+     - 22/09/2026 07:30:00 PM  (day-first, and month-first when
+       the numbers make it unambiguous)
+     - anything the browser itself can parse
+
+   A time with no timezone is read as the viewer's local time,
+   the same as the old new Date(value) behaviour.
+========================================================= */
+
+function epochToMs(number) {
+
+    /*
+     * 10-digit values are seconds, 13-digit are milliseconds.
+     */
+
+    return number < 1e11
+        ? number * 1000
+        : number;
+}
+
+
+function buildLocalTime(
+    year, month, day,
+    hour, minute, second,
+    meridiem
+) {
+
+    let h = Number(hour || 0);
+
+    if (meridiem) {
+
+        h = (h % 12) +
+            (/pm/i.test(meridiem) ? 12 : 0);
+    }
+
+    const date = new Date(
+        Number(year),
+        Number(month) - 1,
+        Number(day),
+        h,
+        Number(minute || 0),
+        Number(second || 0)
+    );
+
+    /*
+     * Reject impossible dates such as 31/02 or month 13
+     * (JavaScript would silently roll them over).
+     */
+
+    if (
+        date.getMonth() !== Number(month) - 1 ||
+        date.getDate() !== Number(day)
+    ) {
+        return NaN;
+    }
+
+    return date.getTime();
+}
+
+
+function parseEventTime(value) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+        return NaN;
+    }
+
+    if (value instanceof Date) {
+        return value.getTime();
+    }
+
+    if (typeof value === "number") {
+
+        return Number.isFinite(value)
+            ? epochToMs(value)
+            : NaN;
+    }
+
+    const text =
+        String(value).trim();
+
+    if (!text) {
+        return NaN;
+    }
+
+    if (/^\d{10,13}$/.test(text)) {
+        return epochToMs(Number(text));
+    }
+
+
+    /*
+     * Year first:  2026-09-22 19:30:00
+     *              2026-09-22T19:30:00.000Z
+     *              2026/09/22 07:30 PM
+     */
+
+    let m = text.match(
+        /^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})(?:[T\s]+(\d{1,2}):(\d{2})(?::(\d{2})(?:\.\d+)?)?\s*([AP]M)?)?\s*(Z|[+-]\d{2}(?::?\d{2})?)?$/i
+    );
+
+    if (m) {
+
+        const [
+            , year, month, day,
+            hour, minute, second,
+            meridiem, zone
+        ] = m;
+
+        if (!zone) {
+
+            return buildLocalTime(
+                year, month, day,
+                hour, minute, second,
+                meridiem
+            );
+        }
+
+        let h = Number(hour || 0);
+
+        if (meridiem) {
+
+            h = (h % 12) +
+                (/pm/i.test(meridiem) ? 12 : 0);
+        }
+
+        const asUtc = Date.UTC(
+            Number(year),
+            Number(month) - 1,
+            Number(day),
+            h,
+            Number(minute || 0),
+            Number(second || 0)
+        );
+
+        if (
+            new Date(asUtc).getUTCMonth() !==
+            Number(month) - 1
+        ) {
+            return NaN;
+        }
+
+        let offsetMinutes = 0;
+
+        if (zone.toUpperCase() !== "Z") {
+
+            const sign =
+                zone[0] === "-" ? -1 : 1;
+
+            const digits =
+                zone.slice(1).replace(":", "");
+
+            offsetMinutes = sign * (
+                Number(digits.slice(0, 2)) * 60 +
+                Number(digits.slice(2, 4) || 0)
+            );
+        }
+
+        return asUtc - offsetMinutes * 60000;
+    }
+
+
+    /*
+     * Day / month first:  22/09/2026 07:30:00 PM
+     *                     22-09-2026 19:30
+     */
+
+    m = text.match(
+        /^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})(?:[T,\s]+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AP]M)?)?$/i
+    );
+
+    if (m) {
+
+        const [
+            , first, second, year,
+            hour, minute, sec,
+            meridiem
+        ] = m;
+
+        const a = Number(first);
+        const b = Number(second);
+
+        const dayFirst = buildLocalTime(
+            year, b, a, hour, minute, sec, meridiem
+        );
+
+        const monthFirst = buildLocalTime(
+            year, a, b, hour, minute, sec, meridiem
+        );
+
+        if (a > 12) {
+            return dayFirst;
+        }
+
+        if (b > 12) {
+            return monthFirst;
+        }
+
+        /*
+         * Genuinely ambiguous (e.g. 05/09/2026).
+         * Prefer day-first (Indian convention) unless only the
+         * month-first reading lands near today.
+         */
+
+        const now = Date.now();
+
+        const plausible = ts =>
+            Number.isFinite(ts) &&
+            ts > now - 2 * 86400000 &&
+            ts < now + 90 * 86400000;
+
+        if (
+            !plausible(dayFirst) &&
+            plausible(monthFirst)
+        ) {
+            return monthFirst;
+        }
+
+        return Number.isFinite(dayFirst)
+            ? dayFirst
+            : monthFirst;
+    }
+
+
+    /*
+     * Last resort: let the browser try.
+     */
+
+    const native =
+        new Date(text).getTime();
+
+    return Number.isFinite(native)
+        ? native
+        : NaN;
+}
+
+
+function getEventTimestamp(match) {
+
+    return parseEventTime(
+        getEventTime(match)
+    );
+}
+
+
+function formatMatchTime(value) {
+
+    const timestamp =
+        parseEventTime(value);
+
+    if (!Number.isFinite(timestamp)) {
+
+        return value
+            ? String(value)
+            : "";
+    }
+
+    return new Date(timestamp).toLocaleString(
+        "en-IN",
+        {
+            day: "2-digit",
+            month: "short",
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
+}
+
+
+function isSameLocalDay(timestamp, reference) {
+
+    const a = new Date(timestamp);
+    const b = new Date(reference);
+
+    return (
+        a.getFullYear() === b.getFullYear() &&
+        a.getMonth() === b.getMonth() &&
+        a.getDate() === b.getDate()
+    );
+}
+
+
+/* =========================================================
    MATCH STATUS
 ========================================================= */
 
@@ -387,9 +689,7 @@ function getMatchStatus(match) {
      */
 
     const timestamp =
-        getTimestamp(
-            getEventTime(match)
-        );
+        getEventTimestamp(match);
 
 
     /*
@@ -427,13 +727,26 @@ function getMatchStatus(match) {
 
 
     /*
-     * If the provider has not marked the match
-     * live and the scheduled time has passed,
-     * don't incorrectly show UPCOMING.
+     * Scheduled time has passed but the provider has not
+     * marked the match live yet.
+     *
+     * Inside the grace window it is most likely a delayed
+     * start, so keep showing it as STARTING. Beyond that it
+     * is a past match.
      */
+    if (
+        now - timestamp <= STARTING_GRACE_MS
+    ) {
+
+        return {
+            type: "starting",
+            label: "STARTING"
+        };
+    }
+
     return {
-        type: "started",
-        label: "STARTED"
+        type: "past",
+        label: "PAST"
     };
 }
 
@@ -450,46 +763,137 @@ function isLive(match) {
    MATCH SORTING
 ========================================================= */
 
+/*
+ * Earliest start time first. Matches with no readable time go
+ * last. Ties fall back to the event name so the order is stable
+ * between refreshes.
+ */
+
 function sortMatchesByTime(matches) {
 
     return [...matches].sort(
         (a, b) => {
 
             const aTime =
-                getTimestamp(
-                    getEventTime(a)
-                );
+                getEventTimestamp(a);
 
             const bTime =
-                getTimestamp(
-                    getEventTime(b)
+                getEventTimestamp(b);
+
+            const aValid =
+                Number.isFinite(aTime);
+
+            const bValid =
+                Number.isFinite(bTime);
+
+
+            if (
+                aValid &&
+                bValid &&
+                aTime !== bTime
+            ) {
+                return aTime - bTime;
+            }
+
+
+            if (
+                aValid !== bValid
+            ) {
+                return aValid ? -1 : 1;
+            }
+
+
+            return getEventName(a)
+                .localeCompare(
+                    getEventName(b)
                 );
-
-
-            if (
-                !Number.isFinite(aTime) &&
-                !Number.isFinite(bTime)
-            ) {
-                return 0;
-            }
-
-
-            if (
-                !Number.isFinite(aTime)
-            ) {
-                return 1;
-            }
-
-
-            if (
-                !Number.isFinite(bTime)
-            ) {
-                return -1;
-            }
-
-
-            return aTime - bTime;
         }
+    );
+}
+
+
+/* =========================================================
+   MATCH VISIBILITY / TAB FILTERING
+
+   LIVE      matches currently in play, earliest start first
+   UPCOMING  matches not started yet (any future date),
+             soonest first
+   ALL       today's matches only: everything in play plus
+             everything still to be played today, in time
+             order. Past and finished matches never show.
+
+   A match with no readable start time cannot be proven past,
+   so it stays visible (last in the list) rather than vanishing.
+========================================================= */
+
+function isActiveMatch(match) {
+
+    const type =
+        getMatchStatus(match).type;
+
+    return (
+        type !== "finished" &&
+        type !== "past"
+    );
+}
+
+
+function getMatchesForFilter(
+    matches,
+    filter
+) {
+
+    const now = Date.now();
+
+    const visible =
+        matches.filter(
+            match => {
+
+                const type =
+                    getMatchStatus(match).type;
+
+
+                if (
+                    type === "finished" ||
+                    type === "past"
+                ) {
+                    return false;
+                }
+
+
+                if (filter === "live") {
+
+                    return type === "live";
+                }
+
+
+                if (filter === "upcoming") {
+
+                    return type !== "live";
+                }
+
+
+                /*
+                 * ALL
+                 */
+
+                if (
+                    type === "live" ||
+                    type === "unknown"
+                ) {
+                    return true;
+                }
+
+                return isSameLocalDay(
+                    getEventTimestamp(match),
+                    now
+                );
+            }
+        );
+
+
+    return sortMatchesByTime(
+        visible
     );
 }
 
@@ -1329,7 +1733,7 @@ function createMatchRow(match) {
             "live-status";
 
     } else if (
-        status.type === "started"
+        status.type === "starting"
     ) {
 
         statusClass =
@@ -1408,7 +1812,7 @@ function createMatchRow(match) {
 
                     <span class="match-time">
                         ${escapeHtml(
-                            formatDate(eventTime)
+                            formatMatchTime(eventTime)
                         )}
                     </span>
 
@@ -1696,6 +2100,38 @@ async function loadMatches() {
         );
 
 
+        /*
+         * Flag start times we could not read. Those matches can't
+         * be filtered by date, so they are shown last rather than
+         * hidden; the raw value here tells us what format to add.
+         */
+
+        const unreadable =
+            allMatches.filter(
+                match =>
+                    !Number.isFinite(
+                        getEventTimestamp(match)
+                    )
+            );
+
+        if (
+            unreadable.length
+        ) {
+
+            console.warn(
+                "[CricBet] Unreadable event_time on " +
+                unreadable.length +
+                " match(es). Sample:",
+                unreadable
+                    .slice(0, 3)
+                    .map(
+                        match =>
+                            getEventTime(match)
+                    )
+            );
+        }
+
+
         console.log(
             "[CricBet] Sorted matches:",
             allMatches
@@ -1919,8 +2355,19 @@ async function loadOddsForMatch(match) {
 
 async function loadAllOdds() {
 
+    /*
+     * Past / finished matches are never displayed,
+     * so don't spend requests fetching their odds.
+     */
+
+    const activeMatches =
+        allMatches.filter(
+            isActiveMatch
+        );
+
+
     if (
-        !allMatches.length
+        !activeMatches.length
     ) {
         return;
     }
@@ -1928,12 +2375,12 @@ async function loadAllOdds() {
 
     for (
         let i = 0;
-        i < allMatches.length;
+        i < activeMatches.length;
         i += ODDS_BATCH_SIZE
     ) {
 
         const batch =
-            allMatches.slice(
+            activeMatches.slice(
                 i,
                 i + ODDS_BATCH_SIZE
             );
@@ -2212,53 +2659,15 @@ function renderMatches() {
     }
 
 
-    let matches =
-        [...allMatches];
-
-
     /*
-     * LIVE FILTER
+     * Live / Upcoming / All rules, plus time ordering,
+     * live in getMatchesForFilter().
      */
 
-    if (
-        currentFilter === "live"
-    ) {
-
-        matches =
-            matches.filter(
-                match =>
-                    getMatchStatus(match).type ===
-                    "live"
-            );
-    }
-
-
-    /*
-     * UPCOMING FILTER
-     *
-     * Only genuinely future matches.
-     */
-
-    if (
-        currentFilter === "upcoming"
-    ) {
-
-        matches =
-            matches.filter(
-                match =>
-                    getMatchStatus(match).type ===
-                    "upcoming"
-            );
-    }
-
-
-    /*
-     * Always preserve chronological order.
-     */
-
-    matches =
-        sortMatchesByTime(
-            matches
+    const matches =
+        getMatchesForFilter(
+            allMatches,
+            currentFilter
         );
 
 
@@ -2267,7 +2676,7 @@ function renderMatches() {
     ) {
 
         let message =
-            "No matches are currently available for this filter.";
+            "There are no cricket matches scheduled for today.";
 
 
         if (
@@ -3374,7 +3783,9 @@ document.addEventListener(
                     allMatches.length
                 ) {
 
-                    allMatches.forEach(
+                    allMatches
+                    .filter(isActiveMatch)
+                    .forEach(
                         match => {
                             loadOddsForMatch(
                                 match
