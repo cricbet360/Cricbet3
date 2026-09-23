@@ -2887,7 +2887,27 @@
             ? numericSize.toFixed(2)
             : "";
 
-        let html =
+        let bettingOdds = numericPrice;
+
+        const normalizedMarketType =
+          String(marketType || "").toUpperCase();
+
+        if(
+          normalizedMarketType === "FANCY" ||
+          normalizedMarketType === "SESSION"
+        ) {
+          if(
+            Number.isFinite(numericSize) &&
+            numericSize > 0
+          ) {
+            bettingOdds =
+              1 + numericSize / 100;
+          } else {
+            bettingOdds = 0;
+          }
+        }
+
+        let html = 
           '<div class="odd-box ' +
           cssClass +
           '"' +
@@ -2906,9 +2926,19 @@
           ' data-bet-side="' +
           escapeAttribute(side) +
           '"' +
-          ' data-bet-odds="' +
+          ' data-bet-line="' +
           escapeAttribute(numericPrice) +
-          '">';
+          '"' +
+          ' data-bet-payout-percent="' +
+          escapeAttribute(
+            Number.isFinite(numericSize)
+              ? numericSize
+              : 0
+      ) +
+      '"' +
+      ' data-bet-odds="' +
+      escapeAttribute(bettingOdds) +
+      '">';
 
         html += '<div class="odd-price">';
 
@@ -2969,6 +2999,14 @@
               side: String(box.dataset.betSide).toUpperCase(),
 
               odds: odds,
+
+              payoutPercent:
+                (
+                  String(box.dataset.betMarketType || "").toUpperCase() === "FANCY" ||
+                  String(box.dataset.betMarketType || "").toUpperCase() === "SESSION"
+                )
+                  ? Number(box.dataset.betPayoutPercent || 0)
+                  : 0,
 
               stake: 0,
 
@@ -3274,11 +3312,27 @@
         betSlipItems.forEach((item) => {
           const stake = numberValue(item.stake);
 
-          const odds = numberValue(item.odds);
+          const marketType = 
+            string(item.marketType || "").toUpperCase();
 
+          let payoutMultiplier =
+            numberValue(item.odds);
+          
+          if (
+            marketType === "FANCY" ||
+            marketType === "SESSION"
+          ) {
+            const payoutPercent =
+              numberValue(item.payoutPercent);
+            
+            if (payoutPercent > 0) {
+              payoutMultiplier =
+                1 + payoutPercent / 100;
+            }
+          }
           totalStake += stake;
-
-          totalReturn += stake * odds;
+          totalReturn +=
+             stake * payoutMultiplier;
         });
 
         if (totalStakeElement) {
@@ -3399,6 +3453,16 @@
               side: String(item.side).toUpperCase(),
 
               odds: Number(item.odds),
+
+              payout_percent:
+                (
+                  String(item.marketType || "")
+                    .toUpperCase() === "FANCY" ||
+                  String(item.marketType || "")
+                    .toUpperCase() === "SESSION"
+                )
+                  ? Number(item.payoutPercent || 0)
+                  : null,
 
               stake: Number(item.stake),
             };

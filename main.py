@@ -1,4 +1,8 @@
 import os
+import threading
+Base.metadata.create_all(
+    bind=engine
+)
 
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
@@ -106,6 +110,19 @@ app = FastAPI(
 # SESSION_HTTPS_ONLY  "true" on the live site (HTTPS) so the cookie is
 #                     only ever sent over an encrypted connection.
 #                     Leave unset/"false" for local http://localhost use.
+
+# ============================================================
+# BET SETTLEMENT WORKER
+# ============================================================
+
+from services.settlement_service import (
+    settlement_loop,
+)
+
+threading.Thread(
+    target=settlement_loop,
+    daemon=True,
+).start()
 
 _INSECURE_DEFAULT_SECRET = "crickbet_super_secret_key_change_this"
 

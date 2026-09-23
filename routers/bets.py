@@ -34,6 +34,8 @@ class PlaceBetRequest(BaseModel):
     side: str
     odds: float
     stake: float
+    payout_percent: float | None = None
+    stake: float
 
 
 # =========================================================
@@ -339,11 +341,53 @@ async def place_bet(
     # POTENTIAL WIN
     # -----------------------------------------------------
 
-    potential_win = (
-        stake * odds
-    ).quantize(
-        Decimal("0.01")
-    )
+    if market_type in {
+    "FANCY",
+    "SESSION",
+    }:
+        try:
+            payout_percent = Decimal(
+                str(
+                    payload.payout_percent
+                    if payload.payout_percent is not None
+                    else 0
+                )
+            )
+        except (
+            InvalidOperation,
+            ValueError,
+            TypeError,
+        ):
+            return _error(
+                "Invalid Fancy payout percentage."
+            )
+
+        if payout_percent <= Decimal("0.00"):
+            return _error(
+                "Invalid Fancy payout percentage."
+            )
+
+        payout_multiplier = (
+            Decimal("1.00") +
+            (
+                payout_percent /
+                Decimal("100.00")
+            )
+        )
+
+        potential_win = (
+            stake *
+            payout_multiplier
+        ).quantize(
+            Decimal("0.01")
+        )
+
+    else:
+        potential_win = (
+            stake * odds
+        ).quantize(
+            Decimal("0.01")
+        )
 
     # -----------------------------------------------------
     # BET
@@ -413,6 +457,21 @@ async def place_bet(
         side=side,
 
         price=float(odds),
+
+        payout_percent=(
+            float(
+                payload.payout_percent
+            )
+            if (
+                market_type
+                in {"FANCY", "SESSION"}
+                and payload.payout_percent
+                is not None
+            )
+            else None
+        ),
+
+        
 
         market_name=stored_market_name,
 

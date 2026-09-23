@@ -503,7 +503,9 @@ def cricket_results(
 def proexch_result(
     request: Request,
     market_id: str,
+    result_type: str = "new_fancy",
 ):
+  
 
     if not _is_logged_in(request):
 
@@ -517,8 +519,9 @@ def proexch_result(
     try:
 
         data = (
-            proexch_api.get_proexch_result(
-                market_id
+            proexch_api.get_proexch_betfair_result(
+                market_id=market_id,
+                result_type=result_type,
             )
         )
 
@@ -526,6 +529,9 @@ def proexch_result(
             "success": True,
             "market_id": str(
                 market_id
+            ),
+            "result_type": str(
+                result_type
             ),
             "data": data,
         }
@@ -543,7 +549,7 @@ def proexch_result(
     except Exception as exc:
 
         print(
-            "[CRICKET] ProExch result error:",
+            "[CRICKET] ProExch Betfair result error:",
             exc,
         )
 
@@ -553,11 +559,10 @@ def proexch_result(
                 "success": False,
                 "detail": (
                     "Unable to load "
-                    "ProExch result"
+                    "ProExch Betfair result"
                 ),
             },
         )
-
 
 # =========================================================
 # SINGLE MATCH

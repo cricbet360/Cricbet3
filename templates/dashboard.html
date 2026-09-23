@@ -7,249 +7,8 @@
 
     <title>CricBet - Cricket</title>
 
-    <link rel="stylesheet" href="/static/css/dashboard.css?v=34" />
-    <style>
-      /* =========================================================
-   TOPBAR ACCOUNT / HAMBURGER MENU
-========================================================= */
-
-      .topbar-right {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 10px;
-        flex-wrap: nowrap;
-      }
-
-      /* Balance */
-
-      .topbar-right .balance {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        justify-content: center;
-        flex-shrink: 0;
-        white-space: nowrap;
-      }
-
-      .topbar-right .balance-label {
-        font-size: 10px;
-        line-height: 12px;
-        text-transform: uppercase;
-      }
-
-      .topbar-right .balance-value {
-        white-space: nowrap;
-      }
-
-      /* Deposit / Withdraw */
-
-      .topbar-right .topbar-action {
-        flex-shrink: 0;
-        white-space: nowrap;
-      }
-
-      /* =========================================================
-   HAMBURGER
-========================================================= */
-
-      .account-menu {
-        position: relative;
-        flex-shrink: 0;
-      }
-
-      .account-menu-toggle {
-        width: 42px;
-        height: 38px;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-
-        gap: 4px;
-
-        padding: 0;
-
-        border: 1px solid #28533e;
-        border-radius: 6px;
-
-        background: #102c20;
-        cursor: pointer;
-      }
-
-      .account-menu-toggle:hover {
-        background: #17412d;
-      }
-
-      .account-menu-toggle span {
-        display: block;
-
-        width: 18px;
-        height: 2px;
-
-        background: #ffffff;
-
-        border-radius: 2px;
-
-        transition:
-          transform 0.2s ease,
-          opacity 0.2s ease;
-      }
-
-      /* Hamburger -> X */
-
-      .account-menu-toggle[aria-expanded="true"] span:nth-child(1) {
-        transform: translateY(6px) rotate(45deg);
-      }
-
-      .account-menu-toggle[aria-expanded="true"] span:nth-child(2) {
-        opacity: 0;
-      }
-
-      .account-menu-toggle[aria-expanded="true"] span:nth-child(3) {
-        transform: translateY(-6px) rotate(-45deg);
-      }
-
-      /* =========================================================
-   PROFILE / LOGOUT DROPDOWN
-========================================================= */
-
-      .account-menu-dropdown {
-        position: absolute;
-
-        top: calc(100% + 8px);
-        right: 0;
-
-        min-width: 145px;
-
-        display: none;
-        flex-direction: column;
-
-        padding: 6px;
-
-        background: #092519;
-
-        border: 1px solid #28533e;
-        border-radius: 7px;
-
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
-
-        z-index: 9999;
-      }
-
-      .account-menu-dropdown.open {
-        display: flex;
-      }
-
-      .account-menu-dropdown a {
-        display: flex;
-        align-items: center;
-
-        min-height: 36px;
-
-        padding: 0 12px;
-
-        text-decoration: none;
-
-        border-radius: 5px;
-
-        white-space: nowrap;
-      }
-
-      /* Profile */
-
-      .account-menu-dropdown .profile-link {
-        color: #dce9e3;
-      }
-
-      .account-menu-dropdown .profile-link:hover {
-        background: #143c29;
-      }
-
-      /* Logout */
-
-      .account-menu-dropdown .logout {
-        color: #ffaaaa;
-      }
-
-      .account-menu-dropdown .logout:hover {
-        background: #321817;
-      }
-
-      /* =========================================================
-   MOBILE
-========================================================= */
-
-      @media (max-width: 700px) {
-        .topbar {
-          width: 100%;
-        }
-
-        .topbar-right {
-          width: auto;
-
-          display: flex;
-
-          flex-direction: row;
-
-          align-items: center;
-
-          justify-content: flex-end;
-
-          gap: 6px;
-
-          flex-wrap: nowrap;
-        }
-
-        /* Balance stays on the same line */
-
-        .topbar-right .balance {
-          flex-shrink: 1;
-          min-width: 0;
-
-          align-items: flex-end;
-        }
-
-        .topbar-right .balance-label {
-          font-size: 8px;
-        }
-
-        .topbar-right .balance-value {
-          font-size: 12px;
-        }
-
-        /* Buttons */
-
-        .topbar-right .topbar-action {
-          height: 36px;
-
-          padding: 0 12px;
-
-          font-size: 11px;
-
-          flex-shrink: 1;
-        }
-
-        /* Hamburger */
-
-        .account-menu-toggle {
-          width: 38px;
-          height: 36px;
-
-          flex-shrink: 0;
-        }
-
-        /* Hide old exposed links if any remain */
-
-        .topbar-right > .profile-link,
-        .topbar-right > .logout {
-          display: none;
-        }
-      }
-    </style>
-
-    <script src="/static/js/dashboard.js?v=35" defer></script>
+    <link rel="stylesheet" href="/static/css/dashboard.css?v=35" />
+    <script src="/static/js/dashboard.js?v=36" defer></script>
   </head>
 
   <body>
@@ -341,55 +100,42 @@
      MAIN CONTENT
 ===================================================== -->
 
+
     <main class="sportsbook-container">
       <section class="sportsbook-header">
         <div class="sport-title">
           <div class="sport-icon">🏏</div>
-
           <div>
             <h2>Cricket</h2>
-
-            <p>Live &amp; upcoming cricket matches</p>
+            <p>All matches from ProExch · sorted by date &amp; time</p>
           </div>
         </div>
 
-        <div class="sport-filters">
-          <button type="button" class="sport-filter active" data-filter="all">
-            All
-          </button>
-
-          <button type="button" class="sport-filter" data-filter="live">
-            Live
-          </button>
-
-          <button type="button" class="sport-filter" data-filter="upcoming">
-            Upcoming
-          </button>
+        <div class="sport-filters" role="tablist" aria-label="Match filters">
+          <button type="button" class="sport-filter active" data-filter="all">All</button>
+          <button type="button" class="sport-filter" data-filter="live">Live</button>
+          <button type="button" class="sport-filter" data-filter="upcoming">Upcoming</button>
         </div>
       </section>
 
-      <!-- =================================================
-         MATCHES
-    ================================================= -->
-
       <section class="matches-wrapper">
         <div class="odds-header">
-          <div class="match-column">Match</div>
-
+          <div class="match-column">MATCH</div>
+          <div class="feature-column tv-header">TV</div>
+          <div class="feature-column fancy-header">F</div>
+          <div class="feature-column bm-header">BM</div>
           <div class="odds-column-header back-header">BACK</div>
-
           <div class="odds-column-header lay-header">LAY</div>
-
-          <div class="odds-column-header draw-header">DRAW</div>
+          <div class="odds-column-header back-header">BACK</div>
+          <div class="odds-column-header lay-header">LAY</div>
+          <div class="odds-column-header back-header">BACK</div>
         </div>
 
         <div id="matches">
           <div class="empty-state">
             <div class="empty-state-icon">🏏</div>
-
             <div class="empty-state-title">Loading cricket matches...</div>
-
-            <div class="empty-state-text">Fetching live cricket data.</div>
+            <div class="empty-state-text">Fetching the latest ProExch match list.</div>
           </div>
         </div>
       </section>

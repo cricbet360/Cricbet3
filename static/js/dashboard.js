@@ -7,7 +7,7 @@
 
 const WHATSAPP_NUMBER = "919289461279";
 
-const MATCH_REFRESH_MS = 30000;
+const MATCH_REFRESH_MS = 15000;
 const ODDS_REFRESH_MS = 5000;
 const BET_REFRESH_MS = 10000;
 const BALANCE_REFRESH_MS = 15000;
@@ -815,88 +815,169 @@ function sortMatchesByTime(matches) {
 /* =========================================================
    MATCH VISIBILITY / TAB FILTERING
 
-   LIVE      matches currently in play, earliest start first
-   UPCOMING  matches not started yet (any future date),
-             soonest first
-   ALL       today's matches only: everything in play plus
-             everything still to be played today, in time
-             order. Past and finished matches never show.
-
-   A match with no readable start time cannot be proven past,
-   so it stays visible (last in the list) rather than vanishing.
+   ALL       every match returned by the ProExch API, sorted by
+             event date/time.
+   LIVE      only matches explicitly marked in-play by ProExch.
+   UPCOMING  only matches whose scheduled time is in the future.
 ========================================================= */
 
 function isActiveMatch(match) {
-
-    const type =
-        getMatchStatus(match).type;
-
-    return (
-        type !== "finished" &&
-        type !== "past"
-    );
+    const type = getMatchStatus(match).type;
+    return type !== "finished" && type !== "past";
 }
 
-
-function getMatchesForFilter(
-    matches,
-    filter
-) {
-
+function getMatchesForFilter(matches, filter) {
     const now = Date.now();
 
-    const visible =
-        matches.filter(
-            match => {
+    const visible = matches.filter(match => {
+        const type = getMatchStatus(match).type;
 
-                const type =
-                    getMatchStatus(match).type;
+        if (filter === "live") {
+            return type === "live";
+        }
 
+        if (filter === "upcoming") {
+            const timestamp = getEventTimestamp(match);
+            return type === "upcoming" || (
+                type === "unknown" && false
+            ) || (
+                Number.isFinite(timestamp) && timestamp > now
+            );
+        }
 
-                if (
-                    type === "finished" ||
-                    type === "past"
-                ) {
-                    return false;
-                }
+        // ALL = do not restrict by today/date. Show the complete
+        // response returned by the provider.
+        return true;
+    });
 
-
-                if (filter === "live") {
-
-                    return type === "live";
-                }
-
-
-                if (filter === "upcoming") {
-
-                    return type !== "live";
-                }
-
-
-                /*
-                 * ALL
-                 */
-
-                if (
-                    type === "live" ||
-                    type === "unknown"
-                ) {
-                    return true;
-                }
-
-                return isSameLocalDay(
-                    getEventTimestamp(match),
-                    now
-                );
-            }
-        );
-
-
-    return sortMatchesByTime(
-        visible
-    );
+    return sortMatchesByTime(visible);
 }
 
+/* =========================================================
+   MATCH FEATURE FLAGS
+========================================================= */
+
+function hasTruthyProviderValue(value) {
+    if (value === true || value === 1) return true;
+    if (typeof value === "string") {
+        const text = value.trim().toLowerCase();
+        return text !== "" && !["0", "false", "no", "null", "undefined", "-"].includes(text);
+    }
+    return Boolean(value);
+}
+
+function getRawMatch(match) {
+    return match?.raw && typeof match.raw === "object"
+        ? match.raw
+        : match;
+}
+
+function hasLiveTv(match) {
+    const raw = getRawMatch(match) || {};
+    const values = [
+        match?.tv,
+        raw.tv,
+        raw.TV,
+        raw.liveTv,
+        raw.liveTV,
+        raw.live_tv,
+        raw.stream,
+        raw.streamUrl,
+        raw.stream_url,
+        raw.video,
+        raw.videoUrl,
+        raw.video_url
+    ];
+
+    return values.some(hasTruthyProviderValue);
+}
+
+function hasFancyHint(match) {
+    const raw = getRawMatch(match) || {};
+    const values = [
+        raw.fancy,
+        raw.fancyOdds,
+        raw.fancy_odds,
+        raw.hasFancy,
+        raw.has_fancy,
+        raw.fancyAvailable,
+        raw.fancy_available
+    ];
+    return values.some(hasTruthyProviderValue);
+}
+
+function hasBookmakerHint(match) {
+    const raw = getRawMatch(match) || {};
+    const values = [
+        raw.bookmaker,
+        raw.bookmakerOdds,
+        raw.bookmaker_odds,
+        raw.bookMakerOdds,
+        raw.hasBookmaker,
+        raw.has_bookmaker
+    ];
+    return values.some(hasTruthyProviderValue);
+}
+
+function getOddsRootForFeatures(payload) {
+    if (!payload || typeof payload !== "object") return null;
+    if (payload.data && typeof payload.data === "object") return payload.data;
+    return payload;
+}
+
+function hasFancyOdds(payload) {
+    const root = getOddsRootForFeatures(payload);
+    return Array.isArray(root?.fancy_odds) && root.fancy_odds.length > 0;
+}
+
+function hasBookmakerOdds(payload) {
+    const root = getOddsRootForFeatures(payload);
+    return Array.isArray(root?.bookmaker_odds) && root.bookmaker_odds.length > 0;
+}
+
+function updateFeatureCell(row, selector, visible, html) {
+    const cell = row?.querySelector(selector);
+    if (!cell) return;
+    cell.innerHTML = visible ? html : "";
+    cell.classList.toggle("feature-available", Boolean(visible));
+}
+
+function updateMatchFeatures(match, payload) {
+    const gameId = getGameId(match);
+    if (!gameId) return;
+
+    const escaped = typeof CSS !== "undefined" && CSS.escape
+        ? CSS.escape(gameId)
+        : gameId.replaceAll('"', '\"');
+
+    const row = document.querySelector(
+        `.sportsbook-match-row[data-game-id="${escaped}"]`
+    );
+    if (!row) return;
+
+    const matchUrl = `/match/${encodeURIComponent(gameId)}`;
+
+    updateFeatureCell(
+        row,
+        ".feature-tv",
+        hasLiveTv(match),
+        `<a class="feature-link tv-feature" href="${matchUrl}" aria-label="Live TV available" title="Live TV available"><span class="tv-icon" aria-hidden="true"><span></span></span></a>`
+    );
+
+    updateFeatureCell(
+        row,
+        ".feature-fancy",
+        hasFancyHint(match) || hasFancyOdds(payload),
+        `<a class="feature-link fancy-feature" href="${matchUrl}" aria-label="Fancy available" title="Fancy available">f</a>`
+    );
+
+    updateFeatureCell(
+        row,
+        ".feature-bm",
+        hasBookmakerHint(match) || hasBookmakerOdds(payload),
+        `<a class="feature-link bm-feature" href="${matchUrl}" aria-label="Bookmaker available" title="Bookmaker available">BM</a>`
+    );
+}
 
 /* =========================================================
    WHATSAPP
@@ -1682,297 +1763,116 @@ function createOddsButton({
 ========================================================= */
 
 function createMatchRow(match) {
+    const gameId = getGameId(match);
+    const eventId = getEventId(match);
+    const marketId = getMarketId(match);
+    const eventName = getEventName(match);
+    const eventTime = getEventTime(match);
+    const team1 = getTeam1(match);
+    const team2 = getTeam2(match);
+    const team3 = getTeam3(match);
+    const status = getMatchStatus(match);
 
-    const gameId =
-        getGameId(match);
+    const odds = oddsCache.has(gameId)
+        ? normalizeMatchOdds(match, oddsCache.get(gameId))
+        : emptyOdds();
 
-    const eventId =
-        getEventId(match);
+    let statusClass = "upcoming-status";
+    if (status.type === "live") statusClass = "live-status";
+    else if (status.type === "starting") statusClass = "started-status";
+    else if (status.type === "finished" || status.type === "past") statusClass = "finished-status";
 
-    const marketId =
-        getMarketId(match);
-
-    const eventName =
-        getEventName(match);
-
-    const eventTime =
-        getEventTime(match);
-
-    const team1 =
-        getTeam1(match);
-
-    const team2 =
-        getTeam2(match);
-
-    const team3 =
-        getTeam3(match);
-
-
-    const status =
-        getMatchStatus(match);
-
-
-    const odds =
-        oddsCache.has(gameId)
-            ? normalizeMatchOdds(
-                match,
-                oddsCache.get(gameId)
-            )
-            : emptyOdds();
-
-
-    let statusClass =
-        "upcoming-status";
-
-
-    if (
-        status.type === "live"
-    ) {
-
-        statusClass =
-            "live-status";
-
-    } else if (
-        status.type === "starting"
-    ) {
-
-        statusClass =
-            "started-status";
-
-    } else if (
-        status.type === "finished"
-    ) {
-
-        statusClass =
-            "finished-status";
-    }
-
-
-    /*
-     * The dashboard has three odds columns.
-     *
-     * We preserve the existing layout:
-     *
-     * Column 1 = Match
-     * Column 2 = Back
-     * Column 3 = Lay
-     * Column 4 = Draw
-     *
-     * The BACK/ LAY cells show the first available
-     * team selection. The detailed Match page contains
-     * the complete market.
-     *
-     * To avoid misleading the user, we use the first
-     * team's BACK, second team's LAY, and draw/team3
-     * BACK in the existing compact table.
-     */
-
-
-    const team1Back =
-        odds.team1.back;
-
-    const team2Lay =
-        odds.team2.lay;
-
-    const drawBack =
-        team3
-            ? odds.team3.back
-            : null;
-
+    const matchUrl = `/match/${encodeURIComponent(gameId)}`;
+    const tvAvailable = hasLiveTv(match);
+    const fancyAvailable = hasFancyHint(match) || hasFancyOdds(oddsCache.get(gameId));
+    const bmAvailable = hasBookmakerHint(match) || hasBookmakerOdds(oddsCache.get(gameId));
 
     return `
-        <div
-            class="sportsbook-match-row"
-            data-game-id="${escapeHtml(gameId)}"
-            data-event-id="${escapeHtml(eventId)}"
-            data-market-id="${escapeHtml(marketId)}"
-        >
-
+        <div class="sportsbook-match-row"
+             data-game-id="${escapeHtml(gameId)}"
+             data-event-id="${escapeHtml(eventId)}"
+             data-market-id="${escapeHtml(marketId)}">
 
             <div class="match-information">
-
-
                 <div class="match-status-line">
-
-                    ${
-                        status.type === "live"
-                            ? `
-                                <span class="live-dot"></span>
-                            `
-                            : ""
-                    }
-
-
-                    <span
-                        class="match-status ${statusClass}"
-                    >
-                        ${escapeHtml(status.label)}
-                    </span>
-
-
-                    <span class="match-time">
-                        ${escapeHtml(
-                            formatMatchTime(eventTime)
-                        )}
-                    </span>
-
+                    ${status.type === "live" ? '<span class="live-dot"></span>' : ''}
+                    <span class="match-status ${statusClass}">${escapeHtml(status.label)}</span>
+                    <span class="match-time">${escapeHtml(formatMatchTime(eventTime))}</span>
                 </div>
 
-
-                <div class="match-name">
+                <a class="match-name" href="${matchUrl}" title="${escapeHtml(eventName)}">
                     ${escapeHtml(eventName)}
-                </div>
-
-
-                <div class="team-names">
-
-                    <div class="team-name">
-                        ${escapeHtml(team1)}
-                    </div>
-
-
-                    <div class="team-name">
-                        ${escapeHtml(team2)}
-                    </div>
-
-
-                    ${
-                        team3
-                            ? `
-                                <div class="team-name">
-                                    ${escapeHtml(team3)}
-                                </div>
-                            `
-                            : ""
-                    }
-
-                </div>
-
-
-                <div class="match-league">
-                    Cricket
-                </div>
-
-            </div>
-
-
-            <!-- BACK -->
-
-            ${createOddsButton({
-
-                gameId,
-                eventId,
-                marketId,
-
-                selectionId:
-                    odds.team1.selectionId ||
-                    getSelectionId(match, 1),
-
-                team:
-                    odds.team1.name ||
-                    team1,
-
-                side:
-                    "back",
-
-                price:
-                    team1Back,
-
-                className:
-                    "odds-team-1"
-
-            })}
-
-
-            <!-- LAY -->
-
-            ${createOddsButton({
-
-                gameId,
-                eventId,
-                marketId,
-
-                selectionId:
-                    odds.team2.selectionId ||
-                    getSelectionId(match, 2),
-
-                team:
-                    odds.team2.name ||
-                    team2,
-
-                side:
-                    "lay",
-
-                price:
-                    team2Lay,
-
-                className:
-                    "odds-team-2"
-
-            })}
-
-
-            <!-- DRAW / THIRD RUNNER -->
-
-            ${
-                team3
-                    ? createOddsButton({
-
-                        gameId,
-                        eventId,
-                        marketId,
-
-                        selectionId:
-                            odds.team3.selectionId ||
-                            getSelectionId(
-                                match,
-                                3
-                            ),
-
-                        team:
-                            odds.team3.name ||
-                            team3,
-
-                        side:
-                            "back",
-
-                        price:
-                            drawBack,
-
-                        className:
-                            "odds-draw"
-
-                    })
-                    : `
-                        <div
-                            class="odds-cell odds-empty"
-                            aria-disabled="true"
-                        >
-                            <span class="odds-price">
-                                -
-                            </span>
-                        </div>
-                    `
-            }
-
-
-            <div class="match-action">
-
-                <a
-                    class="view-match-button"
-                    href="/match/${encodeURIComponent(gameId)}"
-                >
-                    <span>→</span>
-                    VIEW MATCH
                 </a>
 
+                <div class="team-names">
+                    <div class="team-name">${escapeHtml(team1)}</div>
+                    <div class="team-name">${escapeHtml(team2)}</div>
+                    ${team3 ? `<div class="team-name">${escapeHtml(team3)}</div>` : ''}
+                </div>
+
+                <div class="match-league">Cricket</div>
             </div>
 
+            <div class="feature-cell feature-tv">
+                ${tvAvailable ? `<a class="feature-link tv-feature" href="${matchUrl}" aria-label="Live TV available" title="Live TV available"><span class="tv-icon" aria-hidden="true"><span></span></span></a>` : ''}
+            </div>
+
+            <div class="feature-cell feature-fancy">
+                ${fancyAvailable ? `<a class="feature-link fancy-feature" href="${matchUrl}" aria-label="Fancy available" title="Fancy available">f</a>` : ''}
+            </div>
+
+            <div class="feature-cell feature-bm">
+                ${bmAvailable ? `<a class="feature-link bm-feature" href="${matchUrl}" aria-label="Bookmaker available" title="Bookmaker available">BM</a>` : ''}
+            </div>
+
+            ${createOddsButton({
+                gameId, eventId, marketId,
+                selectionId: odds.team1.selectionId || getSelectionId(match, 1),
+                team: odds.team1.name || team1,
+                side: "back",
+                price: odds.team1.back,
+                className: "odds-team-1"
+            })}
+
+            ${createOddsButton({
+                gameId, eventId, marketId,
+                selectionId: odds.team1.selectionId || getSelectionId(match, 1),
+                team: odds.team1.name || team1,
+                side: "lay",
+                price: odds.team1.lay,
+                className: "odds-team-1-lay"
+            })}
+
+            ${createOddsButton({
+                gameId, eventId, marketId,
+                selectionId: odds.team2.selectionId || getSelectionId(match, 2),
+                team: odds.team2.name || team2,
+                side: "back",
+                price: odds.team2.back,
+                className: "odds-team-2"
+            })}
+
+            ${createOddsButton({
+                gameId, eventId, marketId,
+                selectionId: odds.team2.selectionId || getSelectionId(match, 2),
+                team: odds.team2.name || team2,
+                side: "lay",
+                price: odds.team2.lay,
+                className: "odds-team-2-lay"
+            })}
+
+            ${team3 ? createOddsButton({
+                gameId, eventId, marketId,
+                selectionId: odds.team3.selectionId || getSelectionId(match, 3),
+                team: odds.team3.name || team3,
+                side: "back",
+                price: odds.team3.back,
+                className: "odds-draw"
+            }) : `<div class="odds-cell odds-empty"><span class="odds-price">-</span></div>`}
 
         </div>
     `;
 }
-
 
 /* =========================================================
    LOAD MATCHES
@@ -2361,9 +2261,10 @@ async function loadAllOdds() {
      */
 
     const activeMatches =
-        allMatches.filter(
-            isActiveMatch
-        );
+        allMatches.filter(match => {
+            const type = getMatchStatus(match).type;
+            return type !== "finished" && type !== "past";
+        });
 
 
     if (
@@ -2400,129 +2301,44 @@ async function loadAllOdds() {
 ========================================================= */
 
 function updateMatchOdds(match) {
+    const gameId = getGameId(match);
+    if (!gameId || !oddsCache.has(gameId)) return;
 
-    const gameId =
-        getGameId(match);
+    const escapedGameId = typeof CSS !== "undefined" && CSS.escape
+        ? CSS.escape(gameId)
+        : gameId.replaceAll('"', '\"');
 
-
-    if (
-        !gameId ||
-        !oddsCache.has(gameId)
-    ) {
-        return;
-    }
-
-
-    const escapedGameId =
-        typeof CSS !== "undefined" &&
-        CSS.escape
-            ? CSS.escape(gameId)
-            : gameId.replaceAll(
-                '"',
-                '\\"'
-            );
-
-
-    const row =
-        document.querySelector(
-            `.sportsbook-match-row[data-game-id="${escapedGameId}"]`
-        );
-
-
-    if (
-        !row
-    ) {
-        return;
-    }
-
-
-    const odds =
-        normalizeMatchOdds(
-            match,
-            oddsCache.get(gameId)
-        );
-
-
-    const backButton =
-        row.querySelector(
-            ".odds-team-1"
-        );
-
-
-    const layButton =
-        row.querySelector(
-            ".odds-team-2"
-        );
-
-
-    const drawButton =
-        row.querySelector(
-            ".odds-draw"
-        );
-
-
-    updateOddsButton(
-        backButton,
-        odds.team1.back
+    const row = document.querySelector(
+        `.sportsbook-match-row[data-game-id="${escapedGameId}"]`
     );
+    if (!row) return;
 
+    const payload = oddsCache.get(gameId);
+    const odds = normalizeMatchOdds(match, payload);
 
-    updateOddsButton(
-        layButton,
-        odds.team2.lay
-    );
+    updateOddsButton(row.querySelector(".odds-team-1"), odds.team1.back);
+    updateOddsButton(row.querySelector(".odds-team-1-lay"), odds.team1.lay);
+    updateOddsButton(row.querySelector(".odds-team-2"), odds.team2.back);
+    updateOddsButton(row.querySelector(".odds-team-2-lay"), odds.team2.lay);
+    updateOddsButton(row.querySelector(".odds-draw"), odds.team3.back);
 
+    const buttons = [
+        [".odds-team-1", odds.team1.selectionId],
+        [".odds-team-1-lay", odds.team1.selectionId],
+        [".odds-team-2", odds.team2.selectionId],
+        [".odds-team-2-lay", odds.team2.selectionId],
+        [".odds-draw", odds.team3.selectionId]
+    ];
 
-    updateOddsButton(
-        drawButton,
-        odds.team3.back
-    );
+    buttons.forEach(([selector, selectionId]) => {
+        const button = row.querySelector(selector);
+        if (button && selectionId !== null && selectionId !== undefined) {
+            button.dataset.selectionId = String(selectionId);
+        }
+    });
 
-
-    /*
-     * Keep actual ProExch selection IDs on the
-     * clickable dashboard buttons.
-     */
-
-    if (
-        backButton &&
-        odds.team1.selectionId !== null &&
-        odds.team1.selectionId !== undefined
-    ) {
-
-        backButton.dataset.selectionId =
-            String(
-                odds.team1.selectionId
-            );
-    }
-
-
-    if (
-        layButton &&
-        odds.team2.selectionId !== null &&
-        odds.team2.selectionId !== undefined
-    ) {
-
-        layButton.dataset.selectionId =
-            String(
-                odds.team2.selectionId
-            );
-    }
-
-
-    if (
-        drawButton &&
-        odds.team3.selectionId !== null &&
-        odds.team3.selectionId !== undefined
-    ) {
-
-        drawButton.dataset.selectionId =
-            String(
-                odds.team3.selectionId
-            );
-    }
+    updateMatchFeatures(match, payload);
 }
-
 
 /* =========================================================
    UPDATE ODDS BUTTON
@@ -2676,7 +2492,7 @@ function renderMatches() {
     ) {
 
         let message =
-            "There are no cricket matches scheduled for today.";
+            "The ProExch API returned no cricket matches.";
 
 
         if (

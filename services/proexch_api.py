@@ -3277,25 +3277,34 @@ def get_cricketbz_result(
     )
 
 
-def get_proexch_result(
-    game_id: Any,
+def get_proexch_betfair_result(
+    market_id: Any,
+    result_type: str = "new_fancy",
 ) -> Dict[str, Any]:
-
-    game_id = str(
-        game_id or ""
+   
+    market_id = str(
+        market_id or ""
     ).strip()
 
-    if not game_id:
-
+    if not market_id:
         return {
             "success": False,
             "result": None,
+            "message": "Missing market ID.",
         }
+
+    result_type = str(
+        result_type or "new_fancy"
+    ).strip()
+
+    cache_key = (
+        f"betfair:{result_type}:{market_id}"
+    )
 
     now = _now()
 
     cached = _result_cache.get(
-        game_id
+        cache_key
     )
 
     if cached:
@@ -3317,39 +3326,52 @@ def get_proexch_result(
 
     try:
 
-        raw = get_cricketbz_result(
-            game_id
+        raw = _request(
+            "/api/betfair-result",
+            params={
+                "sport": "cricket",
+                "type": result_type,
+                "marketId": market_id,
+            },
         )
 
         normalized = {
             "success": True,
+            "market_id": market_id,
+            "type": result_type,
             "result": raw,
             "raw": raw,
         }
 
         _result_cache[
-            game_id
+            cache_key
         ] = {
             "timestamp": now,
             "data": normalized,
         }
+
+        print(
+            "[PROEXCH BETFAIR RESULT]",
+            market_id,
+            raw,
+        )
 
         return normalized
 
     except Exception as exc:
 
         print(
-            "[PROEXCH] Result request failed:",
+            "[PROEXCH] Betfair result request failed:",
             repr(exc),
         )
 
         return {
             "success": False,
+            "market_id": market_id,
+            "type": result_type,
             "result": None,
             "message": str(exc),
         }
-
-
 # =========================================================
 # VIDEO
 # =========================================================
