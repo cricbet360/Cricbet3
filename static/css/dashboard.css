@@ -2139,3 +2139,217 @@ a:focus-visible {
         font-size: 7.5px;
     }
 }
+
+/* =========================================================
+   ACCOUNT HAMBURGER MENU
+========================================================= */
+
+.account-menu {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    z-index: 1100;
+}
+
+.account-menu-toggle {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    background: #102f21;
+    border: 1px solid #28533e;
+    border-radius: 6px;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.account-menu-toggle span {
+    display: block;
+    width: 17px;
+    height: 2px;
+    flex: 0 0 2px;
+    background: #dce9e3;
+    border-radius: 2px;
+    transition:
+        transform 0.2s ease,
+        opacity 0.2s ease,
+        background 0.2s ease;
+}
+
+.account-menu-toggle:hover {
+    background: #173b29;
+    border-color: #397357;
+}
+
+.account-menu-toggle:focus-visible {
+    outline: 2px solid #28c878;
+    outline-offset: 2px;
+}
+
+/* Hamburger -> X */
+
+.account-menu-toggle[aria-expanded="true"] span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.account-menu-toggle[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+}
+
+.account-menu-toggle[aria-expanded="true"] span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+/* =========================================================
+   ACCOUNT DROPDOWN
+========================================================= */
+
+.account-menu-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+
+    width: 150px;
+    padding: 6px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    background: #0a2117;
+    border: 1px solid #28533e;
+    border-radius: 8px;
+
+    box-shadow:
+        0 14px 35px rgba(0, 0, 0, 0.45);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transform: translateY(-6px);
+
+    transition:
+        opacity 0.18s ease,
+        visibility 0.18s ease,
+        transform 0.18s ease;
+}
+
+.account-menu-dropdown.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.account-menu-dropdown .profile-link,
+.account-menu-dropdown .logout {
+    width: 100%;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    padding: 0 11px;
+
+    border-radius: 5px;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    box-sizing: border-box;
+}
+
+.account-menu-dropdown .profile-link {
+    color: #c4d6ce;
+}
+
+.account-menu-dropdown .profile-link:hover {
+    background: #112d20;
+    color: #ffffff;
+}
+
+.account-menu-dropdown .logout {
+    color: #e09b9f;
+}
+
+.account-menu-dropdown .logout:hover {
+    background: #321817;
+    color: #ffb7bb;
+}
+
+/* =========================================================
+   TOPBAR SAFETY
+========================================================= */
+
+.topbar,
+.topbar-right,
+.account-menu {
+    box-sizing: border-box;
+}
+
+.topbar-right {
+    min-width: 0;
+}
+
+.account-menu-dropdown a {
+    text-decoration: none;
+}
+
+/* =========================================================
+   MOBILE ACCOUNT MENU
+========================================================= */
+
+@media (max-width: 750px) {
+
+    .account-menu-toggle {
+        width: 34px;
+        height: 34px;
+    }
+
+    .account-menu-toggle span {
+        width: 16px;
+    }
+
+    .account-menu-dropdown {
+        top: calc(100% + 7px);
+        right: 0;
+        width: 145px;
+    }
+
+    .account-menu-dropdown .profile-link,
+    .account-menu-dropdown .logout {
+        display: flex !important;
+        min-height: 36px;
+        padding: 0 10px;
+        font-size: 10px;
+    }
+}
+
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media (max-width: 360px) {
+
+    .account-menu-toggle {
+        width: 32px;
+        height: 32px;
+    }
+
+    .account-menu-toggle span {
+        width: 15px;
+        height: 2px;
+    }
+
+    .account-menu-dropdown {
+        right: -2px;
+        width: 140px;
+    }
+}
