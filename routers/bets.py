@@ -498,16 +498,16 @@ async def place_bet(
 
             selection_id=selection_id,
 
-            selection_name=selection_name,
+            runner_name=selection_name,
 
             side=side,
 
-            odds=float(odds),
+            price=float(odds),
 
-            stake=float(stake),
+           
             
 
-            market_name=stored_market_name,
+            market_name=market_name,
 
             event_name=None,
         )
