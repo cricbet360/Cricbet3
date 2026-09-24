@@ -489,7 +489,7 @@ async def place_bet(
         # BET SELECTION
         # -------------------------------------------------
 
-        selection = BetSelection(
+        bet_selection = BetSelection(
             bet_id=bet.id,
 
             market_id=market_id,
@@ -498,24 +498,21 @@ async def place_bet(
 
             selection_id=selection_id,
 
-            runner_name=selection_name,
+            selection_name=selection_name,
 
             side=side,
 
-            price=float(odds),
+            odds=float(odds),
 
-            payout_percent=(
-                float(payout_percent)
-                if payout_percent is not None
-                else None
-            ),
+            stake=float(stake),
+            
 
             market_name=stored_market_name,
 
             event_name=None,
         )
 
-        db.add(selection)
+        db.add(bet_selection)
 
         # -------------------------------------------------
         # UPDATE USER BALANCE
