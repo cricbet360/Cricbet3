@@ -3332,7 +3332,7 @@
           const stake = numberValue(item.stake);
 
           const marketType = 
-            string(item.marketType || "").toUpperCase();
+            String(item.marketType || "").toUpperCase();
 
           let payoutMultiplier =
             numberValue(item.odds);
