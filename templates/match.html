@@ -2059,8 +2059,6 @@
 
       let betSlipItems = [];
 
-      const BET_SLIP_STORAGE = "crickbet_bet_slip";
-
       const MATCH_PATH_GAME_ID = decodeURIComponent(
         window.location.pathname.split("/").filter(Boolean).pop() || "",
       );
@@ -2354,20 +2352,26 @@
             query.set("marketId", marketId);
           }
 
-          const response = await fetch(
-            "/api/cricket/odds?" + query.toString(),
-            {
-              method: "GET",
+          const controller = new AbortController();
+          const requestTimer = window.setTimeout(() => controller.abort(), 4500);
 
-              credentials: "same-origin",
-
-              cache: "no-store",
-
-              headers: {
-                Accept: "application/json",
+          let response;
+          try {
+            response = await fetch(
+              "/api/cricket/odds?" + query.toString(),
+              {
+                method: "GET",
+                credentials: "same-origin",
+                cache: "no-store",
+                signal: controller.signal,
+                headers: {
+                  Accept: "application/json",
+                },
               },
-            },
-          );
+            );
+          } finally {
+            window.clearTimeout(requestTimer);
+          }
 
           if (!response.ok) {
             throw new Error("HTTP " + response.status);
@@ -2822,6 +2826,7 @@
             name,
             selectionId,
             "BACK",
+            market.id || market.market_id || market.marketId || marketId,
           );
 
           html += createOddBox(
@@ -2833,6 +2838,7 @@
             name,
             selectionId,
             "LAY",
+            market.id || market.market_id || market.marketId || marketId,
           );
 
           html += "</div>";
@@ -2869,7 +2875,7 @@
         selection,
         selectionId,
         side,
-        betMarketId,
+        marketIdValue = "",
       ) {
         const numericPrice = Number(price);
 
@@ -2921,9 +2927,6 @@
           ' data-bet-market-type="' +
           escapeAttribute(marketType) +
           '"' +
-          ' data-bet-market-id="' +
-          escapeAttribute(betMarketId || marketId || "") +
-          '"' +
           ' data-bet-market-name="' +
           escapeAttribute(marketName) +
           '"' +
@@ -2932,6 +2935,9 @@
           '"' +
           ' data-bet-selection-id="' +
           escapeAttribute(selectionId) +
+          '"' +
+          ' data-bet-market-id="' +
+          escapeAttribute(marketIdValue) +
           '"' +
           ' data-bet-side="' +
           escapeAttribute(side) +
@@ -2974,25 +2980,20 @@
       function attachBetEvents() {
         document.querySelectorAll("[data-bet-market-type]").forEach((box) => {
           box.addEventListener("click", () => {
-            openBetSlip();
-
             const odds = Number(box.dataset.betOdds);
 
             const selectionId = box.dataset.betSelectionId;
 
             if (!Number.isFinite(odds) || odds <= 1) {
-              showBetMessage(
-                "Selected price is unavailable. Please choose an active price.",
-                "error",
-              );
               return;
             }
 
             if (!selectionId) {
               showBetMessage(
-                "Selection ID is unavailable from ProExch for this market. Refresh the odds and try again.",
+                "Selection ID is unavailable. Refresh the odds and try again.",
                 "error",
               );
+
               return;
             }
 
@@ -3002,9 +3003,7 @@
               eventId: String(eventId || gameId),
 
               marketId: String(
-                box.dataset.betMarketId ||
-                marketId ||
-                ""
+                box.dataset.betMarketId || marketId || "",
               ),
 
               marketType: String(box.dataset.betMarketType).toUpperCase(),
@@ -3037,30 +3036,16 @@
         });
       }
 
+      /*
+       * Bet slip is intentionally SESSION-ONLY.
+       * Do not persist unplaced selections in localStorage.
+       */
       function loadBetSlip() {
-        try {
-          const raw = localStorage.getItem(BET_SLIP_STORAGE);
-
-          if (!raw) {
-            betSlipItems = [];
-
-            return;
-          }
-
-          const parsed = JSON.parse(raw);
-
-          betSlipItems = Array.isArray(parsed) ? parsed : [];
-        } catch (error) {
-          betSlipItems = [];
-        }
+        betSlipItems = [];
       }
 
       function saveBetSlip() {
-        try {
-          localStorage.setItem(BET_SLIP_STORAGE, JSON.stringify(betSlipItems));
-        } catch (error) {
-          console.error("[BETSLIP]", error);
-        }
+        // Intentionally empty. Unplaced bets must never survive a reload.
       }
 
       function addToBetSlip(item) {
@@ -3331,7 +3316,7 @@
         betSlipItems.forEach((item) => {
           const stake = numberValue(item.stake);
 
-          const marketType = 
+          const marketType =
             String(item.marketType || "").toUpperCase();
 
           let payoutMultiplier =
@@ -3425,7 +3410,6 @@
 
         if (!betSlipItems.length) {
           showBetMessage("Your bet slip is empty.", "error");
-
           return;
         }
 
@@ -3436,7 +3420,6 @@
 
         if (invalid) {
           showBetMessage("Enter a valid stake for every selection.", "error");
-
           return;
         }
 
@@ -3444,94 +3427,66 @@
 
         if (button) {
           button.disabled = true;
-
           button.textContent = "Placing...";
         }
 
+        // Keep a snapshot. The slip is cleared ONLY after every request succeeds.
+        const pendingBets = betSlipItems.map((item) => ({ ...item }));
         let placedCount = 0;
 
         try {
-          for (let index = 0; index < betSlipItems.length; index++) {
-            const item = betSlipItems[index];
-
+          for (const item of pendingBets) {
             const requestBody = {
               game_id: String(item.gameId),
-
               event_id: String(item.eventId || item.gameId),
-
               market_id: String(item.marketId || ""),
-
-              market_type: String(item.marketType).toUpperCase(),
-
+              market_type: String(item.marketType || "").toUpperCase(),
               market_name: String(item.marketName || ""),
-
               selection_id: String(item.selectionId),
-
               selection_name: String(item.selectionName),
-
-              side: String(item.side).toUpperCase(),
-
+              side: String(item.side || "BACK").toUpperCase(),
               odds: Number(item.odds),
-
               payout_percent:
-                (
-                  String(item.marketType || "")
-                    .toUpperCase() === "FANCY" ||
-                  String(item.marketType || "")
-                    .toUpperCase() === "SESSION"
+                ["FANCY", "SESSION"].includes(
+                  String(item.marketType || "").toUpperCase(),
                 )
                   ? Number(item.payoutPercent || 0)
                   : null,
-
               stake: Number(item.stake),
             };
 
             const response = await fetch("/bets/place", {
               method: "POST",
-
               headers: {
                 "Content-Type": "application/json",
-
                 Accept: "application/json",
               },
-
               credentials: "same-origin",
-
               body: JSON.stringify(requestBody),
             });
 
             let data = {};
-
             try {
               data = await response.json();
             } catch (error) {}
 
-            if (!response.ok) {
+            if (!response.ok || data.success === false) {
               throw new Error(
                 data.message || data.detail || "Bet placement failed.",
               );
             }
 
-            if (data.success === false) {
-              throw new Error(data.message || "Bet placement failed.");
-            }
-
             placedCount++;
-
-            betSlipItems = betSlipItems.filter(
-              (_, itemIndex) => itemIndex !== index,
-            );
-
-            index--;
-
-            saveBetSlip();
-
-            renderBetSlip();
 
             if (data.balance !== undefined) {
               updateDisplayedBalance(data.balance);
             }
           }
+
+          // IMPORTANT: clear ONLY after all bets were actually accepted.
+          betSlipItems = [];
+          renderBetSlip();
+          minimizeBetSlip();
 
           showBetMessage(
             placedCount +
@@ -3543,11 +3498,13 @@
         } catch (error) {
           console.error("[BET]", error);
 
+          // Do NOT clear the slip when placement fails.
+          renderBetSlip();
+          openBetSlip();
           showBetMessage(error.message || "Unable to place bet.", "error");
         } finally {
           if (button) {
             button.disabled = betSlipItems.length === 0;
-
             button.textContent = "Place Bet";
           }
         }
@@ -4802,7 +4759,7 @@
           if (document.visibilityState === "visible") {
             loadOdds();
           }
-        }, 3000);
+        }, 5000);
       }
 
       function stopOddsPolling() {
