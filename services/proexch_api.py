@@ -11,8 +11,8 @@ import requests
 
 BASE_URL = "https://apidata.proexch.in"
 
-REQUEST_TIMEOUT = 8
-MAX_RETRIES = 2
+REQUEST_TIMEOUT = 6
+MAX_RETRIES = 1
 
 MATCH_CACHE_TTL = 15.0
 ODDS_CACHE_TTL = 2.0
@@ -297,7 +297,7 @@ def _request(
 
             if attempt < MAX_RETRIES:
                 time.sleep(
-                    0.25 * (attempt + 1)
+                    0.10 * (attempt + 1)
                 )
 
     raise RuntimeError(
@@ -361,7 +361,7 @@ def _request_cricketbz(
 
             if attempt < MAX_RETRIES:
                 time.sleep(
-                    0.25 * (attempt + 1)
+                    0.10 * (attempt + 1)
                 )
 
     raise RuntimeError(
@@ -949,7 +949,11 @@ def parse_match_odds(
                             runner,
                             "id",
                             "selectionId",
+                            "selection_id",
                             "sid",
+                            "runnerId",
+                            "runner_id",
+                            "srno",
                             default="",
                         )
                     ),
@@ -1128,6 +1132,11 @@ def parse_bookmaker_odds(
                             runner,
                             "id",
                             "selectionId",
+                            "selection_id",
+                            "sid",
+                            "runnerId",
+                            "runner_id",
+                            "srno",
                             default="",
                         )
                     ),
@@ -1302,6 +1311,11 @@ def parse_fancy_odds(
                             runner,
                             "id",
                             "selectionId",
+                            "selection_id",
+                            "sid",
+                            "runnerId",
+                            "runner_id",
+                            "srno",
                             default="",
                         )
                     ),

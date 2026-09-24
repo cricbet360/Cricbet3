@@ -2578,6 +2578,7 @@
               name,
               selectionId,
               "BACK",
+              market.id || market.market_id || market.marketId || marketId,
             );
 
             html += createOddBox(
@@ -2589,6 +2590,7 @@
               name,
               selectionId,
               "LAY",
+              market.id || market.market_id || market.marketId || marketId,
             );
 
             html += "</div>";
@@ -2650,6 +2652,7 @@
               name,
               selectionId,
               "BACK",
+              market.id || market.market_id || market.marketId || marketId,
             );
 
             html += createOddBox(
@@ -2661,6 +2664,7 @@
               name,
               selectionId,
               "LAY",
+              market.id || market.market_id || market.marketId || marketId,
             );
 
             html += "</div>";
@@ -2753,6 +2757,7 @@
               name,
               selectionId,
               "BACK",
+              market.id || market.market_id || market.marketId || marketId,
             );
 
             html += createOddBox(
@@ -2764,6 +2769,7 @@
               name,
               selectionId,
               "LAY",
+              market.id || market.market_id || market.marketId || marketId,
             );
 
             html += "</div>";
@@ -2863,6 +2869,7 @@
         selection,
         selectionId,
         side,
+        betMarketId,
       ) {
         const numericPrice = Number(price);
 
@@ -2914,6 +2921,9 @@
           ' data-bet-market-type="' +
           escapeAttribute(marketType) +
           '"' +
+          ' data-bet-market-id="' +
+          escapeAttribute(betMarketId || marketId || "") +
+          '"' +
           ' data-bet-market-name="' +
           escapeAttribute(marketName) +
           '"' +
@@ -2964,20 +2974,25 @@
       function attachBetEvents() {
         document.querySelectorAll("[data-bet-market-type]").forEach((box) => {
           box.addEventListener("click", () => {
+            openBetSlip();
+
             const odds = Number(box.dataset.betOdds);
 
             const selectionId = box.dataset.betSelectionId;
 
             if (!Number.isFinite(odds) || odds <= 1) {
+              showBetMessage(
+                "Selected price is unavailable. Please choose an active price.",
+                "error",
+              );
               return;
             }
 
             if (!selectionId) {
               showBetMessage(
-                "Selection ID is unavailable. Refresh the odds and try again.",
+                "Selection ID is unavailable from ProExch for this market. Refresh the odds and try again.",
                 "error",
               );
-
               return;
             }
 
@@ -2986,7 +3001,11 @@
 
               eventId: String(eventId || gameId),
 
-              marketId: String(marketId || ""),
+              marketId: String(
+                box.dataset.betMarketId ||
+                marketId ||
+                ""
+              ),
 
               marketType: String(box.dataset.betMarketType).toUpperCase(),
 

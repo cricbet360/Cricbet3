@@ -364,181 +364,23 @@ async def match_page(
     )
 
     # ------------------------------------------------------
-    # LOAD ODDS
+    # ODDS
+    #
+    # Do NOT call ProExch odds while rendering the HTML page.
+    # The browser loads odds through /api/cricket/odds immediately
+    # after the page is displayed. Calling the provider here caused
+    # the match page to wait for a second odds request before HTML
+    # could be returned.
     # ------------------------------------------------------
 
-    odds_data = {
-        "match_odds": [],
-        "bookmaker_odds": [],
-        "fancy_odds": [],
-        "other_market_odds": [],
-        "counts": {},
-    }
-
-    odds_error = None
-
-    if market_id:
-
-        try:
-
-            odds_data = (
-                proexch_api.get_odds(
-                    game_id=game_id,
-                    event_id=event_id,
-                    market_id=market_id,
-                )
-            )
-
-        except Exception as exc:
-
-            odds_error = str(exc)
-
-            print(
-                "[CRICKET]  ODDS ERROR:",
-                odds_error,
-            )
-
-    else:
-
-        odds_error = (
-            "Did not provide a market ID."
-        )
-
-        print(
-            "[CRICKET] Missing market ID:",
-            game_id,
-        )
-
-    # ------------------------------------------------------
-    # NORMALIZED ODDS
-    #
-    # get_odds() already calls normalize_odds().
-    #
-    # Therefore:
-    #
-    # match_odds
-    # bookmaker_odds
-    # fancy_odds
-    # other_market_odds
-    #
-    # are already parsed.
-    # ------------------------------------------------------
-
-    match_odds = (
-        odds_data.get(
-            "match_odds",
-            []
-        )
-        if isinstance(
-            odds_data,
-            dict
-        )
-        else []
-    )
-
-    bookmaker_odds = (
-        odds_data.get(
-            "bookmaker_odds",
-            []
-        )
-        if isinstance(
-            odds_data,
-            dict
-        )
-        else []
-    )
-
-    fancy_odds = (
-        odds_data.get(
-            "fancy_odds",
-            []
-        )
-        if isinstance(
-            odds_data,
-            dict
-        )
-        else []
-    )
-
-    other_market_odds = (
-        odds_data.get(
-            "other_market_odds",
-            []
-        )
-        if isinstance(
-            odds_data,
-            dict
-        )
-        else []
-    )
-
-    counts = (
-        odds_data.get(
-            "counts",
-            {}
-        )
-        if isinstance(
-            odds_data,
-            dict
-        )
-        else {}
-    )
-
-    # ------------------------------------------------------
-    # FANCY MARKET IDS
-    #
-    # Do NOT call get_fancy_market_ids().
-    # That function does not exist in the current service.
-    #
-    # Build the IDs directly from normalized fancy markets.
-    # ------------------------------------------------------
-
+    match_odds = []
+    bookmaker_odds = []
+    fancy_odds = []
+    other_market_odds = []
+    counts = {}
     fancy_market_ids = []
-
-    if isinstance(
-        fancy_odds,
-        list
-    ):
-
-        for market in fancy_odds:
-
-            if not isinstance(
-                market,
-                dict
-            ):
-                continue
-
-            fancy_id = (
-                market.get("id")
-                or market.get("market_id")
-                or market.get("marketId")
-            )
-
-            if fancy_id:
-
-                fancy_market_ids.append(
-                    str(fancy_id)
-                )
-
-    # ------------------------------------------------------
-    # RAW DATA
-    #
-    # normalize_odds() keeps raw ProExch data under "raw".
-    # ------------------------------------------------------
-
     raw_odds = {}
-
-    if isinstance(
-        odds_data,
-        dict
-    ):
-
-        raw_odds = (
-            odds_data.get(
-                "raw",
-                {}
-            )
-        )
+    odds_error = None
 
     # ------------------------------------------------------
     # FINAL MATCH OBJECT
