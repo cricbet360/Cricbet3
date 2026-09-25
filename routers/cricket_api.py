@@ -1013,39 +1013,42 @@ def clear_cricket_cache(
         ),
     }
 
+
 # =========================================================
 # TEST PROEXCH BETFAIR RESULT - ANY MARKET ID
+# =========================================================
+#
+# DEVELOPMENT / TESTING ENDPOINT ONLY
+#
+# This endpoint intentionally does NOT require a user
+# session so ProExch results can be tested directly with curl.
+#
+# Examples:
+#
+# Fancy:
+# /api/cricket/test-result/36074941_55?result_type=new_fancy
+#
+# Match Odds:
+# /api/cricket/test-result/1.262839161?result_type=match_odds
+#
+# Bookmaker:
+# /api/cricket/test-result/36074941?result_type=bookmaker
+#
 # =========================================================
 
 @router.get("/test-result/{market_id}")
 def test_proexch_result(
-    request: Request,
     market_id: str,
     result_type: str = "new_fancy",
 ):
     """
-    Test ProExch Betfair result for ANY market ID.
+    Test the ProExch betfair-result API for ANY market ID.
 
-    Examples:
+    Authentication is intentionally disabled here because this
+    endpoint is for backend/API testing only.
 
-    Fancy:
-    /api/cricket/test-result/36074941_55?result_type=new_fancy
-
-    Match Odds:
-    /api/cricket/test-result/36074941?result_type=match_odds
-
-    Bookmaker:
-    /api/cricket/test-result/36095117?result_type=bookmaker
+    DO NOT use this endpoint for actual bet settlement.
     """
-
-    if not _is_logged_in(request):
-        return JSONResponse(
-            status_code=401,
-            content={
-                "success": False,
-                "detail": "Login required",
-            },
-        )
 
     market_id = str(
         market_id or ""
@@ -1067,11 +1070,44 @@ def test_proexch_result(
     if not result_type:
         result_type = "new_fancy"
 
+    # -----------------------------------------------------
+    # Only allow the result types that your ProExch
+    # integration is expected to use.
+    # -----------------------------------------------------
+
+    allowed_types = {
+        "new_fancy",
+        "match_odds",
+        "bookmaker",
+    }
+
+    if result_type not in allowed_types:
+        return JSONResponse(
+            status_code=422,
+            content={
+                "success": False,
+                "detail": (
+                    "Invalid result_type. "
+                    "Allowed values: "
+                    "new_fancy, match_odds, bookmaker"
+                ),
+            },
+        )
+
     try:
 
-        data = proexch_api.get_proexch_betfair_result(
-            market_id=market_id,
-            result_type=result_type,
+        data = (
+            proexch_api.get_proexch_betfair_result(
+                market_id=market_id,
+                result_type=result_type,
+            )
+        )
+
+        print(
+            "[PROEXCH TEST RESULT]",
+            market_id,
+            result_type,
+            data,
         )
 
         return {
@@ -1080,6 +1116,18 @@ def test_proexch_result(
             "result_type": result_type,
             "data": data,
         }
+
+    except ValueError as exc:
+
+        return JSONResponse(
+            status_code=422,
+            content={
+                "success": False,
+                "market_id": market_id,
+                "result_type": result_type,
+                "detail": str(exc),
+            },
+        )
 
     except Exception as exc:
 
@@ -1097,3 +1145,4 @@ def test_proexch_result(
                 "detail": str(exc),
             },
         )
+
