@@ -12,6 +12,7 @@ from models.bet import Bet
 from models.bet_selection import BetSelection
 from models.transaction import Transaction
 
+from services.bet_settlement import settle_pending_bets
 
 router = APIRouter(
     prefix="/bets",
@@ -496,6 +497,8 @@ async def place_bet(
 
             event_id=event_id,
 
+            market_type=market_type,
+
             selection_id=selection_id,
 
             runner_name=selection_name,
@@ -831,4 +834,48 @@ async def my_bets(
         return _error(
             f"Could not load bets: {exc}",
             500,
+        )
+
+@router.post("/settle-pending")
+def settle_pending(
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    user_id = request.session.get("user_id")
+
+    if not user_id:
+        return JSONResponse(
+            status_code=401,
+            content={
+                "success": False,
+                "detail": "Login required",
+            },
+        )
+
+    try:
+        stats = settle_pending_bets(
+            db,
+            limit=100,
+        )
+
+        return {
+            "success": True,
+            "message": "Settlement cycle completed.",
+            "stats": stats,
+        }
+
+    except Exception as exc:
+        db.rollback()
+
+        print(
+            "[BET SETTLEMENT ROUTER]",
+            repr(exc),
+        )
+
+        return JSONResponse(
+            status_code=500,
+            content={
+                "success": False,
+                "detail": str(exc),
+            },
         )

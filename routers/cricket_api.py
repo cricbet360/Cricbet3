@@ -1013,3 +1013,87 @@ def clear_cricket_cache(
         ),
     }
 
+# =========================================================
+# TEST PROEXCH BETFAIR RESULT - ANY MARKET ID
+# =========================================================
+
+@router.get("/test-result/{market_id}")
+def test_proexch_result(
+    request: Request,
+    market_id: str,
+    result_type: str = "new_fancy",
+):
+    """
+    Test ProExch Betfair result for ANY market ID.
+
+    Examples:
+
+    Fancy:
+    /api/cricket/test-result/36074941_55?result_type=new_fancy
+
+    Match Odds:
+    /api/cricket/test-result/36074941?result_type=match_odds
+
+    Bookmaker:
+    /api/cricket/test-result/36095117?result_type=bookmaker
+    """
+
+    if not _is_logged_in(request):
+        return JSONResponse(
+            status_code=401,
+            content={
+                "success": False,
+                "detail": "Login required",
+            },
+        )
+
+    market_id = str(
+        market_id or ""
+    ).strip()
+
+    result_type = str(
+        result_type or "new_fancy"
+    ).strip()
+
+    if not market_id:
+        return JSONResponse(
+            status_code=422,
+            content={
+                "success": False,
+                "detail": "market_id is required",
+            },
+        )
+
+    if not result_type:
+        result_type = "new_fancy"
+
+    try:
+
+        data = proexch_api.get_proexch_betfair_result(
+            market_id=market_id,
+            result_type=result_type,
+        )
+
+        return {
+            "success": True,
+            "market_id": market_id,
+            "result_type": result_type,
+            "data": data,
+        }
+
+    except Exception as exc:
+
+        print(
+            "[CRICKET] test result error:",
+            repr(exc),
+        )
+
+        return JSONResponse(
+            status_code=502,
+            content={
+                "success": False,
+                "market_id": market_id,
+                "result_type": result_type,
+                "detail": str(exc),
+            },
+        )

@@ -37,6 +37,11 @@ class BetSelection(Base):
         nullable=True,
     )
 
+    market_type = Column(
+        String(30),
+        nullable=True,
+    )
+
     selection_id = Column(
         String(100),
         nullable=False,
