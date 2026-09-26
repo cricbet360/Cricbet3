@@ -843,60 +843,63 @@ function getMatchesForFilter(
     filter
 ) {
 
-    const now = Date.now();
+    let visible = [];
 
-    const visible =
-        matches.filter(
+    /*
+     * ALL
+     * ----
+     * Show every match returned by ProExch.
+     */
+    if (filter === "all") {
+
+        visible = [...matches];
+    }
+
+    /*
+     * LIVE
+     * ----
+     * Only currently live/in-play matches.
+     */
+    else if (filter === "live") {
+
+        visible = matches.filter(
+            match =>
+                getMatchStatus(match).type === "live"
+        );
+    }
+
+    /*
+     * UPCOMING
+     * --------
+     * Anything that has not started yet.
+     */
+    else if (filter === "upcoming") {
+
+        visible = matches.filter(
             match => {
 
                 const type =
                     getMatchStatus(match).type;
 
-
-                if (
-                    type === "finished" ||
-                    type === "past"
-                ) {
-                    return false;
-                }
-
-
-                if (filter === "live") {
-
-                    return type === "live";
-                }
-
-
-                if (filter === "upcoming") {
-
-                    return type !== "live";
-                }
-
-
-                /*
-                 * ALL
-                 */
-
-                if (
-                    type === "live" ||
+                return (
+                    type === "upcoming" ||
+                    type === "starting" ||
                     type === "unknown"
-                ) {
-                    return true;
-                }
-
-                return isSameLocalDay(
-                    getEventTimestamp(match),
-                    now
                 );
             }
         );
+    }
 
-
+    /*
+     * Always sort by event time.
+     *
+     * Matches without a readable time stay at
+     * the bottom instead of disappearing.
+     */
     return sortMatchesByTime(
         visible
     );
 }
-
 
 /* =========================================================
    WHATSAPP
@@ -2356,35 +2359,38 @@ async function loadOddsForMatch(match) {
 async function loadAllOdds() {
 
     /*
-     * Past / finished matches are never displayed,
-     * so don't spend requests fetching their odds.
+     * Load odds for EVERY match returned by ProExch.
+     *
+     * The dashboard "All" tab is supposed to show
+     * the complete match list, so do not remove
+     * matches based on their date/status here.
      */
 
-    const activeMatches =
+    const matchesWithGameId =
         allMatches.filter(
-            isActiveMatch
+            match =>
+                Boolean(
+                    getGameId(match)
+                )
         );
 
-
     if (
-        !activeMatches.length
+        !matchesWithGameId.length
     ) {
         return;
     }
 
-
     for (
         let i = 0;
-        i < activeMatches.length;
+        i < matchesWithGameId.length;
         i += ODDS_BATCH_SIZE
     ) {
 
         const batch =
-            activeMatches.slice(
+            matchesWithGameId.slice(
                 i,
                 i + ODDS_BATCH_SIZE
             );
-
 
         await Promise.all(
             batch.map(
@@ -2393,7 +2399,6 @@ async function loadAllOdds() {
         );
     }
 }
-
 
 /* =========================================================
    UPDATE MATCH ODDS
@@ -2651,13 +2656,11 @@ function renderMatches() {
             "matches"
         );
 
-
     if (
         !container
     ) {
         return;
     }
-
 
     /*
      * Live / Upcoming / All rules, plus time ordering,
@@ -2670,14 +2673,12 @@ function renderMatches() {
             currentFilter
         );
 
-
     if (
         !matches.length
     ) {
 
         let message =
             "There are no cricket matches scheduled for today.";
-
 
         if (
             currentFilter === "live"
@@ -2687,7 +2688,6 @@ function renderMatches() {
                 "There are no live cricket matches right now.";
         }
 
-
         if (
             currentFilter === "upcoming"
         ) {
@@ -2695,7 +2695,6 @@ function renderMatches() {
             message =
                 "There are no upcoming cricket matches currently available.";
         }
-
 
         container.innerHTML = `
 
@@ -2717,10 +2716,8 @@ function renderMatches() {
 
         `;
 
-
         return;
     }
-
 
     container.innerHTML =
         matches
@@ -2728,7 +2725,6 @@ function renderMatches() {
                 createMatchRow
             )
             .join("");
-
 
     /*
      * Apply already-loaded odds immediately.
