@@ -1055,173 +1055,243 @@ def parse_bookmaker_odds(
     data: Any,
 ) -> List[Dict[str, Any]]:
 
-    if not isinstance(
-        data,
-        dict,
-    ):
+    if not isinstance(data, dict):
         return []
 
     bookmaker = (
-        data.get(
-            "bookmakerOdds"
-        )
-        or data.get(
-            "bookmaker_odds"
-        )
-        or data.get(
-            "bookMakerOdds"
-        )
+        data.get("bookMakerOdds")
+        or data.get("bookmakerOdds")
+        or data.get("bookmaker_odds")
     )
 
-    if isinstance(
-        bookmaker,
-        dict,
-    ):
-        bookmaker = [
-            bookmaker
-        ]
+    if isinstance(bookmaker, dict):
+        bookmaker = [bookmaker]
 
-    if not isinstance(
-        bookmaker,
-        list,
-    ):
+    if not isinstance(bookmaker, list):
         return []
 
-    result = []
+    result: List[Dict[str, Any]] = []
 
-    for market in bookmaker:
+    for bookmaker_item in bookmaker:
 
-        if not isinstance(
-            market,
-            dict,
-        ):
+        if not isinstance(bookmaker_item, dict):
             continue
 
-        odd_datas = market.get(
-            "oddDatas"
-        )
+        # -------------------------------------------------
+        # ProExch structure:
+        #
+        # bookMakerOdds[
+        #     {
+        #         "bm1": {
+        #             "mid": "...",
+        #             "oddDatas": [...]
+        #         }
+        #     }
+        # ]
+        #
+        # Also support direct market objects for compatibility.
+        # -------------------------------------------------
 
-        if isinstance(
-            odd_datas,
-            dict,
-        ):
-            odd_datas = [
-                odd_datas
-            ]
+        markets: List[Dict[str, Any]] = []
 
-        if not isinstance(
-            odd_datas,
-            list,
-        ):
-            odd_datas = []
+        if "oddDatas" in bookmaker_item:
+            markets.append(bookmaker_item)
 
-        runners = []
+        else:
+            for key, value in bookmaker_item.items():
 
-        for runner in odd_datas:
+                if not isinstance(value, dict):
+                    continue
 
-            if not isinstance(
-                runner,
-                dict,
-            ):
+                if (
+                    "oddDatas" in value
+                    or str(key).lower().startswith("bm")
+                ):
+                    markets.append(value)
+
+        for market in markets:
+
+            if not isinstance(market, dict):
                 continue
 
-            runners.append(
+            # -------------------------------------------------
+            # RUNNER DATA
+            # -------------------------------------------------
+
+            odd_datas = (
+                market.get("oddDatas")
+                or market.get("runners")
+                or market.get("runner")
+                or []
+            )
+
+            if isinstance(odd_datas, dict):
+                odd_datas = [odd_datas]
+
+            if not isinstance(odd_datas, list):
+                odd_datas = []
+
+            runners: List[Dict[str, Any]] = []
+
+            for runner in odd_datas:
+
+                if not isinstance(runner, dict):
+                    continue
+
+                runner_id = _first_value(
+                    runner,
+                    "id",
+                    "selectionId",
+                    "selection_id",
+                    "sid",
+                    "runnerId",
+                    "runner_id",
+                    "srno",
+                    default="",
+                )
+
+                runner_name = _first_value(
+                    runner,
+                    "rname",
+                    "runnerName",
+                    "runner_name",
+                    "name",
+                    default="",
+                )
+
+                runners.append(
+                    {
+                        "id": str(runner_id),
+
+                        "name": str(
+                            runner_name
+                        ),
+
+                        "back": _safe_float(
+                            _first_value(
+                                runner,
+                                "b1",
+                                "back",
+                                "backPrice",
+                                "back_price",
+                            )
+                        ),
+
+                        "back_size": _safe_float(
+                            _first_value(
+                                runner,
+                                "bs1",
+                                "backSize",
+                                "back_size",
+                                "back_volume",
+                            )
+                        ),
+
+                        "lay": _safe_float(
+                            _first_value(
+                                runner,
+                                "l1",
+                                "lay",
+                                "layPrice",
+                                "lay_price",
+                            )
+                        ),
+
+                        "lay_size": _safe_float(
+                            _first_value(
+                                runner,
+                                "ls1",
+                                "laySize",
+                                "lay_size",
+                                "lay_volume",
+                            )
+                        ),
+
+                        "status": str(
+                            _first_value(
+                                runner,
+                                "status",
+                                default="",
+                            )
+                        ),
+
+                        "remark": _first_value(
+                            runner,
+                            "remark",
+                            default=None,
+                        ),
+
+                        "raw": runner,
+                    }
+                )
+
+            # -------------------------------------------------
+            # MARKET ID
+            # -------------------------------------------------
+
+            market_id = _first_value(
+                market,
+                "id",
+                "marketId",
+                "market_id",
+                "mid",
+                default="",
+            )
+
+            # -------------------------------------------------
+            # MARKET NAME
+            # -------------------------------------------------
+
+            market_name = _first_value(
+                market,
+                "name",
+                "marketName",
+                "market_name",
+                "mname",
+                default="Bookmaker",
+            )
+
+            # -------------------------------------------------
+            # MARKET STATUS
+            # -------------------------------------------------
+
+            market_status = _first_value(
+                market,
+                "status",
+                "mstatus",
+                default="OPEN",
+            )
+
+            if market_status is None or str(
+                market_status
+            ).strip() == "":
+                market_status = "OPEN"
+
+            # -------------------------------------------------
+            # APPEND NORMALIZED MARKET
+            # -------------------------------------------------
+
+            result.append(
                 {
                     "id": str(
-                        _first_value(
-                            runner,
-                            "id",
-                            "selectionId",
-                            "selection_id",
-                            "sid",
-                            "runnerId",
-                            "runner_id",
-                            "srno",
-                            default="",
-                        )
+                        market_id
                     ),
 
                     "name": str(
-                        _first_value(
-                            runner,
-                            "rname",
-                            "runnerName",
-                            "name",
-                            default="",
-                        )
+                        market_name
                     ),
 
-                    "back": _safe_float(
-                        _first_value(
-                            runner,
-                            "b1",
-                            "back",
-                        )
+                    "status": str(
+                        market_status
                     ),
 
-                    "back_size": _safe_float(
-                        _first_value(
-                            runner,
-                            "bs1",
-                            "backSize",
-                        )
-                    ),
+                    "type": "bookmaker",
 
-                    "lay": _safe_float(
-                        _first_value(
-                            runner,
-                            "l1",
-                            "lay",
-                        )
-                    ),
+                    "runners": runners,
 
-                    "lay_size": _safe_float(
-                        _first_value(
-                            runner,
-                            "ls1",
-                            "laySize",
-                        )
-                    ),
-
-                    "raw": runner,
+                    "raw": market,
                 }
             )
-
-        result.append(
-            {
-                "id": str(
-                    _first_value(
-                        market,
-                        "id",
-                        "marketId",
-                        default="",
-                    )
-                ),
-
-                "name": str(
-                    _first_value(
-                        market,
-                        "name",
-                        "marketName",
-                        default="Bookmaker",
-                    )
-                ),
-
-                "status": str(
-                    _first_value(
-                        market,
-                        "status",
-                        default="OPEN",
-                    )
-                ),
-
-                "type": "bookmaker",
-
-                "runners": runners,
-
-                "raw": market,
-            }
-        )
 
     return result
 
