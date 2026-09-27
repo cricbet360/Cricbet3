@@ -357,6 +357,7 @@ async def place_bet(
     # =====================================================
     # FANCY / SESSION PAYOUT
     # =====================================================
+
     payout_percent = None
 
     if market_type in {
@@ -410,6 +411,8 @@ async def place_bet(
 
     elif market_type == "BOOKMAKER":
 
+        # Bookmaker odds are stored/entered like a percentage,
+        # e.g. odds=54 on a stake of 100 -> win 154.00 (100 + 54% of 100)
         payout_percent = None
 
         bookmaker_multiplier = (
