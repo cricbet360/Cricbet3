@@ -116,12 +116,12 @@ app = FastAPI(
 # BET SETTLEMENT WORKER
 # ============================================================
 
-from services.settlement_service import (
-    settlement_loop,
+from services.bet_settlement import (
+    settlement_worker_loop,
 )
 
 threading.Thread(
-    target=settlement_loop,
+    target=settlement_worker_loop,
     daemon=True,
 ).start()
 
