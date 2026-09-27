@@ -108,6 +108,68 @@
             gap: 15px;
         }
 
+        .bet-selection {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 15px;
+        }
+
+        .bet-selection-left {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .bet-selection-runner {
+            font-weight: 800;
+            font-size: 15px;
+        }
+
+        .bet-selection-market {
+            color: #6b7280;
+            font-size: 12px;
+        }
+
+        .bet-selection-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .side-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .side-badge.back {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .side-badge.lay {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .odds-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 900;
+            background: #111827;
+            color: white;
+        }
+
         .label {
             color: #6b7280;
             font-size: 12px;
@@ -213,6 +275,59 @@
                 </div>
 
             </div>
+
+
+            {% for selection in bet.selections %}
+
+                {% set market_type = (selection.market_type or "MATCH_ODDS")|upper %}
+
+                {% set market_label = {
+                    "MATCH_ODDS": "Match Odds",
+                    "BOOKMAKER": "Bookmaker",
+                    "FANCY": "Fancy",
+                    "SESSION": "Session"
+                }.get(market_type, market_type) %}
+
+                {% set is_fancy = market_type in ["FANCY", "SESSION"] %}
+
+                {% set display_side = (
+                    "YES" if (is_fancy and selection.side == "BACK")
+                    else "NO" if (is_fancy and selection.side == "LAY")
+                    else selection.side
+                ) %}
+
+                <div class="bet-selection">
+
+                    <div class="bet-selection-left">
+
+                        <div class="bet-selection-runner">
+                            {{ selection.runner_name }}
+                        </div>
+
+                        <div class="bet-selection-market">
+                            {{ market_label }}
+                            {% if selection.market_name %}
+                                • {{ selection.market_name }}
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+                    <div class="bet-selection-right">
+
+                        <span class="side-badge {{ 'back' if selection.side == 'BACK' else 'lay' }}">
+                            {{ display_side }}
+                        </span>
+
+                        <span class="odds-badge">
+                            @ {{ "%.2f"|format(selection.price or 0) }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
 
 
             <div class="bet-grid">
