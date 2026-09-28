@@ -4582,12 +4582,10 @@
         }
 
         const url =
-          "https://wa.me/" +
-          MATCH_PAGE_WHATSAPP_NUMBER +
-          "?text=" +
-          encodeURIComponent(message);
+          `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 
-        window.open(url, "_blank", "noopener,noreferrer");
+
+        window.location.href = url;
       }
 
       function matchPageDeposit() {
