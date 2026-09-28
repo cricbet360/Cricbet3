@@ -159,6 +159,16 @@
         background: #1a3a2a;
       }
 
+      .account-crypto {
+        background: #132d21;
+        color: #dce9e3;
+        border: 1px solid #28533e;
+      }
+
+.account-crypto:hover {
+  background: #1a3a2a;
+}
+
       .account-profile {
         color: #b9cdc3;
       }
@@ -1636,6 +1646,14 @@
           class="account-action account-withdraw"
         >
           Withdraw
+        </button>
+
+        <button
+          type="button"
+          id="matchCryptoBtn"
+          class="account-action account-crypto"
+        >
+          Crypto
         </button>
 
         <div class="account-menu">
@@ -4758,6 +4776,12 @@
         );
       }
 
+      function matchPageCrypto() {
+        matchPageOpenWhatsApp(
+          "Hello, I want to make a Crypto transaction in CricBet. Please provide the details.",
+        );
+      }
+
       /* =========================================================
    ACCOUNT SETUP
 ========================================================= */
@@ -4766,6 +4790,8 @@
         const deposit = document.getElementById("matchDepositBtn");
 
         const withdraw = document.getElementById("matchWithdrawBtn");
+        
+        const crypto = document.getElementById("matchCryptoBtn");
 
         if (deposit) {
           deposit.addEventListener("click", matchPageDeposit);
@@ -4773,6 +4799,10 @@
 
         if (withdraw) {
           withdraw.addEventListener("click", matchPageWithdraw);
+        }
+
+        if (crypto) {
+          crypto.addEventListener("click", matchPageCrypto);
         }
 
         loadMatchPageBalance();
