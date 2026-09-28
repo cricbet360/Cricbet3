@@ -4574,35 +4574,42 @@
    ACCOUNT BUTTONS
 ========================================================= */
 
-      const MATCH_PAGE_WHATSAPP_NUMBER = "919289461279";
+      function openWhatsApp(message) {
 
-      function matchPageOpenWhatsApp(message) {
-        if (!MATCH_PAGE_WHATSAPP_NUMBER) {
-          return;
-        }
+          if (!WHATSAPP_NUMBER) {
+            return;
+          }
 
-        const url =
-            `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+      const url =
+          `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 
-
-        window.location.href = url;
+      window.location.href = url;
       }
 
-      function matchPageDeposit() {
-        matchPageOpenWhatsApp("Hello, I want to make a deposit in CricBet.");
+
+      function openDepositWhatsApp() {
+
+          openWhatsApp(
+              "Hello, I want to make a deposit in CricBet."
+          );
       }
 
-      function matchPageWithdraw() {
-        matchPageOpenWhatsApp(
-          "Hello, I want to make a withdrawal from CricBet.",
-        );
+
+      function openWithdrawWhatsApp() {
+
+          openWhatsApp(
+              "Hello, I want to make a withdrawal from CricBet."
+          );
       }
 
-      function matchPageCrypto() {
-        matchPageOpenWhatsApp(
-          "Hello, I want to make a Crypto transaction in CricBet. Please provide the details.",
-        );
+
+      function openCryptoWhatsApp() {
+
+          openWhatsApp(
+              "Hello, I want to make a Crypto transaction in CricBet. Please provide the details."
+          );
       }
+
 
       /* =========================================================
    ACCOUNT SETUP
