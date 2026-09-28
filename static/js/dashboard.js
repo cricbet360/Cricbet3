@@ -938,6 +938,16 @@ function openWithdrawWhatsApp() {
 }
 
 
+function openCryptoWhatsApp() {
+
+    openWhatsApp(
+        "Hello, I want to make a Crypto transaction in CricBet. Please provide the details."
+    );
+}
+
+
+
+
 /* =========================================================
    ODDS RESPONSE
 ========================================================= */
@@ -3725,6 +3735,25 @@ function setupTopbar() {
         );
     }
 }
+
+
+const cryptoButton =
+    document.getElementById(
+        "cryptoBtn"
+    );
+
+
+if (
+    cryptoButton
+) {
+
+    cryptoButton.addEventListener(
+        "click",
+        openCryptoWhatsApp
+    );
+}
+
+
 
 
 /* =========================================================

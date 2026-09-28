@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -8,10 +9,11 @@
     <title>CricBet - Cricket</title>
 
     <link rel="stylesheet" href="/static/css/dashboard.css?v=34" />
+
     <style>
       /* =========================================================
-   TOPBAR ACCOUNT / HAMBURGER MENU
-========================================================= */
+         TOPBAR ACCOUNT / HAMBURGER MENU
+      ========================================================= */
 
       .topbar-right {
         display: flex;
@@ -42,7 +44,7 @@
         white-space: nowrap;
       }
 
-      /* Deposit / Withdraw */
+      /* Deposit / Withdraw / Crypto */
 
       .topbar-right .topbar-action {
         flex-shrink: 0;
@@ -50,8 +52,8 @@
       }
 
       /* =========================================================
-   HAMBURGER
-========================================================= */
+         HAMBURGER
+      ========================================================= */
 
       .account-menu {
         position: relative;
@@ -112,8 +114,8 @@
       }
 
       /* =========================================================
-   PROFILE / LOGOUT DROPDOWN
-========================================================= */
+         PROFILE / LOGOUT DROPDOWN
+      ========================================================= */
 
       .account-menu-dropdown {
         position: absolute;
@@ -178,8 +180,8 @@
       }
 
       /* =========================================================
-   MOBILE
-========================================================= */
+         MOBILE
+      ========================================================= */
 
       @media (max-width: 700px) {
         .topbar {
@@ -197,7 +199,7 @@
 
           justify-content: flex-end;
 
-          gap: 6px;
+          gap: 5px;
 
           flex-wrap: nowrap;
         }
@@ -219,14 +221,14 @@
           font-size: 12px;
         }
 
-        /* Buttons */
+        /* Deposit / Withdraw / Crypto buttons */
 
         .topbar-right .topbar-action {
           height: 36px;
 
-          padding: 0 12px;
+          padding: 0 9px;
 
-          font-size: 11px;
+          font-size: 10px;
 
           flex-shrink: 1;
         }
@@ -247,15 +249,34 @@
           display: none;
         }
       }
+
+      /* =========================================================
+         VERY SMALL MOBILE SCREENS
+      ========================================================= */
+
+      @media (max-width: 430px) {
+        .topbar-right {
+          gap: 3px;
+        }
+
+        .topbar-right .topbar-action {
+          padding: 0 7px;
+          font-size: 9px;
+        }
+
+        .topbar-right .balance-value {
+          font-size: 11px;
+        }
+      }
     </style>
 
-    <script src="/static/js/dashboard.js?v=35" defer></script>
+    <script src="/static/js/dashboard.js?v=36" defer></script>
   </head>
 
   <body>
     <!-- =====================================================
-     TOP BAR
-===================================================== -->
+         TOP BAR
+    ===================================================== -->
 
     <header class="topbar">
       <div class="brand">
@@ -269,9 +290,13 @@
       <div class="topbar-right">
         <!-- BALANCE -->
         <div class="balance">
-          <span class="balance-label"> Balance </span>
+          <span class="balance-label">
+            Balance
+          </span>
 
-          <span id="balance" class="balance-value"> ₹0.00 </span>
+          <span id="balance" class="balance-value">
+            ₹0.00
+          </span>
         </div>
 
         <!-- DEPOSIT -->
@@ -290,6 +315,15 @@
           class="topbar-action withdraw-action"
         >
           Withdraw
+        </button>
+
+        <!-- CRYPTO -->
+        <button
+          type="button"
+          id="cryptoBtn"
+          class="topbar-action crypto-action"
+        >
+          Crypto
         </button>
 
         <!-- HAMBURGER -->
@@ -313,17 +347,21 @@
             class="account-menu-dropdown"
             aria-hidden="true"
           >
-            <a href="/profile" class="profile-link"> Profile </a>
+            <a href="/profile" class="profile-link">
+              Profile
+            </a>
 
-            <a href="/logout" class="logout"> Logout </a>
+            <a href="/logout" class="logout">
+              Logout
+            </a>
           </div>
         </div>
       </div>
     </header>
 
     <!-- =====================================================
-     MAIN NAVIGATION
-===================================================== -->
+         MAIN NAVIGATION
+    ===================================================== -->
 
     <nav class="main-mode-nav">
       <button
@@ -334,12 +372,17 @@
         HOME
       </button>
 
-      <button type="button" class="mode-tab active">CRICKET</button>
+      <button
+        type="button"
+        class="mode-tab active"
+      >
+        CRICKET
+      </button>
     </nav>
 
     <!-- =====================================================
-     MAIN CONTENT
-===================================================== -->
+         MAIN CONTENT
+    ===================================================== -->
 
     <main class="sportsbook-container">
       <section class="sportsbook-header">
@@ -349,62 +392,97 @@
           <div>
             <h2>Cricket</h2>
 
-            <p>Live &amp; upcoming cricket matches</p>
+            <p>
+              Live &amp; upcoming cricket matches
+            </p>
           </div>
         </div>
 
         <div class="sport-filters">
-          <button type="button" class="sport-filter active" data-filter="all">
+          <button
+            type="button"
+            class="sport-filter active"
+            data-filter="all"
+          >
             All
           </button>
 
-          <button type="button" class="sport-filter" data-filter="live">
+          <button
+            type="button"
+            class="sport-filter"
+            data-filter="live"
+          >
             Live
           </button>
 
-          <button type="button" class="sport-filter" data-filter="upcoming">
+          <button
+            type="button"
+            class="sport-filter"
+            data-filter="upcoming"
+          >
             Upcoming
           </button>
         </div>
       </section>
 
       <!-- =================================================
-         MATCHES
-    ================================================= -->
+           MATCHES
+      ================================================= -->
 
       <section class="matches-wrapper">
         <div class="odds-header">
-          <div class="match-column">Match</div>
+          <div class="match-column">
+            Match
+          </div>
 
-          <div class="odds-column-header back-header">BACK</div>
+          <div class="odds-column-header back-header">
+            BACK
+          </div>
 
-          <div class="odds-column-header lay-header">LAY</div>
+          <div class="odds-column-header lay-header">
+            LAY
+          </div>
 
-          <div class="odds-column-header draw-header">DRAW</div>
+          <div class="odds-column-header draw-header">
+            DRAW
+          </div>
         </div>
 
         <div id="matches">
           <div class="empty-state">
-            <div class="empty-state-icon">🏏</div>
+            <div class="empty-state-icon">
+              🏏
+            </div>
 
-            <div class="empty-state-title">Loading cricket matches...</div>
+            <div class="empty-state-title">
+              Loading cricket matches...
+            </div>
 
-            <div class="empty-state-text">Fetching live cricket data.</div>
+            <div class="empty-state-text">
+              Fetching live cricket data.
+            </div>
           </div>
         </div>
       </section>
     </main>
 
     <!-- =====================================================
-     BET SLIP
-===================================================== -->
+         BET SLIP
+    ===================================================== -->
 
-    <div id="betslip" class="betslip" hidden aria-hidden="true">
+    <div
+      id="betslip"
+      class="betslip"
+      hidden
+      aria-hidden="true"
+    >
       <div class="betslip-header">
         <div>
           <h2>Bet Slip</h2>
 
-          <span id="betslipSubtitle"> My Bets </span>
+          <span id="betslipSubtitle">
+            My Bets
+          </span>
         </div>
 
         <button
@@ -418,27 +496,38 @@
         </button>
       </div>
 
-      <div id="betslipContent" class="betslip-content">
+      <div
+        id="betslipContent"
+        class="betslip-content"
+      >
         <div class="betslip-empty">
-          <div class="betslip-empty-icon">🎟️</div>
+          <div class="betslip-empty-icon">
+            🎟️
+          </div>
 
-          <h3>Loading bets...</h3>
+          <h3>
+            Loading bets...
+          </h3>
 
-          <p>Loading your betting history.</p>
+          <p>
+            Loading your betting history.
+          </p>
         </div>
       </div>
 
       <div class="betslip-footer">
         <div class="betslip-balance">
-          <span> Balance </span>
+          <span>
+            Balance
+          </span>
 
-          <strong id="betslipBalance" class="balance-value"> ₹0.00 </strong>
+          <strong
+            id="betslipBalance"
+            class="balance-value"
+          >
+            ₹0.00
+          </strong>
         </div>
-
-        <!--
-            Kept for compatibility with the existing dashboard.
-            Actual bet placement continues through the match page.
-        -->
 
         <button
           type="button"
@@ -452,8 +541,8 @@
     </div>
 
     <!-- =====================================================
-     BET SLIP OPEN BUTTON
-===================================================== -->
+         BET SLIP OPEN BUTTON
+    ===================================================== -->
 
     <button
       type="button"
@@ -462,70 +551,139 @@
       aria-label="Open bet slip"
       aria-controls="betslip"
     >
-      <span> BET SLIP </span>
+      <span>
+        BET SLIP
+      </span>
 
-      <span id="betslipCount" class="betslip-count"> 0 </span>
+      <span
+        id="betslipCount"
+        class="betslip-count"
+      >
+        0
+      </span>
     </button>
+
+    <!-- =====================================================
+         ACCOUNT MENU
+    ===================================================== -->
 
     <script>
       (function () {
         function initAccountMenu() {
-          const toggle = document.getElementById("accountMenuToggle");
-          const dropdown = document.getElementById("accountMenuDropdown");
+          const toggle =
+            document.getElementById(
+              "accountMenuToggle"
+            );
 
-          if (!toggle || !dropdown) return;
+          const dropdown =
+            document.getElementById(
+              "accountMenuDropdown"
+            );
 
-          // Prevent duplicate initialization if the page/script is loaded twice.
-          if (toggle.dataset.menuInitialized === "true") return;
-          toggle.dataset.menuInitialized = "true";
+          if (!toggle || !dropdown) {
+            return;
+          }
+
+          if (
+            toggle.dataset.menuInitialized ===
+            "true"
+          ) {
+            return;
+          }
+
+          toggle.dataset.menuInitialized =
+            "true";
 
           function closeMenu() {
-            toggle.setAttribute("aria-expanded", "false");
-            toggle.setAttribute("aria-label", "Open account menu");
-            dropdown.classList.remove("open");
-            dropdown.setAttribute("aria-hidden", "true");
+            toggle.setAttribute(
+              "aria-expanded",
+              "false"
+            );
+
+            toggle.setAttribute(
+              "aria-label",
+              "Open account menu"
+            );
+
+            dropdown.classList.remove(
+              "open"
+            );
+
+            dropdown.setAttribute(
+              "aria-hidden",
+              "true"
+            );
           }
 
           function openMenu() {
-            toggle.setAttribute("aria-expanded", "true");
-            toggle.setAttribute("aria-label", "Close account menu");
+            toggle.setAttribute(
+              "aria-expanded",
+              "true"
+            );
+
+            toggle.setAttribute(
+              "aria-label",
+              "Close account menu"
+            );
+
             dropdown.classList.add("open");
-            dropdown.setAttribute("aria-hidden", "false");
+
+            dropdown.setAttribute(
+              "aria-hidden",
+              "false"
+            );
           }
 
-          toggle.addEventListener("click", function (event) {
-            event.preventDefault();
-            event.stopPropagation();
+          toggle.addEventListener(
+            "click",
+            function (event) {
+              event.preventDefault();
+              event.stopPropagation();
 
-            if (toggle.getAttribute("aria-expanded") === "true") {
-              closeMenu();
-            } else {
-              openMenu();
+              if (
+                toggle.getAttribute(
+                  "aria-expanded"
+                ) === "true"
+              ) {
+                closeMenu();
+              } else {
+                openMenu();
+              }
             }
-          });
+          );
 
-          // Don't let clicking inside the dropdown immediately close it.
-          dropdown.addEventListener("click", function (event) {
-            event.stopPropagation();
-          });
+          dropdown.addEventListener(
+            "click",
+            function (event) {
+              event.stopPropagation();
+            }
+          );
 
-          // Close when clicking elsewhere.
-          document.addEventListener("click", function () {
-            closeMenu();
-          });
-
-          // Close with Escape.
-          document.addEventListener("keydown", function (event) {
-            if (event.key === "Escape") {
+          document.addEventListener(
+            "click",
+            function () {
               closeMenu();
             }
-          });
+          );
+
+          document.addEventListener(
+            "keydown",
+            function (event) {
+              if (event.key === "Escape") {
+                closeMenu();
+              }
+            }
+          );
         }
 
-        // This script is placed near the end of <body>, but this also works
-        // if the document has already finished loading.
-        if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", initAccountMenu);
+        if (
+          document.readyState ===
+          "loading"
+        ) {
+          document.addEventListener(
+            "DOMContentLoaded",
+            initAccountMenu
+          );
         } else {
           initAccountMenu();
         }
@@ -533,3 +691,4 @@
     </script>
   </body>
 </html>
+
