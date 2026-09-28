@@ -123,6 +123,22 @@ function formatMoney(value) {
     return "₹" + number.toFixed(2);
 }
 
+/* =========================================================
+   FORMAT ODDS
+   ========================================================= */
+
+function formatOdds(value) {
+
+    const number = Number(value);
+
+    if (!Number.isFinite(number)) {
+        return "-";
+    }
+
+    return String(number)
+        .replace(/\.0+$/, "")
+        .replace(/(\.\d*?)0+$/, "$1");
+}
 
 /* =========================================================
    HTML ESCAPE
@@ -519,7 +535,7 @@ function renderBetSlip() {
                         </span>
 
                         <span class="slip-price">
-                            ${Number(selection.price).toFixed(2)}
+                            ${formatOdds(selection.price)}
                         </span>
 
                     </div>

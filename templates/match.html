@@ -2084,6 +2084,30 @@
         return escapeHtml(value);
       }
 
+      /* =========================================================
+         FORMAT ODDS / RATE DISPLAY
+         ========================================================= */
+
+      function formatOddsDisplay(value) {
+        const number = Number(value);
+
+        if (!Number.isFinite(number)) {
+          return "-";
+        }
+
+        /*
+         * Show bookmaker/fancy/session values without
+         * unnecessary trailing zeroes.
+         *
+         * 56.00  -> 56
+         * 56.50  -> 56.5
+         * 56.25  -> 56.25
+         * 112.00 -> 112
+         */
+        return String(number);
+      }
+
+
       /*
        * IMPORTANT:
        * 0 IS VALID DATA.
@@ -2897,7 +2921,7 @@
 
         const sizeText =
           Number.isFinite(numericSize) && numericSize > 0
-            ? numericSize.toFixed(2)
+            ? formatOddsDisplay(numericSize)
             : "";
 
         let bettingOdds = numericPrice;
@@ -2960,7 +2984,7 @@
 
 
 
-        html += numericPrice.toFixed(2);
+        html += formatOddsDisplay(numericPrice);
 
         html += "</div>";
 
@@ -3244,9 +3268,21 @@
               escapeHtml(displaySide) +
               "</span>";
 
+            const slipMarketType =
+              String(item.marketType || "").toUpperCase();
+
+            const slipDisplayValue =
+              (
+                slipMarketType === "FANCY" ||
+                slipMarketType === "SESSION"
+              ) &&
+              numberValue(item.payoutPercent) > 0
+                ? numberValue(item.payoutPercent)
+                : numberValue(item.odds);
+
             html +=
               '<span class="slip-odds">' +
-              numberValue(item.odds).toFixed(2) +
+              formatOddsDisplay(slipDisplayValue) +
               "</span>";
 
             html += "</div>";
