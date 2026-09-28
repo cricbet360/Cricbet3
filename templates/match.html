@@ -49,242 +49,144 @@
       /* =========================================================
            ACCOUNT BAR
         ========================================================= */
+/* ---------- base ---------- */
+.topbar, .topbar button, .topbar a {
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+.topbar { font-size: 14px; color: #f1f5f3; }
+.topbar button { font-size: inherit; border: 0; }
+.topbar a { color: inherit; text-decoration: none; }
 
-      .account-topbar {
-        width: 100%;
-        min-height: 64px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 14px;
-        padding: 10px 24px;
-        background: #0a2117;
-        border-bottom: 1px solid #173c2a;
-        position: sticky;
-        top: 0;
-        z-index: 10000;
-      }
-
-      .account-brand {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        color: #ffffff;
-        font-size: 21px;
-        font-weight: 900;
-        letter-spacing: 1.2px;
-        white-space: nowrap;
-      }
-
-      .account-brand-icon {
-        font-size: 25px;
-        line-height: 1;
-      }
-
-      .account-brand-accent {
-        color: #22b56b;
-      }
-
-      .account-actions {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 8px;
-        flex-wrap: wrap;
-      }
-
-      .account-balance {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        justify-content: center;
-        min-width: 95px;
-        margin-right: 4px;
-      }
-
-      .account-balance-label {
-        color: #8da99b;
-        font-size: 10px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.7px;
-      }
-
-      .account-balance-value {
-        min-width: 80px;
-        color: #ffffff;
-        font-size: 14px;
-        font-weight: 800;
-        text-align: right;
-        white-space: nowrap;
-      }
-
-      .account-action,
-      .account-profile,
-      .account-logout {
-        min-height: 36px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0 13px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 800;
-        text-decoration: none;
-        white-space: nowrap;
-      }
-
-      .account-action {
-        border: 0;
-        cursor: pointer;
-        font-family: inherit;
-      }
-
-      .account-deposit {
-        background: #138653;
-        color: #ffffff;
-      }
-
-      .account-deposit:hover {
-        background: #17a565;
-      }
-
-      .account-withdraw {
-        background: #132d21;
-        color: #dce9e3;
-        border: 1px solid #28533e;
-      }
-
-      .account-withdraw:hover {
-        background: #1a3a2a;
-      }
-
-      .account-crypto {
-        background: #132d21;
-        color: #dce9e3;
-        border: 1px solid #28533e;
-      }
-
-.account-crypto:hover {
-  background: #1a3a2a;
+.topbar {
+  width: 100%; min-height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px;
+  background: #0a2117; border-bottom: 1px solid #173c2a;
+  position: sticky; top: 0; z-index: 10000;
 }
 
-      .account-profile {
-        color: #b9cdc3;
-      }
+.brand { display: flex; align-items: center; gap: 9px; user-select: none; }
+.brand-icon { font-size: 25px; line-height: 1; }
+.brand-text { color: #fff; font-size: 21px; font-weight: 900; letter-spacing: 1.2px; }
+.brand-accent { color: #22b56b; }
 
-      .account-profile:hover {
-        color: #ffffff;
-        background: #112d20;
-      }
+.topbar-right {
+  display: flex; align-items: center; justify-content: flex-end;
+  gap: 10px; flex-wrap: nowrap;
+}
+.balance {
+  display: flex; flex-direction: column; align-items: flex-end;
+  justify-content: center; margin-right: 6px; flex-shrink: 0; white-space: nowrap;
+}
+.balance-label {
+  color: #8da99b; font-size: 10px; line-height: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .7px;
+}
+.balance-value { color: #fff; font-size: 14px; font-weight: 800; white-space: nowrap; }
 
-      .account-logout {
-        color: #d59b9b;
-      }
+/* ---------- buttons ---------- */
+.topbar-action, .profile-link, .logout {
+  min-height: 36px; display: inline-flex; align-items: center; justify-content: center;
+  padding: 0 13px; border-radius: 6px; font-size: 12px; font-weight: 800;
+  transition: background .2s ease, border-color .2s ease, color .2s ease, transform .15s ease;
+}
+.topbar-action { cursor: pointer; flex-shrink: 0; white-space: nowrap; }
 
-      .account-logout:hover {
-        color: #ffb1b1;
-        background: #321817;
-      }
+.deposit-action { background: #138653; color: #fff; }
+.deposit-action:hover { background: #17a565; transform: translateY(-1px); }
 
-      /* =========================================================
-           ACCOUNT MENU / HAMBURGER
-        ========================================================= */
+.withdraw-action { background: #132d21; color: #dce9e3; border: 1px solid #28533e; }
+.withdraw-action:hover { background: #1a3a2a; border-color: #397357; }
 
-      .account-actions {
-        position: relative;
-      }
+/* ---------- hamburger ---------- */
+.account-menu { position: relative; flex-shrink: 0; }
+.account-menu-toggle {
+  width: 42px; height: 38px;
+  display: flex; align-items: center; justify-content: center; flex-direction: column;
+  gap: 4px; padding: 0;
+  border: 1px solid #28533e; border-radius: 6px;
+  background: #102c20; cursor: pointer;
+}
+.account-menu-toggle:hover { background: #17412d; }
+.account-menu-toggle span {
+  display: block; width: 18px; height: 2px; background: #fff; border-radius: 2px;
+  transition: transform .2s ease, opacity .2s ease;
+}
+.account-menu-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.account-menu-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.account-menu-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
-      .account-menu {
-        position: relative;
-      }
+/* ---------- dropdown ---------- */
+.account-menu-dropdown {
+  position: absolute; top: calc(100% + 8px); right: 0; min-width: 145px;
+  display: none; flex-direction: column; padding: 6px;
+  background: #092519; border: 1px solid #28533e; border-radius: 7px;
+  box-shadow: 0 12px 30px rgba(0,0,0,.35); z-index: 9999;
+}
+.account-menu-dropdown.open { display: flex; }
+.account-menu-dropdown a {
+  display: flex; align-items: center; min-height: 36px; padding: 0 12px;
+  border-radius: 5px; white-space: nowrap;
+}
+.account-menu-dropdown .profile-link { color: #dce9e3; }
+.account-menu-dropdown .profile-link:hover { background: #143c29; }
+.account-menu-dropdown .logout { color: #ffaaaa; }
+.account-menu-dropdown .logout:hover { background: #321817; }
 
-      .account-menu-toggle {
-        width: 38px;
-        height: 36px;
-        display: inline-flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
-        padding: 0;
-        border: 1px solid #28533e;
-        border-radius: 6px;
-        background: #132d21;
-        color: #ffffff;
-        cursor: pointer;
-      }
+/* ---------- HOME / CRICKET tabs ---------- */
+.main-mode-nav {
+  width: 100%; display: flex; align-items: center; padding: 0 24px;
+  background: #091f15; border-bottom: 1px solid #173b29;
+}
+.mode-tab {
+  min-width: 100px; height: 45px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; color: #779287; border: 0; border-bottom: 2px solid transparent;
+  cursor: pointer; font-family: Inter, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 12px; font-weight: 900; letter-spacing: .8px;
+  transition: color .2s ease, border-color .2s ease, background .2s ease;
+}
+.mode-tab:hover { color: #fff; background: #0d281c; }
+.mode-tab.active { color: #27c274; border-bottom-color: #20ad68; }
 
-      .account-menu-toggle:hover {
-        background: #1a3a2a;
-      }
-
-      .account-menu-toggle span {
-        width: 17px;
-        height: 2px;
-        border-radius: 2px;
-        background: #dce9e3;
-        transition:
-          transform 0.15s ease,
-          opacity 0.15s ease;
-      }
-
-      .account-menu-toggle[aria-expanded="true"] span:nth-child(1) {
-        transform: translateY(6px) rotate(45deg);
-      }
-
-      .account-menu-toggle[aria-expanded="true"] span:nth-child(2) {
-        opacity: 0;
-      }
-
-      .account-menu-toggle[aria-expanded="true"] span:nth-child(3) {
-        transform: translateY(-6px) rotate(-45deg);
-      }
-
-      .account-menu-dropdown {
-        position: absolute;
-        top: calc(100% + 8px);
-        right: 0;
-        z-index: 10001;
-        min-width: 150px;
-        padding: 6px;
-        display: none;
-        flex-direction: column;
-        gap: 3px;
-        background: #0b2418;
-        border: 1px solid #28533e;
-        border-radius: 8px;
-        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
-      }
-
-      .account-menu-dropdown.open {
-        display: flex;
-      }
-
-      .account-menu-dropdown .account-profile,
-      .account-menu-dropdown .account-logout {
-        width: 100%;
-        justify-content: flex-start;
-        min-height: 36px;
-        padding: 0 11px;
-      }
-
-      @media (max-width: 700px) {
-        .account-menu {
-          display: flex;
-          justify-content: stretch;
-        }
-
-        .account-menu-toggle {
-          width: 100%;
-        }
-
-        .account-menu-dropdown {
-          top: calc(100% + 6px);
-          right: 0;
-          min-width: 160px;
-        }
-      }
+/* ---------- mobile ---------- */
+@media (max-width: 750px) {
+  .topbar { min-height: 58px; padding: 0 12px; }
+  .brand-text { font-size: 18px; }
+  .brand-icon { font-size: 21px; }
+  .topbar-right { gap: 5px; }
+  .balance { margin-right: 2px; }
+  .balance-label { display: none; }
+  .topbar-action, .profile-link, .logout { min-height: 32px; padding: 0 8px; font-size: 9px; }
+  .main-mode-nav { padding: 0 12px; }
+  .mode-tab { min-width: 82px; height: 41px; font-size: 10px; }
+}
+@media (max-width: 700px) {
+  .topbar-right { width: auto; }
+  .balance { flex-shrink: 1; min-width: 0; }
+  .balance-label { font-size: 8px; }
+  .balance-value { font-size: 12px; }
+  .topbar-right .topbar-action { height: 36px; padding: 0 9px; font-size: 10px; flex-shrink: 1; }
+  .account-menu-toggle { width: 38px; height: 36px; flex-shrink: 0; }
+  .topbar-right > .profile-link, .topbar-right > .logout { display: none; }
+}
+@media (max-width: 480px) {
+  .topbar { padding: 0 8px; }
+  .brand-text { font-size: 16px; }
+  .brand-icon { display: none; }
+  .logout { padding-left: 7px; padding-right: 7px; }
+  .topbar-action { padding-left: 7px; padding-right: 7px; }
+}
+@media (max-width: 430px) {
+  .topbar-right { gap: 3px; }
+  .topbar-right .topbar-action { padding: 0 7px; font-size: 9px; }
+  .topbar-right .balance-value { font-size: 11px; }
+}
+@media (max-width: 360px) {
+  .withdraw-action { display: none; }
+  .brand-text { font-size: 15px; }
+  .balance-value { font-size: 12px; }
+}
 
       /* =========================================================
            SCOREBOARD
@@ -1616,45 +1518,23 @@
      ACCOUNT TOP BAR
 ========================================================= -->
 
-    <header class="account-topbar">
-      <div class="account-brand">
-        <span class="account-brand-icon"> 🏏 </span>
-
-        <span> CRIC<span class="account-brand-accent">BET</span> </span>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-icon">🏏</span>
+        <span class="brand-text">CRIC<span class="brand-accent">BET</span></span>
       </div>
 
-      <div class="account-actions">
-        <div class="account-balance">
-          <span class="account-balance-label"> Balance </span>
-
-          <span id="matchPageBalance" class="account-balance-value">
+      <div class="topbar-right">
+        <div class="balance">
+          <span class="balance-label">Balance</span>
+          <span id="matchPageBalance" class="balance-value">
             ₹{{ "%.2f"|format(user.balance or 0) }}
           </span>
         </div>
 
-        <button
-          type="button"
-          id="matchDepositBtn"
-          class="account-action account-deposit"
-        >
-          Deposit
-        </button>
-
-        <button
-          type="button"
-          id="matchWithdrawBtn"
-          class="account-action account-withdraw"
-        >
-          Withdraw
-        </button>
-
-        <button
-          type="button"
-          id="matchCryptoBtn"
-          class="account-action account-crypto"
-        >
-          Crypto
-        </button>
+        <button type="button" id="matchDepositBtn" class="topbar-action deposit-action">Deposit</button>
+        <button type="button" id="matchWithdrawBtn" class="topbar-action withdraw-action">Withdraw</button>
+        <button type="button" id="matchCryptoBtn" class="topbar-action crypto-action">Crypto</button>
 
         <div class="account-menu">
           <button
@@ -1664,25 +1544,24 @@
             aria-expanded="false"
             aria-controls="accountMenuDropdown"
             aria-label="Open account menu"
-            title="Account menu"
           >
             <span></span>
             <span></span>
             <span></span>
           </button>
 
-          <div
-            id="accountMenuDropdown"
-            class="account-menu-dropdown"
-            aria-hidden="true"
-          >
-            <a href="/profile" class="account-profile"> Profile </a>
-
-            <a href="/logout" class="account-logout"> Logout </a>
+          <div id="accountMenuDropdown" class="account-menu-dropdown" aria-hidden="true">
+            <a href="/profile" class="profile-link">Profile</a>
+            <a href="/logout" class="logout">Logout</a>
           </div>
         </div>
       </div>
     </header>
+
+    <nav class="main-mode-nav">
+      <button type="button" class="mode-tab" onclick="window.location.href = '/dashboard'">HOME</button>
+      <button type="button" class="mode-tab active">CRICKET</button>
+    </nav>
 
     <!-- =========================================================
      MAIN MATCH PAGE
