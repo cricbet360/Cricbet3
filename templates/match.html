@@ -186,6 +186,16 @@
   .withdraw-action { display: none; }
   .brand-text { font-size: 15px; }
   .balance-value { font-size: 12px; }
+
+/* ---------- phone safety ---------- */
+.brand { flex-shrink: 0; }
+.topbar-right { min-width: 0; }
+@media (max-width: 430px) {
+  .topbar { gap: 6px; }
+  .brand-text { letter-spacing: .6px; }
+  .topbar-right .balance-value { font-size: 10px; }
+  .account-menu-toggle { width: 34px; }
+}
 }
 
       /* =========================================================
@@ -1291,71 +1301,6 @@
         ========================================================= */
 
       @media (max-width: 700px) {
-        .account-topbar {
-          padding: 9px 10px;
-          flex-direction: column;
-          align-items: stretch;
-          gap: 8px;
-        }
-
-        .account-brand {
-          width: 100%;
-          justify-content: center;
-          font-size: 18px;
-        }
-
-        .account-brand-icon {
-          font-size: 22px;
-        }
-
-        .account-actions {
-          width: 100%;
-          display: grid;
-          grid-template-columns:
-            minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)
-            44px;
-          align-items: center;
-          gap: 6px;
-          flex-wrap: nowrap;
-        }
-
-        .account-balance {
-          min-width: 0;
-          margin: 0;
-          align-items: center;
-        }
-
-        .account-balance-label {
-          font-size: 8px;
-        }
-
-        .account-balance-value {
-          font-size: 12px;
-          text-align: center;
-        }
-
-        .account-action,
-        .account-profile,
-        .account-logout {
-          width: 100%;
-          min-width: 0;
-          min-height: 34px;
-          padding: 0 4px;
-          font-size: 10px;
-          white-space: nowrap;
-        }
-
-        .account-menu {
-          width: 100%;
-          min-width: 0;
-        }
-
-        .account-menu-toggle {
-          width: 100%;
-          min-width: 0;
-          height: 34px;
-        }
-
         .scoreboard-inner {
           padding: 11px 10px 14px;
         }
