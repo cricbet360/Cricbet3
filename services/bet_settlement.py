@@ -1,17 +1,16 @@
 import re
+import time
 from decimal import Decimal, InvalidOperation
 from typing import Any, Optional
 
 from sqlalchemy.orm import Session
 
 from database.database import get_db
-
 from models.bet import Bet
 from models.bet_selection import BetSelection
 from models.transaction import Transaction
 from models.user import User
 from models.wallet import Wallet
-
 from services import proexch_api
 
 
@@ -19,20 +18,15 @@ from services import proexch_api
 # CONFIGURATION
 # =========================================================
 
-# Confirmed ProExch Fancy/Session result endpoint:
-#
-# /api/betfair-result?sport=cricket&type=new_fancy&marketId=...
-#
-# When the Fancy result exactly equals the selected line,
-# we currently VOID the bet and return the original stake.
-#
-# Example:
-#
-# line   = 151
-# result = 151
-# result => VOID
-#
+# If Fancy result exactly equals the selected line,
+# return the original stake.
 FANCY_EQUAL_ACTION = "void"
+
+# Settlement worker polling interval.
+SETTLEMENT_INTERVAL = 5.0
+
+# Maximum pending bets checked in one cycle.
+SETTLEMENT_BATCH_SIZE = 100
 
 
 # =========================================================
@@ -47,10 +41,10 @@ def _clean(value: Any) -> str:
 
 
 def _to_float(value: Any) -> Optional[float]:
-    if value is None:
-        return None
-
     try:
+        if value is None:
+            return None
+
         text = str(value).strip()
 
         if not text:
@@ -69,7 +63,11 @@ def _to_decimal(value: Any) -> Optional[Decimal]:
 
         return Decimal(str(value))
 
-    except (InvalidOperation, TypeError, ValueError):
+    except (
+        InvalidOperation,
+        TypeError,
+        ValueError,
+    ):
         return None
 
 
@@ -80,18 +78,8 @@ def _to_decimal(value: Any) -> Optional[Decimal]:
 def _detect_market_type(
     selection: BetSelection,
 ) -> str:
-    """
-    Detect the market type using the current BetSelection
-    schema.
 
-    Priority:
-        1. stored market_type
-        2. market_name
-        3. current Fancy market-id / numeric-line fallback
-        4. MATCH_ODDS
-    """
-
-    stored_market_type = _clean(
+    stored = _clean(
         getattr(
             selection,
             "market_type",
@@ -99,33 +87,28 @@ def _detect_market_type(
         )
     ).upper()
 
-    # -----------------------------------------------------
-    # Stored market type
-    # -----------------------------------------------------
+    aliases = {
+        "MATCH": "MATCH_ODDS",
+        "MATCHODDS": "MATCH_ODDS",
+        "MATCH_ODD": "MATCH_ODDS",
+        "MATCH ODDS": "MATCH_ODDS",
 
-    if stored_market_type:
-        aliases = {
-            "MATCH": "MATCH_ODDS",
-            "MATCHODDS": "MATCH_ODDS",
-            "MATCH_ODD": "MATCH_ODDS",
-            "MATCH ODDS": "MATCH_ODDS",
-            "BOOK": "BOOKMAKER",
-            "BOOKMAKER ODDS": "BOOKMAKER",
-            "BOOKMAKER_ODDS": "BOOKMAKER",
-            "FANCY ODDS": "FANCY",
-            "FANCY_ODDS": "FANCY",
-            "SESSION ODDS": "SESSION",
-            "SESSION_ODDS": "SESSION",
-        }
+        "BOOK": "BOOKMAKER",
+        "BOOKMAKER ODDS": "BOOKMAKER",
+        "BOOKMAKER_ODDS": "BOOKMAKER",
 
+        "FANCY ODDS": "FANCY",
+        "FANCY_ODDS": "FANCY",
+
+        "SESSION ODDS": "SESSION",
+        "SESSION_ODDS": "SESSION",
+    }
+
+    if stored:
         return aliases.get(
-            stored_market_type,
-            stored_market_type,
+            stored,
+            stored,
         )
-
-    # -----------------------------------------------------
-    # Market name detection
-    # -----------------------------------------------------
 
     market_name = _clean(
         getattr(
@@ -147,9 +130,13 @@ def _detect_market_type(
     if "MATCH ODDS" in market_name:
         return "MATCH_ODDS"
 
-    # -----------------------------------------------------
-    # Fancy fallback
-    # -----------------------------------------------------
+    market_id = _clean(
+        getattr(
+            selection,
+            "market_id",
+            "",
+        )
+    )
 
     runner_name = _clean(
         getattr(
@@ -159,80 +146,63 @@ def _detect_market_type(
         )
     )
 
-    market_id = _clean(
-        getattr(
-            selection,
-            "market_id",
-            "",
-        )
-    )
-
-    # Current ProExch Fancy IDs commonly look like:
-    #
-    # 36074941_55
-    #
-    # with a numeric runner/line such as:
-    #
-    # 151
-    # 151.5
-    #
-    if "_" in market_id:
-        if _extract_line(runner_name) is not None:
-            return "FANCY"
+    if (
+        "_" in market_id
+        and _extract_line(
+            runner_name
+        ) is not None
+    ):
+        return "FANCY"
 
     return "MATCH_ODDS"
 
 
 # =========================================================
-# EXTRACT PROVIDER RESULT ROWS
+# PROVIDER RESPONSE PARSING
 # =========================================================
 
 def _extract_result_rows(
     payload: Any,
 ) -> list[dict[str, Any]]:
-    """
-    Handles the confirmed ProExch structure:
 
-    {
-        "statusCode": 200,
-        "data": {
-            "data": [
-                {
-                    "id": "36074941_55",
-                    "result": "151"
-                }
-            ]
-        }
-    }
-
-    Also handles the wrapper returned by
-    proexch_api.get_proexch_betfair_result().
-    """
-
-    if not isinstance(payload, dict):
+    if not isinstance(
+        payload,
+        dict,
+    ):
         return []
 
     current = payload
 
-    # -----------------------------------------------------
-    # Our service wrapper
-    # -----------------------------------------------------
-
+    # Our ProExch service wraps the raw response
+    # inside "result".
     if isinstance(
         current.get("result"),
         dict,
     ):
         current = current["result"]
 
+    data = current.get(
+        "data"
+    )
+
     # -----------------------------------------------------
-    # Provider data wrapper
+    # Standard ProExch response:
+    #
+    # {
+    #   "data": {
+    #       "data": [...]
+    #   }
+    # }
     # -----------------------------------------------------
 
-    data = current.get("data")
+    if isinstance(
+        data,
+        dict,
+    ):
 
-    if isinstance(data, dict):
-
-        nested = data.get("data")
+        nested = data.get(
+            "data"
+        )
 
         if isinstance(
             nested,
@@ -241,26 +211,35 @@ def _extract_result_rows(
             return [
                 item
                 for item in nested
-                if isinstance(item, dict)
+                if isinstance(
+                    item,
+                    dict,
+                )
             ]
 
         if isinstance(
             nested,
             dict,
         ):
-            return [nested]
+            return [
+                nested
+            ]
 
-        # Single result directly inside data
-        if (
-            "result" in data
-            or "id" in data
-            or "winner" in data
-            or "winnerId" in data
+        if any(
+            key in data
+            for key in (
+                "id",
+                "result",
+                "winner",
+                "winnerId",
+            )
         ):
-            return [data]
+            return [
+                data
+            ]
 
     # -----------------------------------------------------
-    # Data is already a list
+    # Data itself is a list
     # -----------------------------------------------------
 
     if isinstance(
@@ -270,32 +249,41 @@ def _extract_result_rows(
         return [
             item
             for item in data
-            if isinstance(item, dict)
+            if isinstance(
+                item,
+                dict,
+            )
         ]
 
     # -----------------------------------------------------
     # Direct result object
     # -----------------------------------------------------
 
-    if (
-        "result" in current
-        or "id" in current
-        or "winner" in current
-        or "winnerId" in current
+    if any(
+        key in current
+        for key in (
+            "id",
+            "result",
+            "winner",
+            "winnerId",
+        )
     ):
-        return [current]
+        return [
+            current
+        ]
 
     return []
 
 
 # =========================================================
-# GET PROVIDER RESULT VALUE
+# GET PROVIDER RESULT
 # =========================================================
 
 def _get_result_value(
     selection: BetSelection,
     result_type: str,
 ) -> Optional[str]:
+
     market_id = _clean(
         getattr(
             selection,
@@ -305,53 +293,166 @@ def _get_result_value(
     )
 
     if not market_id:
+
+        print(
+            "[SETTLEMENT] Missing market ID:",
+            "selection=",
+            getattr(
+                selection,
+                "id",
+                "?",
+            ),
+            "type=",
+            result_type,
+        )
+
         return None
 
-    response = (
-        proexch_api.get_proexch_betfair_result(
-            market_id=market_id,
-            result_type=result_type,
+    # -----------------------------------------------------
+    # REQUEST PROEXCH RESULT
+    # -----------------------------------------------------
+
+    try:
+
+        response = (
+            proexch_api
+            .get_proexch_betfair_result(
+                market_id=market_id,
+                result_type=result_type,
+            )
         )
-    )
+
+    except Exception as exc:
+
+        print(
+            "[SETTLEMENT] Provider request exception:",
+            "market=",
+            market_id,
+            "type=",
+            result_type,
+            "error=",
+            repr(exc),
+        )
+
+        return None
+
+    # -----------------------------------------------------
+    # PROVIDER FAILURE
+    # -----------------------------------------------------
 
     if (
         not response
-        or not response.get("success")
+        or not response.get(
+            "success"
+        )
     ):
+
+        print(
+            "[SETTLEMENT] Provider result unavailable:",
+            "market=",
+            market_id,
+            "type=",
+            result_type,
+            "response=",
+            response,
+        )
+
         return None
+
+    # -----------------------------------------------------
+    # EXTRACT ROWS
+    # -----------------------------------------------------
 
     rows = _extract_result_rows(
         response
     )
 
     if not rows:
-        return None
 
-    for row in rows:
-
-        row_id = _clean(
-            row.get("id")
+        print(
+            "[SETTLEMENT] No result rows:",
+            "market=",
+            market_id,
+            "type=",
+            result_type,
         )
 
-        # -------------------------------------------------
-        # Exact market protection
-        # -------------------------------------------------
+        return None
 
-        if (
-            row_id
-            and row_id != market_id
-        ):
-            continue
+    # -----------------------------------------------------
+    # EXACT ID MATCH
+    # -----------------------------------------------------
 
-        # -------------------------------------------------
-        # Normal result field
-        # -------------------------------------------------
+    exact_rows = [
+        row
+        for row in rows
+        if _clean(
+            row.get("id")
+        ) == market_id
+    ]
 
-        result = row.get("result")
+    # -----------------------------------------------------
+    # SINGLE RESULT FALLBACK
+    # -----------------------------------------------------
+    #
+    # The request already targeted the exact market ID.
+    #
+    # Some ProExch responses can return one result row
+    # whose "id" representation differs from market_id.
+    #
+    # If exactly one row is returned, it is safe to use
+    # that row.
+    # -----------------------------------------------------
 
-        # -------------------------------------------------
-        # Additional possible provider fields
-        # -------------------------------------------------
+    if exact_rows:
+
+        candidate_rows = exact_rows
+
+    elif len(rows) == 1:
+
+        candidate_rows = rows
+
+    else:
+
+        print(
+            "[SETTLEMENT] Could not identify result row:",
+            "market=",
+            market_id,
+            "type=",
+            result_type,
+            "returned_ids=",
+            [
+                _clean(
+                    row.get("id")
+                )
+                for row in rows
+            ],
+        )
+
+        return None
+
+    # -----------------------------------------------------
+    # EXTRACT FINAL RESULT
+    # -----------------------------------------------------
+
+    pending_values = {
+        "",
+        "-",
+        "PENDING",
+        "OPEN",
+        "SUSPENDED",
+        "UNAVAILABLE",
+        "NULL",
+        "NONE",
+        "WAITING",
+        "PROCESSING",
+    }
+
+    for row in candidate_rows:
+
+        result = row.get(
+            "result"
+        )
 
         if result is None:
             result = row.get(
@@ -378,56 +479,65 @@ def _get_result_value(
                 "selection_id"
             )
 
-        if result is None:
-            continue
-
         result_text = _clean(
             result
         )
 
-        if not result_text:
-            continue
-
         # -------------------------------------------------
-        # Not settled yet
+        # RESULT NOT FINISHED
         # -------------------------------------------------
 
-        if result_text.upper() in {
-            "-",
-            "PENDING",
-            "OPEN",
-            "SUSPENDED",
-            "UNAVAILABLE",
-            "NULL",
-            "NONE",
-            "WAITING",
-            "PROCESSING",
-        }:
+        if (
+            result_text.upper()
+            in pending_values
+        ):
+
+            print(
+                "[SETTLEMENT] Result not final:",
+                "market=",
+                market_id,
+                "type=",
+                result_type,
+                "result=",
+                result_text,
+            )
+
             return None
 
-        return result_text
+        # -------------------------------------------------
+        # FINAL RESULT
+        # -------------------------------------------------
+
+        if result_text:
+
+            print(
+                "[SETTLEMENT] FINAL RESULT:",
+                "market=",
+                market_id,
+                "type=",
+                result_type,
+                "result=",
+                result_text,
+            )
+
+            return result_text
+
+    print(
+        "[SETTLEMENT] Result row has no usable result:",
+        market_id,
+        result_type,
+    )
 
     return None
 
 
 # =========================================================
-# EXTRACT FANCY LINE
+# FANCY LINE
 # =========================================================
 
 def _extract_line(
     text: Any,
 ) -> Optional[float]:
-    """
-    Accepted examples:
-
-        151
-        151.5
-        Over 151 Runs
-        Under 151.5 Runs
-        Team A 151
-
-    The last numeric value is used.
-    """
 
     value = _clean(
         text
@@ -445,6 +555,7 @@ def _extract_line(
         return None
 
     try:
+
         return float(
             numbers[-1]
         )
@@ -453,6 +564,7 @@ def _extract_line(
         TypeError,
         ValueError,
     ):
+
         return None
 
 
@@ -464,28 +576,6 @@ def _settle_fancy(
     selection: BetSelection,
     result_text: str,
 ) -> Optional[str]:
-    """
-    Current UI mapping:
-
-        BACK = YES
-        LAY  = NO
-
-    Example:
-
-        line   = 151
-        result = 154
-
-        BACK/YES -> WIN
-        LAY/NO   -> LOSS
-
-    Example:
-
-        line   = 151
-        result = 149
-
-        BACK/YES -> LOSS
-        LAY/NO   -> WIN
-    """
 
     result_value = _to_float(
         result_text
@@ -505,10 +595,6 @@ def _settle_fancy(
     line = _extract_line(
         runner_name
     )
-
-    # -----------------------------------------------------
-    # Fallback market name
-    # -----------------------------------------------------
 
     if line is None:
 
@@ -543,7 +629,7 @@ def _settle_fancy(
     ).upper()
 
     # -----------------------------------------------------
-    # Result greater than line
+    # RESULT ABOVE LINE
     # -----------------------------------------------------
 
     if result_value > line:
@@ -555,7 +641,7 @@ def _settle_fancy(
             return "lost"
 
     # -----------------------------------------------------
-    # Result lower than line
+    # RESULT BELOW LINE
     # -----------------------------------------------------
 
     if result_value < line:
@@ -567,7 +653,7 @@ def _settle_fancy(
             return "won"
 
     # -----------------------------------------------------
-    # Exact line
+    # RESULT EQUAL TO LINE
     # -----------------------------------------------------
 
     if result_value == line:
@@ -579,20 +665,13 @@ def _settle_fancy(
 
 
 # =========================================================
-# RESULT MATCH HELPER
+# STANDARD RESULT MATCHING
 # =========================================================
 
 def _contains_numeric_identifier(
     result_text: str,
     identifier: str,
 ) -> bool:
-    """
-    Avoids false substring matches such as:
-
-        selection_id = 12
-        result       = 312
-
-    """
 
     identifier = identifier.strip()
 
@@ -600,9 +679,10 @@ def _contains_numeric_identifier(
         return False
 
     if not identifier.isdigit():
+
         return (
-            identifier.lower()
-            in result_text.lower()
+            identifier.casefold()
+            in result_text.casefold()
         )
 
     pattern = (
@@ -611,40 +691,19 @@ def _contains_numeric_identifier(
         + r"(?!\d)"
     )
 
-    return re.search(
-        pattern,
-        result_text,
-    ) is not None
+    return (
+        re.search(
+            pattern,
+            result_text,
+        )
+        is not None
+    )
 
-
-# =========================================================
-# STANDARD MARKET SETTLEMENT
-# =========================================================
 
 def _standard_result_matches_selection(
     selection: BetSelection,
     provider_result: str,
 ) -> Optional[str]:
-    """
-    Handles standard Match Odds / Bookmaker results.
-
-    Provider result can commonly be:
-
-        selection ID
-        runner name
-        winner ID embedded in text
-        winner name embedded in text
-
-    IMPORTANT:
-
-        BACK:
-            selected runner wins  -> WIN
-            selected runner loses -> LOSS
-
-        LAY:
-            selected runner wins  -> LOSS
-            selected runner loses -> WIN
-    """
 
     result_text = _clean(
         provider_result
@@ -677,28 +736,35 @@ def _standard_result_matches_selection(
         )
     ).upper()
 
-    # -----------------------------------------------------
-    # Determine whether user's selected runner won
-    # -----------------------------------------------------
-
     selected_runner_won = False
 
-    # Exact selection ID
+    # -----------------------------------------------------
+    # EXACT SELECTION ID
+    # -----------------------------------------------------
+
     if (
         selection_id
         and result_text == selection_id
     ):
+
         selected_runner_won = True
 
-    # Exact runner name
+    # -----------------------------------------------------
+    # EXACT RUNNER NAME
+    # -----------------------------------------------------
+
     elif (
         runner_name
         and result_text.casefold()
         == runner_name.casefold()
     ):
+
         selected_runner_won = True
 
-    # Selection ID embedded in provider result
+    # -----------------------------------------------------
+    # SELECTION ID INSIDE RESULT
+    # -----------------------------------------------------
+
     elif (
         selection_id
         and _contains_numeric_identifier(
@@ -706,14 +772,19 @@ def _standard_result_matches_selection(
             selection_id,
         )
     ):
+
         selected_runner_won = True
 
-    # Runner name embedded in provider result
+    # -----------------------------------------------------
+    # RUNNER NAME INSIDE RESULT
+    # -----------------------------------------------------
+
     elif (
         runner_name
         and runner_name.casefold()
         in result_text.casefold()
     ):
+
         selected_runner_won = True
 
     # -----------------------------------------------------
@@ -725,8 +796,6 @@ def _standard_result_matches_selection(
         if selected_runner_won:
             return "won"
 
-        # A final provider winner that does not match
-        # the selected runner means the BACK bet lost.
         return "lost"
 
     # -----------------------------------------------------
@@ -738,14 +807,13 @@ def _standard_result_matches_selection(
         if selected_runner_won:
             return "lost"
 
-        # Selected runner did not win.
         return "won"
 
     return None
 
 
 # =========================================================
-# SYNC BALANCE
+# BALANCE SYNC
 # =========================================================
 
 def _set_user_balance(
@@ -753,13 +821,6 @@ def _set_user_balance(
     user: User,
     new_balance: Decimal,
 ) -> None:
-    """
-    User.balance is the balance used by the current bet
-    placement flow.
-
-    Wallet.balance is kept synchronized so the two models
-    do not diverge.
-    """
 
     user.balance = float(
         new_balance
@@ -786,32 +847,26 @@ def settle_one_bet(
     db: Session,
     bet: Bet,
 ) -> Optional[str]:
-    """
-    Returns:
-
-        "won"
-        "lost"
-        "void"
-        None
-
-    None means:
-        still pending
-        provider result unavailable
-        unsupported market
-        incomplete data
-    """
 
     # -----------------------------------------------------
-    # Only pending bets
+    # ONLY PENDING
     # -----------------------------------------------------
 
-    if _clean(
-        bet.status
-    ).lower() != "pending":
+    if (
+        _clean(
+            getattr(
+                bet,
+                "status",
+                "",
+            )
+        ).lower()
+        != "pending"
+    ):
+
         return None
 
     # -----------------------------------------------------
-    # Get selections
+    # GET SELECTION
     # -----------------------------------------------------
 
     selections = list(
@@ -832,12 +887,7 @@ def settle_one_bet(
 
         return None
 
-    # Current place-bet flow creates one selection.
     selection = selections[0]
-
-    # -----------------------------------------------------
-    # Detect market
-    # -----------------------------------------------------
 
     market_type = _detect_market_type(
         selection
@@ -852,11 +902,9 @@ def settle_one_bet(
         "SESSION",
     }:
 
-        provider_type = "new_fancy"
-
         result_text = _get_result_value(
             selection,
-            provider_type,
+            "new_fancy",
         )
 
         if result_text is None:
@@ -866,9 +914,6 @@ def settle_one_bet(
             selection,
             result_text,
         )
-
-        if settlement is None:
-            return None
 
     # =====================================================
     # MATCH ODDS
@@ -891,9 +936,6 @@ def settle_one_bet(
             )
         )
 
-        if settlement is None:
-            return None
-
     # =====================================================
     # BOOKMAKER
     # =====================================================
@@ -915,9 +957,6 @@ def settle_one_bet(
             )
         )
 
-        if settlement is None:
-            return None
-
     else:
 
         print(
@@ -929,8 +968,11 @@ def settle_one_bet(
 
         return None
 
+    if settlement is None:
+        return None
+
     # =====================================================
-    # IDEMPOTENCY CHECK
+    # IDEMPOTENCY
     # =====================================================
 
     existing_settlement = (
@@ -938,6 +980,7 @@ def settle_one_bet(
         .filter(
             Transaction.reference_type
             == "bet_settlement",
+
             Transaction.reference_id
             == bet.id,
         )
@@ -946,8 +989,6 @@ def settle_one_bet(
 
     if existing_settlement:
 
-        # A settlement transaction already exists.
-        # Never create another payout/refund.
         bet.status = settlement
 
         return settlement
@@ -974,7 +1015,7 @@ def settle_one_bet(
         return None
 
     # =====================================================
-    # MONEY VALUES
+    # MONEY
     # =====================================================
 
     stake = (
@@ -999,21 +1040,21 @@ def settle_one_bet(
     )
 
     # =====================================================
-    # WIN
+    # WON
     # =====================================================
 
     if settlement == "won":
 
-        # potential_win represents TOTAL return.
+        # potential_win is the TOTAL return.
         #
         # Example:
         #
-        # stake         = 100
-        # odds          = 1.50
+        # stake = 100
+        # odds = 1.50
         # potential_win = 150
         #
-        # Stake was already deducted at placement.
-        # Therefore we credit the full 150.
+        # The stake was already deducted.
+        # Therefore credit the full 150.
 
         credit = potential_win
 
@@ -1064,26 +1105,18 @@ def settle_one_bet(
         return "won"
 
     # =====================================================
-    # LOSS
+    # LOST
     # =====================================================
 
     if settlement == "lost":
 
-        # Stake was already deducted when the bet
-        # was placed.
-
-        # No money is added on a losing bet.
-
-        # We still synchronize Wallet.balance with
-        # User.balance so old discrepancies are repaired.
+        # Stake was already deducted at placement.
 
         _set_user_balance(
             db,
             user,
             current_balance,
         )
-
-        bet.status = "lost"
 
         transaction = Transaction(
             user_id=user.id,
@@ -1101,6 +1134,8 @@ def settle_one_bet(
             transaction
         )
 
+        bet.status = "lost"
+
         print(
             "[SETTLEMENT] LOST:",
             "bet=",
@@ -1116,8 +1151,6 @@ def settle_one_bet(
     # =====================================================
 
     if settlement == "void":
-
-        # Return original stake.
 
         new_balance = (
             current_balance
@@ -1174,22 +1207,8 @@ def settle_one_bet(
 
 def settle_pending_bets(
     db: Session,
-    limit: int = 100,
+    limit: int = SETTLEMENT_BATCH_SIZE,
 ) -> dict[str, int]:
-    """
-    Settles pending bets one by one.
-
-    IMPORTANT:
-    Each successfully settled bet is committed separately.
-
-    This prevents:
-
-        Bet #1 -> successful settlement
-        Bet #2 -> exception
-        rollback()
-        => Bet #1 payout accidentally disappears
-
-    """
 
     stats = {
         "checked": 0,
@@ -1224,41 +1243,41 @@ def settle_pending_bets(
             )
 
             # -------------------------------------------------
-            # Nothing final yet
+            # Still waiting for provider result
             # -------------------------------------------------
 
             if result is None:
 
                 stats["pending"] += 1
 
-                # No changes need committing.
                 continue
 
             # -------------------------------------------------
-            # Commit THIS settlement immediately
+            # Commit this settlement immediately.
             # -------------------------------------------------
 
             db.commit()
 
             if result == "won":
+
                 stats["won"] += 1
 
             elif result == "lost":
+
                 stats["lost"] += 1
 
             elif result == "void":
+
                 stats["void"] += 1
 
         except Exception as exc:
 
             stats["errors"] += 1
 
-            # Roll back ONLY this failed transaction.
-            # Earlier successfully committed settlements
-            # remain safe.
-
             try:
+
                 db.rollback()
+
             except Exception:
                 pass
 
@@ -1280,7 +1299,7 @@ def settle_pending_bets(
 # =========================================================
 
 def run_settlement_cycle(
-    limit: int = 100,
+    limit: int = SETTLEMENT_BATCH_SIZE,
 ) -> dict[str, int]:
 
     generator = get_db()
@@ -1299,24 +1318,30 @@ def run_settlement_cycle(
     finally:
 
         try:
+
             next(generator)
 
         except StopIteration:
+
             pass
 
 
 # =========================================================
-# SIMPLE CONTINUOUS WORKER
+# CONTINUOUS WORKER
 # =========================================================
 
 def settlement_worker_loop(
-    interval_seconds: float = 5.0,
+    interval_seconds: float = SETTLEMENT_INTERVAL,
 ) -> None:
-
-    import time
 
     print(
         "[SETTLEMENT] Worker started"
+    )
+
+    print(
+        "[SETTLEMENT] Poll interval:",
+        interval_seconds,
+        "seconds",
     )
 
     while True:
