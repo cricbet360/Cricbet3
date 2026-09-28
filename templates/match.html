@@ -4574,42 +4574,36 @@
    ACCOUNT BUTTONS
 ========================================================= */
 
+      const WHATSAPP_NUMBER = "919289461279";
+
       function openWhatsApp(message) {
+        if (!WHATSAPP_NUMBER) {
+          return;
+        }
 
-          if (!WHATSAPP_NUMBER) {
-            return;
-          }
+        const url =
+          "https://wa.me/" +
+          WHATSAPP_NUMBER +
+          "?text=" +
+          encodeURIComponent(message);
 
-      const url =
-          `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-
-      window.location.href = url;
+        // Same-tab redirect: works on phones (window.open gets blocked).
+        window.location.href = url;
       }
-
 
       function openDepositWhatsApp() {
-
-          openWhatsApp(
-              "Hello, I want to make a deposit in CricBet."
-          );
+        openWhatsApp("Hello, I want to make a deposit in CricBet.");
       }
-
 
       function openWithdrawWhatsApp() {
-
-          openWhatsApp(
-              "Hello, I want to make a withdrawal from CricBet."
-          );
+        openWhatsApp("Hello, I want to make a withdrawal from CricBet.");
       }
-
 
       function openCryptoWhatsApp() {
-
-          openWhatsApp(
-              "Hello, I want to make a Crypto transaction in CricBet. Please provide the details."
-          );
+        openWhatsApp(
+          "Hello, I want to make a Crypto transaction in CricBet. Please provide the details.",
+        );
       }
-
 
       /* =========================================================
    ACCOUNT SETUP
@@ -4623,15 +4617,15 @@
         const crypto = document.getElementById("matchCryptoBtn");
 
         if (deposit) {
-          deposit.addEventListener("click", matchPageDeposit);
+          deposit.addEventListener("click", openDepositWhatsApp);
         }
 
         if (withdraw) {
-          withdraw.addEventListener("click", matchPageWithdraw);
+          withdraw.addEventListener("click", openWithdrawWhatsApp);
         }
 
         if (crypto) {
-          crypto.addEventListener("click", matchPageCrypto);
+          crypto.addEventListener("click", openCryptoWhatsApp);
         }
 
         loadMatchPageBalance();
