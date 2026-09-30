@@ -3197,25 +3197,39 @@
           const marketType =
             String(item.marketType || "").toUpperCase();
 
-          let payoutMultiplier =
-            numberValue(item.odds);
+          const odds = numberValue(item.odds);
+
+          let potentialReturn = 0;
           
-          if (
+          if (marketType === "BOOKMAKER"){
+            potentialReturn = 
+              stake * (1 + odds / 100);
+          }
+
+          else if (
             marketType === "FANCY" ||
             marketType === "SESSION"
           ) {
             const payoutPercent =
               numberValue(item.payoutPercent);
-            
+
             if (payoutPercent > 0) {
-              payoutMultiplier =
-                1 + payoutPercent / 100;
+              potentialReturn =
+                stake * (1 + payoutPercent / 100);
+            } else {
+              potentialReturn = 0;
             }
           }
+          else {
+            potentialReturn =
+              stake * odds;
+          }
+
           totalStake += stake;
-          totalReturn +=
-             stake * payoutMultiplier;
+          totalReturn += potentialReturn;
+
         });
+          
 
         if (totalStakeElement) {
           totalStakeElement.textContent = "₹" + totalStake.toFixed(2);
