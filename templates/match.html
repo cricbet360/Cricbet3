@@ -392,6 +392,45 @@
         letter-spacing: 0.7px;
       }
 
+      .team-role-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 6px;
+      }
+
+      .team-role-badges {
+        gap: 3px;
+      }
+
+      .batting-badge,
+      .bowling-badge {
+        font-size: 6px;
+        padding: 3px 5px;
+      }
+
+      .batting-badge,
+      .bowling-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3px 7px;
+        border-radius: 4px;
+        font-size: 8px;
+        font-weight: 900;
+        letter-spacing: 0.7px;
+      }
+
+      .batting-badge {
+        background: #123f29;
+        color: #65e59c;
+      }
+
+      .bowling-badge {
+        background: #263b58;
+        color: #9ecbff;
+      }
+
       .score-center {
         display: flex;
         flex-direction: column;
@@ -1634,8 +1673,15 @@
 
                 <div id="scoreTeam1Overs" class="score-team-overs"></div>
 
-                <div id="scoreTeam1Batting" class="batting-badge" hidden>
-                  BATTING
+                <div class="team-role-badges">
+                  <div id="scoreTeam1Batting" class="batting-badge" hidden>
+                    BATTING
+                  </div>
+
+                   <div id="scoreTeam1Bowling" class="bowling-badge" hidden>
+                    BOWLING
+                  </div>
+                
                 </div>
               </div>
             </div>
@@ -1670,8 +1716,14 @@
 
                 <div id="scoreTeam2Overs" class="score-team-overs"></div>
 
-                <div id="scoreTeam2Batting" class="batting-badge" hidden>
-                  BATTING
+                <div class="team-role-badges">
+                  <div id="scoreTeam2Batting" class="batting-badge" hidden>
+                    BATTING
+                  </div>
+
+                  <div id="scoreTeam2Bowling" class="bowling-badge" hidden>
+                    BOWLING
+                  </div>
                 </div>
               </div>
             </div>
@@ -2156,11 +2208,17 @@
           const live =
             match.in_play === true ||
             match.in_play === 1 ||
-            match.in_play === "true";
+            String(match.in_play).toLowerCase() === "true";
 
-          status.textContent = live ? "LIVE" : "UPCOMING";
-
-          status.classList.toggle("live-badge", live);
+          if (live) {
+            status.textContent = "LIVE";
+            status.classList.add("live-badge");
+            status.style.display = "inline-flex";
+          } else {
+            status.textContent = "";
+            status.classList.remove("live-badge");
+            status.style.display = "none";
+          }
         }
 
         setText("matchTime", formatTime(match.event_time));
@@ -3553,8 +3611,30 @@
 
         const liveValue = firstData(score, ["LiveCommentary"]);
 
-        const isLive = String(liveValue) === "1";
+        const isLive = 
+          String(liveValue) === "1" ||
+          String(liveValue).trim().toLowerCase() === "true";
+        
+        /*
+ * Keep the main match header synchronized
+ * with the actual scoreboard live state.
+ */
+        const matchStatus = document.getElementById("matchStatus");
 
+        if (matchStatus) {
+          if (isLive) {
+            matchStatus.textContent = "LIVE";
+            matchStatus.classList.add("live-badge");
+            matchStatus.style.display = "inline-flex";
+          } else {
+    /*
+     * Never show UPCOMING.
+     */
+            matchStatus.textContent = "";
+            matchStatus.classList.remove("live-badge");
+            matchStatus.style.display = "none";
+          }
+        }
         if (badge) {
           if (isLive) {
             badge.className = "scoreboard-status";
@@ -3671,20 +3751,32 @@
         const team1Badge = document.getElementById("scoreTeam1Batting");
 
         const team2Badge = document.getElementById("scoreTeam2Batting");
+        const team1Bowling = document.getElementById("scoreTeam1Bowling");
+        const team2Bowling = document.getElementById("scoreTeam2Bowling");
+
 
         /*
          * ALWAYS hide both first.
          */
 
-        if (team1Badge) {
-          team1Badge.hidden = true;
+        if (team1Batting) {
+          team1Batting.hidden = true;
         }
 
-        if (team2Badge) {
-          team2Badge.hidden = true;
+        if (team2Batting) {
+          team2Batting.hidden = true;
         }
 
-        const rawInning = firstData(score, ["CurrentInning"]);
+        if (team1Bowling) {
+          team1Bowling.hidden = true;
+        }
+
+        if (team2Bowling) {
+          team2Bowling.hidden = true;
+        }
+
+
+        const rawInning = firstData(score, ["CurrentInning",]);
 
         /*
          * Do not turn missing data into 0.
