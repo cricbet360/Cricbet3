@@ -14,6 +14,7 @@ from models.transaction import Transaction
 
 from services.bet_settlement import settle_pending_bets
 
+
 router = APIRouter(
     prefix="/bets",
     tags=["Bets"],
@@ -145,11 +146,13 @@ async def place_bet(
     # =====================================================
 
     try:
+
         user = (
             db.query(User)
             .filter(User.id == user_id)
             .first()
         )
+
     except Exception as exc:
 
         db.rollback()
@@ -213,6 +216,10 @@ async def place_bet(
         payload.selection_name or ""
     ).strip()
 
+    # =====================================================
+    # REQUIRED FIELDS
+    # =====================================================
+
     if not game_id:
         return _error(
             "Missing game ID."
@@ -237,7 +244,7 @@ async def place_bet(
         event_id = game_id
 
     # =====================================================
-    # MARKET TYPE
+    # MARKET TYPE VALIDATION
     # =====================================================
 
     allowed_market_types = {
@@ -262,6 +269,7 @@ async def place_bet(
     )
 
     if side_error:
+
         return _error(
             side_error
         )
@@ -355,6 +363,37 @@ async def place_bet(
         )
 
     # =====================================================
+    # CANONICAL MARKET ID
+    # =====================================================
+    #
+    # ProExch result endpoint:
+    #
+    # FANCY / SESSION:
+    #   event_id_selection_id
+    #
+    # Example:
+    #   36111678_91
+    #
+    # MATCH_ODDS:
+    #   original market_id
+    #
+    # BOOKMAKER:
+    #   original market_id
+    #
+    # =====================================================
+
+    stored_market_id = market_id
+
+    if market_type in {
+        "FANCY",
+        "SESSION",
+    }:
+
+        stored_market_id = (
+            f"{event_id}_{selection_id}"
+        )
+
+    # =====================================================
     # FANCY / SESSION PAYOUT
     # =====================================================
 
@@ -411,8 +450,13 @@ async def place_bet(
 
     elif market_type == "BOOKMAKER":
 
-        # Bookmaker odds are stored/entered like a percentage,
-        # e.g. odds=54 on a stake of 100 -> win 154.00 (100 + 54% of 100)
+        # Bookmaker odds are treated as percentage profit.
+        #
+        # Example:
+        # odds = 54
+        # stake = 100
+        # return = 154
+
         payout_percent = None
 
         bookmaker_multiplier = (
@@ -434,6 +478,8 @@ async def place_bet(
         )
 
     else:
+
+        # MATCH_ODDS
 
         payout_percent = None
 
@@ -479,7 +525,7 @@ async def place_bet(
 
         db.add(bet)
 
-        # Generate bet.id
+        # Generate bet ID
         db.flush()
 
         # -------------------------------------------------
@@ -517,7 +563,7 @@ async def place_bet(
         bet_selection = BetSelection(
             bet_id=bet.id,
 
-            market_id=market_id,
+            market_id=stored_market_id,
 
             event_id=event_id,
 
@@ -531,15 +577,14 @@ async def place_bet(
 
             price=float(odds),
 
-           
-            
-
             market_name=market_name,
 
             event_name=None,
         )
 
-        db.add(bet_selection)
+        db.add(
+            bet_selection
+        )
 
         # -------------------------------------------------
         # UPDATE USER BALANCE
@@ -591,7 +636,9 @@ async def place_bet(
             ),
         )
 
-        db.add(transaction)
+        db.add(
+            transaction
+        )
 
         # -------------------------------------------------
         # COMMIT
@@ -599,56 +646,86 @@ async def place_bet(
 
         db.commit()
 
-        db.refresh(bet)
+        db.refresh(
+            bet
+        )
 
-        db.refresh(user)
+        db.refresh(
+            user
+        )
+
+        # -------------------------------------------------
+        # RESPONSE
+        # -------------------------------------------------
 
         return {
             "success": True,
 
-            "message": "Bet placed successfully.",
+            "message":
+                "Bet placed successfully.",
 
-            "bet_id": bet.id,
+            "bet_id":
+                bet.id,
 
-            "status": bet.status,
+            "status":
+                bet.status,
 
-            "game_id": game_id,
+            "game_id":
+                game_id,
 
-            "event_id": event_id,
+            "event_id":
+                event_id,
 
-            "market_id": market_id,
+            # IMPORTANT:
+            # For FANCY/SESSION this is now:
+            # event_id_selection_id
+            "market_id":
+                stored_market_id,
 
-            "market_type": market_type,
+            "market_type":
+                market_type,
 
-            "market_name": market_name,
+            "market_name":
+                market_name,
 
-            "selection_id": selection_id,
+            "selection_id":
+                selection_id,
 
-            "selection_name": selection_name,
+            "selection_name":
+                selection_name,
 
-            "side": side,
+            "side":
+                side,
 
             "display_side": (
                 "YES"
                 if (
                     market_type
-                    in {"FANCY", "SESSION"}
+                    in {
+                        "FANCY",
+                        "SESSION",
+                    }
                     and side == "BACK"
                 )
                 else (
                     "NO"
                     if (
                         market_type
-                        in {"FANCY", "SESSION"}
+                        in {
+                            "FANCY",
+                            "SESSION",
+                        }
                         and side == "LAY"
                     )
                     else side
                 )
             ),
 
-            "stake": float(stake),
+            "stake":
+                float(stake),
 
-            "odds": float(odds),
+            "odds":
+                float(odds),
 
             "payout_percent": (
                 float(payout_percent)
@@ -656,13 +733,15 @@ async def place_bet(
                 else None
             ),
 
-            "potential_win": float(
-                potential_win
-            ),
+            "potential_win":
+                float(
+                    potential_win
+                ),
 
-            "balance": float(
-                new_balance
-            ),
+            "balance":
+                float(
+                    new_balance
+                ),
         }
 
     except Exception as exc:
@@ -749,6 +828,20 @@ async def my_bets(
                     display_market_name = (
                         parts[1].strip()
                     )
+
+                # Fallback:
+                # If the stored market_name does not
+                # contain the type, use selection.market_type.
+                if not market_type:
+
+                    market_type = str(
+                        getattr(
+                            selection,
+                            "market_type",
+                            "",
+                        )
+                        or ""
+                    ).strip().upper()
 
                 selections.append(
                     {
@@ -860,14 +953,23 @@ async def my_bets(
             500,
         )
 
+
+# =========================================================
+# MANUAL SETTLEMENT TRIGGER
+# =========================================================
+
 @router.post("/settle-pending")
 def settle_pending(
     request: Request,
     db: Session = Depends(get_db),
 ):
-    user_id = request.session.get("user_id")
+
+    user_id = request.session.get(
+        "user_id"
+    )
 
     if not user_id:
+
         return JSONResponse(
             status_code=401,
             content={
@@ -877,6 +979,7 @@ def settle_pending(
         )
 
     try:
+
         stats = settle_pending_bets(
             db,
             limit=100,
@@ -884,11 +987,16 @@ def settle_pending(
 
         return {
             "success": True,
-            "message": "Settlement cycle completed.",
-            "stats": stats,
+
+            "message":
+                "Settlement cycle completed.",
+
+            "stats":
+                stats,
         }
 
     except Exception as exc:
+
         db.rollback()
 
         print(
