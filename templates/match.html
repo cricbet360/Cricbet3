@@ -3748,17 +3748,15 @@
 ========================================================= */
 
       function renderBattingSide(score) {
-        const team1Badge = document.getElementById("scoreTeam1Batting");
+        const team1Batting = document.getElementById("scoreTeam1Batting");
+        const team2Batting = document.getElementById("scoreTeam2Batting");
 
-        const team2Badge = document.getElementById("scoreTeam2Batting");
         const team1Bowling = document.getElementById("scoreTeam1Bowling");
         const team2Bowling = document.getElementById("scoreTeam2Bowling");
 
-
-        /*
-         * ALWAYS hide both first.
-         */
-
+  /*
+   * Always reset all four role badges first.
+   */
         if (team1Batting) {
           team1Batting.hidden = true;
         }
@@ -3775,45 +3773,198 @@
           team2Bowling.hidden = true;
         }
 
+  /*
+   * Current innings.
+   */
+        const rawInning = firstData(score, [
+          "CurrentInning",
+          "currentInning",
+          "Inning",
+          "inning",
+        ]);
 
-        const rawInning = firstData(score, ["CurrentInning",]);
+        const inning = parseInt(
+          String(rawInning || "").trim(),
+          10,
+        );
 
-        /*
-         * Do not turn missing data into 0.
-         */
-
-        if (!hasData(rawInning)) {
+  /*
+   * Keep the innings display.
+   */
+        if (Number.isInteger(inning) && inning > 0) {
+          setText(
+            "scoreCurrentInning",
+            ordinalInning(inning),
+          );
+        } else {
           setText("scoreCurrentInning", "");
-
-          return;
         }
 
-        const inning = parseInt(String(rawInning).trim(), 10);
+  /*
+   * =========================================================
+   * TEAM NAME NORMALIZATION
+   * =========================================================
+   */
+        function normalizeTeamName(value) {
+          return String(value || "")
+            .replace(/\*/g, "")
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, "");
+        } 
 
-        if (!Number.isInteger(inning) || inning <= 0) {
-          setText("scoreCurrentInning", "");
+  /*
+   * =========================================================
+   * RESOLVE TEAM FROM PROVIDER VALUE
+   * =========================================================
+   *
+   * Supports:
+   *   1
+   *   2
+   *   Team1
+   *   Team2
+   *   actual team name
+   */
+        function resolveTeamIndex(value) {
+          if (!hasData(value)) {
+            return 0;
+          }
 
-          return;
+          const text = String(value).trim();
+          const lower = text.toLowerCase();
+
+          if (
+            lower === "1" ||
+            lower === "team1" ||
+            lower === "team 1"
+          ) {
+            return 1;
+          }
+
+          if (
+            lower === "2" ||
+            lower === "team2" ||
+            lower === "team 2"
+          ) {
+            return 2;
+          }
+
+          const team1Name =
+            firstData(score, ["Team1Name"]);
+
+          const team2Name =
+            firstData(score, ["Team2Name"]);
+
+          const normalizedValue =
+            normalizeTeamName(text);
+
+          const normalizedTeam1 =
+            normalizeTeamName(team1Name);
+
+          const normalizedTeam2 =
+            normalizeTeamName(team2Name);
+
+          if (
+            normalizedTeam1 &&
+            normalizedValue === normalizedTeam1
+          ) {
+            return 1;
+          }
+
+          if (
+            normalizedTeam2 &&
+            normalizedValue === normalizedTeam2
+          ) {
+            return 2;
+          }
+
+          return 0;
         }
 
-        setText("scoreCurrentInning", ordinalInning(inning));
+  /*
+   * =========================================================
+   * TRY EXPLICIT BATTING TEAM FROM SCORE FEED
+   * =========================================================
+   */
+        const battingValue = firstData(score, [
+          "BattingTeam",
+          "BattingTeamName",
+          "CurrentBattingTeam",
+          "CurrentBattingTeamName",
+          "TeamBatting",
+          "CurrentTeamBatting",
+          "StrikerTeam",
+        ]);
 
-        /*
-         * Only current innings gets BATTING.
-         *
-         * 1 -> Team 1
-         * 2 -> Team 2
-         */
+        let battingTeam = resolveTeamIndex(battingValue);
 
-        if (inning === 1) {
-          if (team1Badge) {
-            team1Badge.hidden = false;
+  /*
+   * =========================================================
+   * FALLBACK TO CURRENT INNING
+   * =========================================================
+   *
+   * Normal limited-overs match:
+   *
+   * 1st innings -> Team 1 batting
+   * 2nd innings -> Team 2 batting
+   */
+        if (!battingTeam) {
+          if (inning === 1) {
+            battingTeam = 1;
+          } else if (inning === 2) {
+            battingTeam = 2;
           }
         }
 
-        if (inning === 2) {
-          if (team2Badge) {
-            team2Badge.hidden = false;
+  /*
+   * =========================================================
+   * TRY EXPLICIT BOWLING TEAM
+   * =========================================================
+   */
+        const bowlingValue = firstData(score, [
+          "BowlingTeam",
+          "BowlingTeamName",
+          "CurrentBowlingTeam",
+          "CurrentBowlingTeamName",
+          "TeamBowling",
+          "CurrentTeamBowling",
+        ]);
+
+        let bowlingTeam = resolveTeamIndex(bowlingValue);
+
+  /*
+   * If provider doesn't give bowling team,
+   * it is the opposite side of the batting team.
+   */
+        if (!bowlingTeam && (battingTeam === 1 || battingTeam === 2)) {
+          bowlingTeam = battingTeam === 1 ? 2 : 1;
+        }
+
+  /*
+   * =========================================================
+   * SHOW CORRECT ROLES
+   * =========================================================
+   */
+        if (battingTeam === 1) {
+          if (team1Batting) {
+            team1Batting.hidden = false;
+          }
+        }
+
+        if (battingTeam === 2) {
+          if (team2Batting) {
+            team2Batting.hidden = false;
+          }
+        }
+
+        if (bowlingTeam === 1) {
+          if (team1Bowling) {
+            team1Bowling.hidden = false;
+          }
+        }
+
+        if (bowlingTeam === 2) {
+          if (team2Bowling) {
+            team2Bowling.hidden = false;
           }
         }
       }
