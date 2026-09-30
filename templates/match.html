@@ -49,154 +49,232 @@
       /* =========================================================
            ACCOUNT BAR
         ========================================================= */
-/* ---------- base ---------- */
-.topbar, .topbar button, .topbar a {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-}
-.topbar { font-size: 14px; color: #f1f5f3; }
-.topbar button { font-size: inherit; border: 0; }
-.topbar a { color: inherit; text-decoration: none; }
 
-.topbar {
-  width: 100%; min-height: 64px;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 24px;
-  background: #0a2117; border-bottom: 1px solid #173c2a;
-  position: sticky; top: 0; z-index: 10000;
-}
+      .account-topbar {
+        width: 100%;
+        min-height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 10px 24px;
+        background: #0a2117;
+        border-bottom: 1px solid #173c2a;
+        position: sticky;
+        top: 0;
+        z-index: 10000;
+      }
 
-.brand { display: flex; align-items: center; gap: 9px; user-select: none; }
-.brand-icon { font-size: 25px; line-height: 1; }
-.brand-text { color: #fff; font-size: 21px; font-weight: 900; letter-spacing: 1.2px; }
-.brand-accent { color: #22b56b; }
+      .account-brand {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        color: #ffffff;
+        font-size: 21px;
+        font-weight: 900;
+        letter-spacing: 1.2px;
+        white-space: nowrap;
+      }
 
-.topbar-right {
-  display: flex; align-items: center; justify-content: flex-end;
-  gap: 10px; flex-wrap: nowrap;
-}
-.balance {
-  display: flex; flex-direction: column; align-items: flex-end;
-  justify-content: center; margin-right: 6px; flex-shrink: 0; white-space: nowrap;
-}
-.balance-label {
-  color: #8da99b; font-size: 10px; line-height: 12px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .7px;
-}
-.balance-value { color: #fff; font-size: 14px; font-weight: 800; white-space: nowrap; }
+      .account-brand-icon {
+        font-size: 25px;
+        line-height: 1;
+      }
 
-/* ---------- buttons ---------- */
-.topbar-action, .profile-link, .logout {
-  min-height: 36px; display: inline-flex; align-items: center; justify-content: center;
-  padding: 0 13px; border-radius: 6px; font-size: 12px; font-weight: 800;
-  transition: background .2s ease, border-color .2s ease, color .2s ease, transform .15s ease;
-}
-.topbar-action { cursor: pointer; flex-shrink: 0; white-space: nowrap; }
+      .account-brand-accent {
+        color: #22b56b;
+      }
 
-.deposit-action { background: #138653; color: #fff; }
-.deposit-action:hover { background: #17a565; transform: translateY(-1px); }
+      .account-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
 
-.withdraw-action { background: #132d21; color: #dce9e3; border: 1px solid #28533e; }
-.withdraw-action:hover { background: #1a3a2a; border-color: #397357; }
+      .account-balance {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: center;
+        min-width: 95px;
+        margin-right: 4px;
+      }
 
-/* ---------- hamburger ---------- */
-.account-menu { position: relative; flex-shrink: 0; }
-.account-menu-toggle {
-  width: 42px; height: 38px;
-  display: flex; align-items: center; justify-content: center; flex-direction: column;
-  gap: 4px; padding: 0;
-  border: 1px solid #28533e; border-radius: 6px;
-  background: #102c20; cursor: pointer;
-}
-.account-menu-toggle:hover { background: #17412d; }
-.account-menu-toggle span {
-  display: block; width: 18px; height: 2px; background: #fff; border-radius: 2px;
-  transition: transform .2s ease, opacity .2s ease;
-}
-.account-menu-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
-.account-menu-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
-.account-menu-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+      .account-balance-label {
+        color: #8da99b;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+      }
 
-/* ---------- dropdown ---------- */
-.account-menu-dropdown {
-  position: absolute; top: calc(100% + 8px); right: 0; min-width: 145px;
-  display: none; flex-direction: column; padding: 6px;
-  background: #092519; border: 1px solid #28533e; border-radius: 7px;
-  box-shadow: 0 12px 30px rgba(0,0,0,.35); z-index: 9999;
-}
-.account-menu-dropdown.open { display: flex; }
-.account-menu-dropdown a {
-  display: flex; align-items: center; min-height: 36px; padding: 0 12px;
-  border-radius: 5px; white-space: nowrap;
-}
-.account-menu-dropdown .profile-link { color: #dce9e3; }
-.account-menu-dropdown .profile-link:hover { background: #143c29; }
-.account-menu-dropdown .logout { color: #ffaaaa; }
-.account-menu-dropdown .logout:hover { background: #321817; }
+      .account-balance-value {
+        min-width: 80px;
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 800;
+        text-align: right;
+        white-space: nowrap;
+      }
 
-/* ---------- HOME / CRICKET tabs ---------- */
-.main-mode-nav {
-  width: 100%; display: flex; align-items: center; padding: 0 24px;
-  background: #091f15; border-bottom: 1px solid #173b29;
-}
-.mode-tab {
-  min-width: 100px; height: 45px;
-  display: inline-flex; align-items: center; justify-content: center;
-  background: transparent; color: #779287; border: 0; border-bottom: 2px solid transparent;
-  cursor: pointer; font-family: Inter, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  font-size: 12px; font-weight: 900; letter-spacing: .8px;
-  transition: color .2s ease, border-color .2s ease, background .2s ease;
-}
-.mode-tab:hover { color: #fff; background: #0d281c; }
-.mode-tab.active { color: #27c274; border-bottom-color: #20ad68; }
+      .account-action,
+      .account-profile,
+      .account-logout {
+        min-height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 13px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 800;
+        text-decoration: none;
+        white-space: nowrap;
+      }
 
-/* ---------- mobile ---------- */
-@media (max-width: 750px) {
-  .topbar { min-height: 58px; padding: 0 12px; }
-  .brand-text { font-size: 18px; }
-  .brand-icon { font-size: 21px; }
-  .topbar-right { gap: 5px; }
-  .balance { margin-right: 2px; }
-  .balance-label { display: none; }
-  .topbar-action, .profile-link, .logout { min-height: 32px; padding: 0 8px; font-size: 9px; }
-  .main-mode-nav { padding: 0 12px; }
-  .mode-tab { min-width: 82px; height: 41px; font-size: 10px; }
-}
-@media (max-width: 700px) {
-  .topbar-right { width: auto; }
-  .balance { flex-shrink: 1; min-width: 0; }
-  .balance-label { font-size: 8px; }
-  .balance-value { font-size: 12px; }
-  .topbar-right .topbar-action { height: 36px; padding: 0 9px; font-size: 10px; flex-shrink: 1; }
-  .account-menu-toggle { width: 38px; height: 36px; flex-shrink: 0; }
-  .topbar-right > .profile-link, .topbar-right > .logout { display: none; }
-}
-@media (max-width: 480px) {
-  .topbar { padding: 0 8px; }
-  .brand-text { font-size: 16px; }
-  .brand-icon { display: none; }
-  .logout { padding-left: 7px; padding-right: 7px; }
-  .topbar-action { padding-left: 7px; padding-right: 7px; }
-}
-@media (max-width: 430px) {
-  .topbar-right { gap: 3px; }
-  .topbar-right .topbar-action { padding: 0 7px; font-size: 9px; }
-  .topbar-right .balance-value { font-size: 11px; }
-}
-@media (max-width: 360px) {
-  .withdraw-action { display: none; }
-  .brand-text { font-size: 15px; }
-  .balance-value { font-size: 12px; }
+      .account-action {
+        border: 0;
+        cursor: pointer;
+        font-family: inherit;
+      }
 
-/* ---------- phone safety ---------- */
-.brand { flex-shrink: 0; }
-.topbar-right { min-width: 0; }
-@media (max-width: 430px) {
-  .topbar { gap: 6px; }
-  .brand-text { letter-spacing: .6px; }
-  .topbar-right .balance-value { font-size: 10px; }
-  .account-menu-toggle { width: 34px; }
-}
-}
+      .account-deposit {
+        background: #138653;
+        color: #ffffff;
+      }
+
+      .account-deposit:hover {
+        background: #17a565;
+      }
+
+      .account-withdraw {
+        background: #132d21;
+        color: #dce9e3;
+        border: 1px solid #28533e;
+      }
+
+      .account-withdraw:hover {
+        background: #1a3a2a;
+      }
+
+      .account-profile {
+        color: #b9cdc3;
+      }
+
+      .account-profile:hover {
+        color: #ffffff;
+        background: #112d20;
+      }
+
+      .account-logout {
+        color: #d59b9b;
+      }
+
+      .account-logout:hover {
+        color: #ffb1b1;
+        background: #321817;
+      }
+
+      /* =========================================================
+           ACCOUNT MENU / HAMBURGER
+        ========================================================= */
+
+      .account-actions {
+        position: relative;
+      }
+
+      .account-menu {
+        position: relative;
+      }
+
+      .account-menu-toggle {
+        width: 38px;
+        height: 36px;
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding: 0;
+        border: 1px solid #28533e;
+        border-radius: 6px;
+        background: #132d21;
+        color: #ffffff;
+        cursor: pointer;
+      }
+
+      .account-menu-toggle:hover {
+        background: #1a3a2a;
+      }
+
+      .account-menu-toggle span {
+        width: 17px;
+        height: 2px;
+        border-radius: 2px;
+        background: #dce9e3;
+        transition:
+          transform 0.15s ease,
+          opacity 0.15s ease;
+      }
+
+      .account-menu-toggle[aria-expanded="true"] span:nth-child(1) {
+        transform: translateY(6px) rotate(45deg);
+      }
+
+      .account-menu-toggle[aria-expanded="true"] span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .account-menu-toggle[aria-expanded="true"] span:nth-child(3) {
+        transform: translateY(-6px) rotate(-45deg);
+      }
+
+      .account-menu-dropdown {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        z-index: 10001;
+        min-width: 150px;
+        padding: 6px;
+        display: none;
+        flex-direction: column;
+        gap: 3px;
+        background: #0b2418;
+        border: 1px solid #28533e;
+        border-radius: 8px;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+      }
+
+      .account-menu-dropdown.open {
+        display: flex;
+      }
+
+      .account-menu-dropdown .account-profile,
+      .account-menu-dropdown .account-logout {
+        width: 100%;
+        justify-content: flex-start;
+        min-height: 36px;
+        padding: 0 11px;
+      }
+
+      @media (max-width: 700px) {
+        .account-menu {
+          display: flex;
+          justify-content: stretch;
+        }
+
+        .account-menu-toggle {
+          width: 100%;
+        }
+
+        .account-menu-dropdown {
+          top: calc(100% + 6px);
+          right: 0;
+          min-width: 160px;
+        }
+      }
 
       /* =========================================================
            SCOREBOARD
@@ -380,16 +458,33 @@
         font-weight: 700;
       }
 
-      .batting-badge {
-        display: inline-flex;
+      .team-role-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
         margin-top: 6px;
+      }
+
+      .batting-badge,
+      .bowling-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         padding: 3px 7px;
         border-radius: 4px;
-        background: #123f29;
-        color: #65e59c;
         font-size: 8px;
         font-weight: 900;
         letter-spacing: 0.7px;
+      }
+
+      .batting-badge {
+        background: #123f29;
+        color: #65e59c;
+      }
+
+      .bowling-badge {
+        background: #263b58;
+        color: #9ecbff;
       }
 
       .score-center {
@@ -1301,6 +1396,71 @@
         ========================================================= */
 
       @media (max-width: 700px) {
+        .account-topbar {
+          padding: 9px 10px;
+          flex-direction: column;
+          align-items: stretch;
+          gap: 8px;
+        }
+
+        .account-brand {
+          width: 100%;
+          justify-content: center;
+          font-size: 18px;
+        }
+
+        .account-brand-icon {
+          font-size: 22px;
+        }
+
+        .account-actions {
+          width: 100%;
+          display: grid;
+          grid-template-columns:
+            minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)
+            44px;
+          align-items: center;
+          gap: 6px;
+          flex-wrap: nowrap;
+        }
+
+        .account-balance {
+          min-width: 0;
+          margin: 0;
+          align-items: center;
+        }
+
+        .account-balance-label {
+          font-size: 8px;
+        }
+
+        .account-balance-value {
+          font-size: 12px;
+          text-align: center;
+        }
+
+        .account-action,
+        .account-profile,
+        .account-logout {
+          width: 100%;
+          min-width: 0;
+          min-height: 34px;
+          padding: 0 4px;
+          font-size: 10px;
+          white-space: nowrap;
+        }
+
+        .account-menu {
+          width: 100%;
+          min-width: 0;
+        }
+
+        .account-menu-toggle {
+          width: 100%;
+          min-width: 0;
+          height: 34px;
+        }
+
         .scoreboard-inner {
           padding: 11px 10px 14px;
         }
@@ -1343,7 +1503,12 @@
           font-size: 8px;
         }
 
-        .batting-badge {
+        .team-role-badges {
+          gap: 3px;
+        }
+
+        .batting-badge,
+        .bowling-badge {
           font-size: 6px;
           padding: 3px 5px;
         }
@@ -1463,23 +1628,37 @@
      ACCOUNT TOP BAR
 ========================================================= -->
 
-    <header class="topbar">
-      <div class="brand">
-        <span class="brand-icon">🏏</span>
-        <span class="brand-text">CRIC<span class="brand-accent">BET</span></span>
+    <header class="account-topbar">
+      <div class="account-brand">
+        <span class="account-brand-icon"> 🏏 </span>
+
+        <span> CRIC<span class="account-brand-accent">BET</span> </span>
       </div>
 
-      <div class="topbar-right">
-        <div class="balance">
-          <span class="balance-label">Balance</span>
-          <span id="matchPageBalance" class="balance-value">
+      <div class="account-actions">
+        <div class="account-balance">
+          <span class="account-balance-label"> Balance </span>
+
+          <span id="matchPageBalance" class="account-balance-value">
             ₹{{ "%.2f"|format(user.balance or 0) }}
           </span>
         </div>
 
-        <button type="button" id="matchDepositBtn" class="topbar-action deposit-action">Deposit</button>
-        <button type="button" id="matchWithdrawBtn" class="topbar-action withdraw-action">Withdraw</button>
-        <button type="button" id="matchCryptoBtn" class="topbar-action crypto-action">Crypto</button>
+        <button
+          type="button"
+          id="matchDepositBtn"
+          class="account-action account-deposit"
+        >
+          Deposit
+        </button>
+
+        <button
+          type="button"
+          id="matchWithdrawBtn"
+          class="account-action account-withdraw"
+        >
+          Withdraw
+        </button>
 
         <div class="account-menu">
           <button
@@ -1489,31 +1668,32 @@
             aria-expanded="false"
             aria-controls="accountMenuDropdown"
             aria-label="Open account menu"
+            title="Account menu"
           >
             <span></span>
             <span></span>
             <span></span>
           </button>
 
-          <div id="accountMenuDropdown" class="account-menu-dropdown" aria-hidden="true">
-            <a href="/profile" class="profile-link">Profile</a>
-            <a href="/logout" class="logout">Logout</a>
+          <div
+            id="accountMenuDropdown"
+            class="account-menu-dropdown"
+            aria-hidden="true"
+          >
+            <a href="/profile" class="account-profile"> Profile </a>
+
+            <a href="/logout" class="account-logout"> Logout </a>
           </div>
         </div>
       </div>
     </header>
-
-    <nav class="main-mode-nav">
-      <button type="button" class="mode-tab" onclick="window.location.href = '/dashboard'">HOME</button>
-      <button type="button" class="mode-tab active">CRICKET</button>
-    </nav>
 
     <!-- =========================================================
      MAIN MATCH PAGE
 ========================================================= -->
 
     <div class="page">
-      <a href="/dashboard" class="account-back"> ← Home </a>
+      <a href="/dashboard" class="account-back"> ← Back to Cricket </a>
 
       <section class="match-header">
         <div id="eventName" class="event-name">
@@ -1529,7 +1709,7 @@
         </div>
 
         <div class="match-info">
-          <span id="matchStatus" class="badge"> Loading </span>
+          <span id="matchStatus" class="badge" hidden></span>
 
           <span id="matchTime" class="badge"> -- </span>
         </div>
@@ -1634,8 +1814,14 @@
 
                 <div id="scoreTeam1Overs" class="score-team-overs"></div>
 
-                <div id="scoreTeam1Batting" class="batting-badge" hidden>
-                  BATTING
+                <div class="team-role-badges">
+                  <div id="scoreTeam1Batting" class="batting-badge" hidden>
+                    BATTING
+                  </div>
+
+                  <div id="scoreTeam1Bowling" class="bowling-badge" hidden>
+                    BOWLING
+                  </div>
                 </div>
               </div>
             </div>
@@ -1670,8 +1856,14 @@
 
                 <div id="scoreTeam2Overs" class="score-team-overs"></div>
 
-                <div id="scoreTeam2Batting" class="batting-badge" hidden>
-                  BATTING
+                <div class="team-role-badges">
+                  <div id="scoreTeam2Batting" class="batting-badge" hidden>
+                    BATTING
+                  </div>
+
+                  <div id="scoreTeam2Bowling" class="bowling-badge" hidden>
+                    BOWLING
+                  </div>
                 </div>
               </div>
             </div>
@@ -1926,30 +2118,6 @@
         return escapeHtml(value);
       }
 
-      /* =========================================================
-         FORMAT ODDS / RATE DISPLAY
-         ========================================================= */
-
-      function formatOddsDisplay(value) {
-        const number = Number(value);
-
-        if (!Number.isFinite(number)) {
-          return "-";
-        }
-
-        /*
-         * Show bookmaker/fancy/session values without
-         * unnecessary trailing zeroes.
-         *
-         * 56.00  -> 56
-         * 56.50  -> 56.5
-         * 56.25  -> 56.25
-         * 112.00 -> 112
-         */
-        return String(number);
-      }
-
-
       /*
        * IMPORTANT:
        * 0 IS VALID DATA.
@@ -2156,11 +2324,18 @@
           const live =
             match.in_play === true ||
             match.in_play === 1 ||
-            match.in_play === "true";
+            String(match.in_play).toLowerCase() === "true";
 
-          status.textContent = live ? "LIVE" : "UPCOMING";
-
-          status.classList.toggle("live-badge", live);
+          if (live) {
+            status.textContent = "LIVE";
+            status.classList.add("live-badge");
+            status.hidden = false;
+          } else {
+            /* Never show UPCOMING on the match page. */
+            status.textContent = "";
+            status.classList.remove("live-badge");
+            status.hidden = true;
+          }
         }
 
         setText("matchTime", formatTime(match.event_time));
@@ -2763,7 +2938,7 @@
 
         const sizeText =
           Number.isFinite(numericSize) && numericSize > 0
-            ? formatOddsDisplay(numericSize)
+            ? numericSize.toFixed(2)
             : "";
 
         let bettingOdds = numericPrice;
@@ -2826,7 +3001,7 @@
 
 
 
-        html += formatOddsDisplay(numericPrice);
+        html += numericPrice.toFixed(2);
 
         html += "</div>";
 
@@ -3110,21 +3285,9 @@
               escapeHtml(displaySide) +
               "</span>";
 
-            const slipMarketType =
-              String(item.marketType || "").toUpperCase();
-
-            const slipDisplayValue =
-              (
-                slipMarketType === "FANCY" ||
-                slipMarketType === "SESSION"
-              ) &&
-              numberValue(item.payoutPercent) > 0
-                ? numberValue(item.payoutPercent)
-                : numberValue(item.odds);
-
             html +=
               '<span class="slip-odds">' +
-              formatOddsDisplay(slipDisplayValue) +
+              numberValue(item.odds).toFixed(2) +
               "</span>";
 
             html += "</div>";
@@ -3197,39 +3360,25 @@
           const marketType =
             String(item.marketType || "").toUpperCase();
 
-          const odds = numberValue(item.odds);
-
-          let potentialReturn = 0;
+          let payoutMultiplier =
+            numberValue(item.odds);
           
-          if (marketType === "BOOKMAKER"){
-            potentialReturn = 
-              stake * (1 + odds / 100);
-          }
-
-          else if (
+          if (
             marketType === "FANCY" ||
             marketType === "SESSION"
           ) {
             const payoutPercent =
               numberValue(item.payoutPercent);
-
+            
             if (payoutPercent > 0) {
-              potentialReturn =
-                stake * (1 + payoutPercent / 100);
-            } else {
-              potentialReturn = 0;
+              payoutMultiplier =
+                1 + payoutPercent / 100;
             }
           }
-          else {
-            potentialReturn =
-              stake * odds;
-          }
-
           totalStake += stake;
-          totalReturn += potentialReturn;
-
+          totalReturn +=
+             stake * payoutMultiplier;
         });
-          
 
         if (totalStakeElement) {
           totalStakeElement.textContent = "₹" + totalStake.toFixed(2);
@@ -3553,7 +3702,9 @@
 
         const liveValue = firstData(score, ["LiveCommentary"]);
 
-        const isLive = String(liveValue) === "1";
+        const isLive =
+          String(liveValue).trim() === "1" ||
+          String(liveValue).trim().toLowerCase() === "true";
 
         if (badge) {
           if (isLive) {
@@ -3565,6 +3716,22 @@
             badge.className = "scoreboard-status score";
 
             badge.textContent = "SCORE";
+          }
+        }
+
+        /* Keep the main match header synchronized with the real
+         * scoreboard state. Never show UPCOMING. */
+        const matchStatus = document.getElementById("matchStatus");
+
+        if (matchStatus) {
+          if (isLive) {
+            matchStatus.textContent = "LIVE";
+            matchStatus.classList.add("live-badge");
+            matchStatus.hidden = false;
+          } else {
+            matchStatus.textContent = "";
+            matchStatus.classList.remove("live-badge");
+            matchStatus.hidden = true;
           }
         }
 
@@ -3668,64 +3835,155 @@
 ========================================================= */
 
       function renderBattingSide(score) {
-        const team1Badge = document.getElementById("scoreTeam1Batting");
+        const team1Batting = document.getElementById("scoreTeam1Batting");
+        const team2Batting = document.getElementById("scoreTeam2Batting");
+        const team1Bowling = document.getElementById("scoreTeam1Bowling");
+        const team2Bowling = document.getElementById("scoreTeam2Bowling");
 
-        const team2Badge = document.getElementById("scoreTeam2Batting");
-
-        /*
-         * ALWAYS hide both first.
-         */
-
-        if (team1Badge) {
-          team1Badge.hidden = true;
-        }
-
-        if (team2Badge) {
-          team2Badge.hidden = true;
-        }
-
-        const rawInning = firstData(score, ["CurrentInning"]);
-
-        /*
-         * Do not turn missing data into 0.
-         */
-
-        if (!hasData(rawInning)) {
-          setText("scoreCurrentInning", "");
-
-          return;
-        }
-
-        const inning = parseInt(String(rawInning).trim(), 10);
-
-        if (!Number.isInteger(inning) || inning <= 0) {
-          setText("scoreCurrentInning", "");
-
-          return;
-        }
-
-        setText("scoreCurrentInning", ordinalInning(inning));
-
-        /*
-         * Only current innings gets BATTING.
-         *
-         * 1 -> Team 1
-         * 2 -> Team 2
-         */
-
-        if (inning === 1) {
-          if (team1Badge) {
-            team1Badge.hidden = false;
+        /* Always reset all role badges before applying the latest state. */
+        [
+          team1Batting,
+          team2Batting,
+          team1Bowling,
+          team2Bowling,
+        ].forEach((element) => {
+          if (element) {
+            element.hidden = true;
           }
+        });
+
+        const rawInning = firstData(score, [
+          "CurrentInning",
+          "currentInning",
+          "Inning",
+          "inning",
+        ]);
+
+        const inning = parseInt(String(rawInning || "").trim(), 10);
+
+        if (Number.isInteger(inning) && inning > 0) {
+          setText("scoreCurrentInning", ordinalInning(inning));
+        } else {
+          setText("scoreCurrentInning", "");
         }
 
-        if (inning === 2) {
-          if (team2Badge) {
-            team2Badge.hidden = false;
+        function normalizeTeamName(value) {
+          return String(value || "")
+            .replace(/\*/g, "")
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, "");
+        }
+
+        function resolveTeamIndex(value) {
+          if (!hasData(value)) {
+            return 0;
           }
+
+          const text = String(value).trim();
+          const lower = text.toLowerCase();
+
+          if (
+            lower === "1" ||
+            lower === "team1" ||
+            lower === "team 1"
+          ) {
+            return 1;
+          }
+
+          if (
+            lower === "2" ||
+            lower === "team2" ||
+            lower === "team 2"
+          ) {
+            return 2;
+          }
+
+          const team1Name = firstData(score, ["Team1Name"]);
+          const team2Name = firstData(score, ["Team2Name"]);
+          const normalizedValue = normalizeTeamName(text);
+          const normalizedTeam1 = normalizeTeamName(team1Name);
+          const normalizedTeam2 = normalizeTeamName(team2Name);
+
+          if (
+            normalizedTeam1 &&
+            normalizedValue === normalizedTeam1
+          ) {
+            return 1;
+          }
+
+          if (
+            normalizedTeam2 &&
+            normalizedValue === normalizedTeam2
+          ) {
+            return 2;
+          }
+
+          return 0;
+        }
+
+        /*
+         * First use an explicit team-role value when the score
+         * provider supplies one. Different score formats use
+         * different field names, so support the common variants.
+         */
+        const battingValue = firstData(score, [
+          "BattingTeam",
+          "BattingTeamName",
+          "CurrentBattingTeam",
+          "CurrentBattingTeamName",
+          "TeamBatting",
+          "CurrentTeamBatting",
+          "StrikerTeam",
+        ]);
+
+        let battingTeam = resolveTeamIndex(battingValue);
+
+        /*
+         * If the provider does not expose a batting-team field,
+         * derive it from the innings. In a normal two-team cricket
+         * match, odd innings belong to Team 1 and even innings to
+         * Team 2. This also keeps the side correct when innings
+         * changes during a live match.
+         */
+        if (!battingTeam && Number.isInteger(inning) && inning > 0) {
+          battingTeam = inning % 2 === 1 ? 1 : 2;
+        }
+
+        const bowlingValue = firstData(score, [
+          "BowlingTeam",
+          "BowlingTeamName",
+          "CurrentBowlingTeam",
+          "CurrentBowlingTeamName",
+          "TeamBowling",
+          "CurrentTeamBowling",
+        ]);
+
+        let bowlingTeam = resolveTeamIndex(bowlingValue);
+
+        /*
+         * Usually the provider does not need to send bowling-team
+         * separately: it is the other team from the batting side.
+         */
+        if (!bowlingTeam && (battingTeam === 1 || battingTeam === 2)) {
+          bowlingTeam = battingTeam === 1 ? 2 : 1;
+        }
+
+        if (battingTeam === 1 && team1Batting) {
+          team1Batting.hidden = false;
+        }
+
+        if (battingTeam === 2 && team2Batting) {
+          team2Batting.hidden = false;
+        }
+
+        if (bowlingTeam === 1 && team1Bowling) {
+          team1Bowling.hidden = false;
+        }
+
+        if (bowlingTeam === 2 && team2Bowling) {
+          team2Bowling.hidden = false;
         }
       }
-
       /* =========================================================
    SCORE STATS
 ========================================================= */
@@ -4588,34 +4846,29 @@
    ACCOUNT BUTTONS
 ========================================================= */
 
-      const WHATSAPP_NUMBER = "919289461279";
+      const MATCH_PAGE_WHATSAPP_NUMBER = "919289461279";
 
-      function openWhatsApp(message) {
-        if (!WHATSAPP_NUMBER) {
+      function matchPageOpenWhatsApp(message) {
+        if (!MATCH_PAGE_WHATSAPP_NUMBER) {
           return;
         }
 
         const url =
           "https://wa.me/" +
-          WHATSAPP_NUMBER +
+          MATCH_PAGE_WHATSAPP_NUMBER +
           "?text=" +
           encodeURIComponent(message);
 
-        // Same-tab redirect: works on phones (window.open gets blocked).
-        window.location.href = url;
+        window.open(url, "_blank", "noopener,noreferrer");
       }
 
-      function openDepositWhatsApp() {
-        openWhatsApp("Hello, I want to make a deposit in CricBet.");
+      function matchPageDeposit() {
+        matchPageOpenWhatsApp("Hello, I want to make a deposit in CricBet.");
       }
 
-      function openWithdrawWhatsApp() {
-        openWhatsApp("Hello, I want to make a withdrawal from CricBet.");
-      }
-
-      function openCryptoWhatsApp() {
-        openWhatsApp(
-          "Hello, I want to make a Crypto transaction in CricBet. Please provide the details.",
+      function matchPageWithdraw() {
+        matchPageOpenWhatsApp(
+          "Hello, I want to make a withdrawal from CricBet.",
         );
       }
 
@@ -4627,19 +4880,13 @@
         const deposit = document.getElementById("matchDepositBtn");
 
         const withdraw = document.getElementById("matchWithdrawBtn");
-        
-        const crypto = document.getElementById("matchCryptoBtn");
 
         if (deposit) {
-          deposit.addEventListener("click", openDepositWhatsApp);
+          deposit.addEventListener("click", matchPageDeposit);
         }
 
         if (withdraw) {
-          withdraw.addEventListener("click", openWithdrawWhatsApp);
-        }
-
-        if (crypto) {
-          crypto.addEventListener("click", openCryptoWhatsApp);
+          withdraw.addEventListener("click", matchPageWithdraw);
         }
 
         loadMatchPageBalance();
