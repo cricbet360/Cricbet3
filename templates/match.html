@@ -2118,6 +2118,30 @@
         return escapeHtml(value);
       }
 
+      /* =========================================================
+         FORMAT ODDS / RATE DISPLAY
+         ========================================================= */
+
+      function formatOddsDisplay(value) {
+        const number = Number(value);
+
+        if (!Number.isFinite(number)) {
+          return "-";
+        }
+
+        /*
+         * Never show unnecessary trailing zeroes.
+         *
+         * Bookmaker / Fancy / Session:
+         *   14.00 -> 14
+         *   14.50 -> 14.5
+         *
+         * Match Odds:
+         *   2.14 -> 2.14
+         */
+        return String(number);
+      }
+
       /*
        * IMPORTANT:
        * 0 IS VALID DATA.
@@ -2938,7 +2962,7 @@
 
         const sizeText =
           Number.isFinite(numericSize) && numericSize > 0
-            ? numericSize.toFixed(2)
+            ? formatOddsDisplay(numericSize)
             : "";
 
         let bettingOdds = numericPrice;
@@ -3001,7 +3025,7 @@
 
 
 
-        html += numericPrice.toFixed(2);
+        html += formatOddsDisplay(numericPrice);
 
         html += "</div>";
 
@@ -3347,48 +3371,73 @@
 
       function updateSlipSummary() {
         const totalStakeElement = document.getElementById("totalStake");
-
         const returnElement = document.getElementById("potentialReturn");
 
         let totalStake = 0;
-
         let totalReturn = 0;
 
         betSlipItems.forEach((item) => {
           const stake = numberValue(item.stake);
+          const marketType = String(item.marketType || "").toUpperCase();
+          const odds = numberValue(item.odds);
 
-          const marketType =
-            String(item.marketType || "").toUpperCase();
+          let potentialReturn = 0;
 
-          let payoutMultiplier =
-            numberValue(item.odds);
-          
-          if (
+          /*
+           * MATCH ODDS
+           * Decimal odds.
+           * ₹100 at 2.14 = ₹214.00 return.
+           */
+          if (marketType === "MATCH_ODDS") {
+            potentialReturn = stake * odds;
+          }
+
+          /*
+           * BOOKMAKER
+           * Odds are percentage profit.
+           * ₹100 at 14 = ₹114.00 return.
+           * ₹200 at 14 = ₹228.00 return.
+           */
+          else if (marketType === "BOOKMAKER") {
+            potentialReturn = stake * (1 + odds / 100);
+          }
+
+          /*
+           * FANCY / SESSION
+           * payoutPercent is percentage profit.
+           * ₹100 at 14 = ₹114.00 return.
+           */
+          else if (
             marketType === "FANCY" ||
             marketType === "SESSION"
           ) {
-            const payoutPercent =
-              numberValue(item.payoutPercent);
-            
-            if (payoutPercent > 0) {
-              payoutMultiplier =
-                1 + payoutPercent / 100;
-            }
+            const payoutPercent = numberValue(item.payoutPercent);
+
+            potentialReturn =
+              payoutPercent > 0
+                ? stake * (1 + payoutPercent / 100)
+                : 0;
           }
+
+          /* Other market types retain normal decimal-odds behavior. */
+          else {
+            potentialReturn = stake * odds;
+          }
+
           totalStake += stake;
-          totalReturn +=
-             stake * payoutMultiplier;
+          totalReturn += potentialReturn;
         });
 
         if (totalStakeElement) {
-          totalStakeElement.textContent = "₹" + totalStake.toFixed(2);
+          totalStakeElement.textContent =
+            "₹" + totalStake.toFixed(2);
         }
 
         if (returnElement) {
-          returnElement.textContent = "₹" + totalReturn.toFixed(2);
+          returnElement.textContent =
+            "₹" + totalReturn.toFixed(2);
         }
       }
-
       function openBetSlip() {
         const slip = document.getElementById("betSlip");
 
