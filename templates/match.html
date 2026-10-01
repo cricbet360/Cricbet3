@@ -494,28 +494,6 @@
         text-transform: uppercase;
       }
 
-      .slip-fancy-line {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-        margin-top: 6px;
-        padding: 7px 9px;
-        border-radius: 6px;
-        background: rgba(0, 210, 106, 0.08);
-        border: 1px solid rgba(0, 210, 106, 0.18);
-        font-size: 12px;
-      }
-
-      .slip-fancy-label {
-          color: #9aa9a1;
-      }
-
-      .slip-fancy-value {
-          color: #00d26a;
-          font-weight: 700;
-      }
-
       .score-stat-value {
         margin-top: 3px;
         color: #ffffff;
@@ -2502,8 +2480,8 @@
         html +=
           '<div class="market-columns">' +
           "<div>Runner</div>" +
-          "<div>Lay</div>" +
           "<div>Back</div>" +
+          "<div>Lay</div>" +
           "</div>";
 
         if (!runners.length) {
@@ -2520,18 +2498,6 @@
             html += '<div class="runner-name">' + escapeHtml(name) + "</div>";
 
             html += createOddBox(
-              runner.lay,
-              runner.lay_size,
-              "lay-box",
-              "MATCH_ODDS",
-              market.name || "Match Odds",
-              name,
-              selectionId,
-              "LAY",
-              market.id || market.market_id || market.marketId || marketId,
-            );
-
-            html += createOddBox(
               runner.back,
               runner.back_size,
               "back-box",
@@ -2540,6 +2506,18 @@
               name,
               selectionId,
               "BACK",
+              market.id || market.market_id || market.marketId || marketId,
+            );
+
+            html += createOddBox(
+              runner.lay,
+              runner.lay_size,
+              "lay-box",
+              "MATCH_ODDS",
+              market.name || "Match Odds",
+              name,
+              selectionId,
+              "LAY",
               market.id || market.market_id || market.marketId || marketId,
             );
 
@@ -2574,8 +2552,8 @@
         html +=
           '<div class="market-columns">' +
           "<div>Runner</div>" +
-          "<div>Lay</div>" +
           "<div>Back</div>" +
+          "<div>Lay</div>" +
           "</div>";
 
         if (!runners.length) {
@@ -2594,18 +2572,6 @@
             html += '<div class="runner-name">' + escapeHtml(name) + "</div>";
 
             html += createOddBox(
-              runner.lay,
-              runner.lay_size,
-              "lay-box",
-              "BOOKMAKER",
-              market.name || "Bookmaker",
-              name,
-              selectionId,
-              "LAY",
-              market.id || market.market_id || market.marketId || marketId,
-            );
-
-            html += createOddBox(
               runner.back,
               runner.back_size,
               "back-box",
@@ -2614,6 +2580,18 @@
               name,
               selectionId,
               "BACK",
+              market.id || market.market_id || market.marketId || marketId,
+            );
+
+            html += createOddBox(
+              runner.lay,
+              runner.lay_size,
+              "lay-box",
+              "BOOKMAKER",
+              market.name || "Bookmaker",
+              name,
+              selectionId,
+              "LAY",
               market.id || market.market_id || market.marketId || marketId,
             );
 
@@ -2666,8 +2644,8 @@
           "<div>" +
           (marketType === "SESSION" ? "Session" : "Fancy") +
           "</div>" +
-          "<div>No</div>" +
           "<div>Yes</div>" +
+          "<div>No</div>" +
           "</div>";
 
         if (!rows.length) {
@@ -2694,32 +2672,9 @@
 
             const noSize = row.no_size ?? row.lay_size ?? row.ls1;
 
-            const fancyLine =
-              row.line ??
-              row.lineValue ??
-              row.line_value ??
-              row.runs ??
-              row.run ??
-              row.point ??
-              row.points ??
-              "";
-
             html += '<div class="runner">';
 
             html += '<div class="runner-name">' + escapeHtml(name) + "</div>";
-
-            html += createOddBox(
-              no,
-              noSize,
-              "fancy-no",
-              marketType,
-              rawName,
-              name,
-              selectionId,
-              "LAY",
-              market.id || market.market_id || market.marketId || marketId,
-              fancyLine,
-            );
 
             html += createOddBox(
               yes,
@@ -2731,7 +2686,18 @@
               selectionId,
               "BACK",
               market.id || market.market_id || market.marketId || marketId,
-              fancyLine,
+            );
+
+            html += createOddBox(
+              no,
+              noSize,
+              "fancy-no",
+              marketType,
+              rawName,
+              name,
+              selectionId,
+              "LAY",
+              market.id || market.market_id || market.marketId || marketId,
             );
 
             html += "</div>";
@@ -2776,18 +2742,6 @@
           html += '<div class="runner-name">' + escapeHtml(name) + "</div>";
 
           html += createOddBox(
-            runner.lay,
-            runner.lay_size,
-            "lay-box",
-            "MATCH_ODDS",
-            market.name || "Other Market",
-            name,
-            selectionId,
-            "LAY",
-            market.id || market.market_id || market.marketId || marketId,
-          );
-
-          html += createOddBox(
             runner.back,
             runner.back_size,
             "back-box",
@@ -2796,6 +2750,18 @@
             name,
             selectionId,
             "BACK",
+            market.id || market.market_id || market.marketId || marketId,
+          );
+
+          html += createOddBox(
+            runner.lay,
+            runner.lay_size,
+            "lay-box",
+            "MATCH_ODDS",
+            market.name || "Other Market",
+            name,
+            selectionId,
+            "LAY",
             market.id || market.market_id || market.marketId || marketId,
           );
 
@@ -2834,7 +2800,6 @@
         selectionId,
         side,
         marketIdValue = "",
-        fancyLine = "",
       ) {
         const numericPrice = Number(price);
 
@@ -2902,12 +2867,7 @@
           escapeAttribute(side) +
           '"' +
           ' data-bet-line="' +
-          escapeAttribute(
-            normalizedMarketType === "FANCY" ||
-            normalizedMarketType === "SESSION"
-              ? fancyLine
-              : numericPrice
-            ) +
+          escapeAttribute(numericPrice) +
           '"' +
           ' data-bet-payout-percent="' +
           escapeAttribute(
@@ -2981,8 +2941,6 @@
               side: String(box.dataset.betSide).toUpperCase(),
 
               odds: odds,
-
-              line: String(box.dataset.betLine || ""),
 
               payoutPercent:
                 (
@@ -3170,40 +3128,15 @@
                     ? "Bookmaker"
                     : "Match Odds";
 
-            const isFancyMarket =
-              item.marketType === "FANCY" ||
-              item.marketType === "SESSION";
-
-            const fancyLine =
-              isFancyMarket && item.line
-                ? item.line
-                : "";
-
             html += '<div class="slip-selection">';
 
             html += '<div class="slip-selection-top">';
 
-            if (isFancyMarket) {
-              html +=
-                '<div class="slip-selection-name">'+
-                escapeHtml(item.selectionName || "Fancy") +
-                "</div>";
+            html +=
+              '<div class="slip-selection-name">' +
+              escapeHtml(item.selectionName) +
+              "</div>";
 
-              if (fancyLine) {
-                html +=
-                  '<div class="slip-fancy-line">' +
-                  '<span class="slip-fancy-label">Runs / Line</span>' +
-                  '<span class="slip-fancy-value">' +
-                  escapeHtml(fancyLine) +
-                  "</span>" +
-                  "</div>";
-              }
-            } else {
-              html +=
-                '<div class="slip-selection-name">' +
-                escapeHtml(item.selectionName) +
-                 "</div>";
-            }
             html +=
               "<button " +
               'type="button" ' +
@@ -3460,7 +3393,6 @@
               market_type: String(item.marketType || "").toUpperCase(),
               market_name: String(item.marketName || ""),
               selection_id: String(item.selectionId),
-              line: item.line != null ? String(item.line) : null,
               selection_name: String(item.selectionName),
               side: String(item.side || "BACK").toUpperCase(),
               odds: Number(item.odds),
@@ -3621,167 +3553,55 @@
          * (shallowest first) until we find an object that looks like it.
          */
 
-          if (!payload || typeof payload !== "object") {
-            return null;
-          }
-
-          const backendData =
-            payload.data &&
-            typeof payload.data === "object"
-              ? payload.data
-              : null;
-
-          const scoreboard =
-            backendData &&
-            backendData.scoreboard &&
-            typeof backendData.scoreboard === "object"
-              ? backendData.scoreboard
-              : null;
-
-          const rawScore =
-            scoreboard &&
-            scoreboard.raw_score &&
-            typeof scoreboard.raw_score === "object"
-              ? scoreboard.raw_score
-              : null;
-
-          if (
-            rawScore &&
-            (
-              Object.prototype.hasOwnProperty.call(rawScore, "Team1Name") ||
-              Object.prototype.hasOwnProperty.call(rawScore, "Team2Name") ||
-              Object.prototype.hasOwnProperty.call(rawScore, "Team1Score") ||
-              Object.prototype.hasOwnProperty.call(rawScore, "Team2Score")
-            )
-          ) {
-            return rawScore
-          }
-  /*
-   * =========================================================
-   * 2. OTHER BACKEND LOCATIONS
-   * =========================================================
-   */
-
-          const directCandidates = [
-            backendData && backendData.score,
-            backendData && backendData.data,
-            backendData && backendData.scoreboard,
-            payload.score,
-            payload.scoreboard,
-            payload.data,
-          ];
-
-          for (const candidate of directCandidates) {
-            if (
-              candidate &&
-              typeof candidate === "object" &&
-              !Array.isArray(candidate)
-            ) {
-              if (
-                Object.prototype.hasOwnProperty.call(candidate, "Team1Name") ||
-                Object.prototype.hasOwnProperty.call(candidate, "Team2Name") ||
-                Object.prototype.hasOwnProperty.call(candidate, "Team1Score") ||
-                Object.prototype.hasOwnProperty.call(candidate, "Team2Score")
-              ) {
-                return candidate;
-              }
-
-      /*
-       * A normalized scoreboard may itself contain raw_score.
-       */
-              if (
-                candidate.raw_score &&
-                typeof candidate.raw_score === "object" &&
-                (
-                  Object.prototype.hasOwnProperty.call(
-                    candidate.raw_score,
-                    "Team1Name",
-                  ) ||
-                  Object.prototype.hasOwnProperty.call(
-                    candidate.raw_score,
-                    "Team2Name",
-                  ) ||
-                  Object.prototype.hasOwnProperty.call(
-                    candidate.raw_score,
-                    "Team1Score",
-                  ) ||
-                  Object.prototype.hasOwnProperty.call(
-                    candidate.raw_score,
-                    "Team2Score",
-                  )
-                )
-              ) {
-                return candidate.raw_score;
-              }
-            }
-          }
-
-  /*
-   * =========================================================
-   * 3. FINAL RECURSIVE FALLBACK
-   * =========================================================
-   *
-   * Keep this so older response formats continue to work.
-   */
-
-          const queue = [
-            {
-              node: payload,
-              depth: 0,
-            },
-          ];
-
-          const seen = new Set();
-
-          while (queue.length) {
-            const current = queue.shift();
-            const node = current.node;
-
-            if (
-              !node ||
-              typeof node !== "object" ||
-              seen.has(node)
-            ) {
-              continue;
-            }
-
-            seen.add(node);
-
-            if (
-              !Array.isArray(node) &&
-              (
-                Object.prototype.hasOwnProperty.call(node, "Team1Name") ||
-                Object.prototype.hasOwnProperty.call(node, "Team2Name") ||
-                Object.prototype.hasOwnProperty.call(node, "Team1Score") ||
-                Object.prototype.hasOwnProperty.call(node, "Team2Score")
-              )
-            ) {
-              return node;
-            }
-
-            if (current.depth >= 7) {
-              continue;
-            }
-
-            const children = Array.isArray(node)
-              ? node.slice(0, 20)
-              : Object.values(node);
-
-            children.forEach((child) => {
-              if (
-                child &&
-                typeof child === "object"
-              ) {
-                queue.push({
-                  node: child,
-                  depth: current.depth + 1,
-                });
-              }
-            });
-          }
-
+        if (!payload || typeof payload !== "object") {
           return null;
+        }
+
+        const queue = [
+          {
+            node: payload,
+            depth: 0,
+          },
+        ];
+
+        const seen = new Set();
+
+        while (queue.length) {
+          const current = queue.shift();
+
+          const node = current.node;
+
+          if (!node || typeof node !== "object" || seen.has(node)) {
+            continue;
+          }
+
+          seen.add(node);
+
+          if (!Array.isArray(node) && looksLikeScoreRecord(node)) {
+            return node;
+          }
+
+          if (current.depth >= 7) {
+            continue;
+          }
+
+          const children = Array.isArray(node)
+            ? node.slice(0, 20)
+            : Object.values(node);
+
+          children.forEach((child) => {
+            if (child && typeof child === "object") {
+              queue.push({
+                node: child,
+                depth: current.depth + 1,
+              });
+            }
+          });
+        }
+
+        return null;
       }
+
       /* =========================================================
    SCORE STATUS
 ========================================================= */
@@ -4952,29 +4772,7 @@
               return;
             }
 
-            const backendData =
-              result.payload &&
-              result.payload.data &&
-              typeof result.payload.data === "object"
-                ? result.payload.data
-                : null;
-
-            if (
-              backendData &&
-              backendData.success === false
-            ) {
-              console.warn(
-                "[SCOREBOARD] score unavailable for",
-                id,
-                backendData.message || backendData.status || "NoData",
-              );
-
-              continue;
-            }
-
-            const record = getScoreRecord(
-              backendData || result.payload
-            );
+            const record = getScoreRecord(result.payload);
 
             if (record) {
               workingScoreId = id;

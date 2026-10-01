@@ -52,11 +52,6 @@ class BetSelection(Base):
         nullable=False,
     )
 
-    line = Column(
-    Float,
-    nullable=True,
-    )
-
     side = Column(
         String(10),
         nullable=False,

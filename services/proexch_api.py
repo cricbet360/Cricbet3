@@ -1299,6 +1299,7 @@ def parse_bookmaker_odds(
 # =========================================================
 # FANCY ODDS
 # =========================================================
+
 def parse_fancy_odds(
     data: Any,
 ) -> List[Dict[str, Any]]:
@@ -1373,26 +1374,6 @@ def parse_fancy_odds(
             ):
                 continue
 
-            # -------------------------------------------------
-            # Fancy line / runs / point
-            # -------------------------------------------------
-
-            line_value = _first_value(
-                runner,
-                "line",
-                "lineValue",
-                "line_value",
-                "runs",
-                "run",
-                "point",
-                "points",
-                "rate",
-                "value",
-                "odds",
-                "srno",
-                default="",
-            )
-
             runners.append(
                 {
                     "id": str(
@@ -1417,15 +1398,6 @@ def parse_fancy_odds(
                             "name",
                             default="",
                         )
-                    ),
-
-                    "line": (
-                        str(line_value)
-                        if line_value not in (
-                            None,
-                            "",
-                        )
-                        else ""
                     ),
 
                     "back": _safe_float(
@@ -1501,6 +1473,7 @@ def parse_fancy_odds(
         )
 
     return result
+
 
 # =========================================================
 # NORMALIZE ODDS
@@ -3241,7 +3214,7 @@ def get_score(
                 return cached_data
 
     # =====================================================
-    # CRICKETBZ SCORE
+    # PRIMARY CRICKETBZ SOURCE
     # =====================================================
 
     url = (
@@ -3252,7 +3225,7 @@ def get_score(
     try:
 
         print(
-            "[SCORE] Getting CricketBZ score:",
+            "[PROEXCH] Getting CricketBZ score:",
             url,
         )
 
@@ -3260,16 +3233,20 @@ def get_score(
             url
         )
 
-        # -------------------------------------------------
-        # CricketBZ can return HTTP 200 while reporting
-        # that the score is unavailable.
-        # -------------------------------------------------
-
         normalized = (
             _parse_cricketbz_score(
                 raw
             )
         )
+
+        # Generic fallback
+        if not normalized.get(
+            "success"
+        ):
+
+            normalized = normalize_score(
+                raw
+            )
 
         if normalized.get(
             "success"
@@ -3283,21 +3260,49 @@ def get_score(
             }
 
             print(
-                "[SCORE] CricketBZ score found:",
+                "[PROEXCH] CricketBZ score found:",
                 score_id,
             )
 
             return normalized
 
-        # -------------------------------------------------
-        # Generic score parser
-        # -------------------------------------------------
+    except Exception as exc:
 
-        generic = normalize_score(
-            raw
+        print(
+            "[PROEXCH] Direct CricketBZ score failed:",
+            repr(exc),
         )
 
-        if generic.get(
+    # =====================================================
+    # PROEXCH FALLBACK
+    # =====================================================
+
+    try:
+
+        print(
+            "[PROEXCH] Trying ProExch cricketbz fallback:",
+            score_id,
+        )
+
+        fallback = get_cricketbz(
+            score_id
+        )
+
+        normalized = (
+            _parse_cricketbz_score(
+                fallback
+            )
+        )
+
+        if not normalized.get(
+            "success"
+        ):
+
+            normalized = normalize_score(
+                fallback
+            )
+
+        if normalized.get(
             "success"
         ):
 
@@ -3305,78 +3310,34 @@ def get_score(
                 score_id
             ] = {
                 "timestamp": now,
-                "data": generic,
+                "data": normalized,
             }
 
-            print(
-                "[SCORE] Generic score found:",
-                score_id,
-            )
-
-            return generic
-
-        # -------------------------------------------------
-        # Provider explicitly has no score.
-        # -------------------------------------------------
-
-        print(
-            "[SCORE] No scoreboard data for:",
-            score_id,
-        )
-
-        unavailable = {
-            "success": False,
-            "status": "NoData",
-            "source": "cricketbz",
-            "score": None,
-            "scoreboard": None,
-            "scores": [],
-            "data": {
-                "Status": "NoData",
-                "Message": (
-                    "Live scoreboard is not available "
-                    "for this match."
-                ),
-                "Data": {
-                    "Score": [],
-                },
-            },
-            "message": (
-                "Live scoreboard is not available "
-                "for this match."
-            ),
-        }
-
-        _score_cache[
-            score_id
-        ] = {
-            "timestamp": now,
-            "data": unavailable,
-        }
-
-        return unavailable
+            return normalized
 
     except Exception as exc:
 
         print(
-            "[SCORE] CricketBZ request failed:",
+            "[PROEXCH] ProExch scoreboard fallback failed:",
             repr(exc),
         )
 
-        unavailable = {
-            "success": False,
-            "status": "UNAVAILABLE",
-            "source": "cricketbz",
-            "score": None,
-            "scoreboard": None,
-            "scores": [],
-            "data": None,
-            "message": (
-                "Live scoreboard is currently unavailable."
-            ),
-        }
+    # =====================================================
+    # UNAVAILABLE
+    # =====================================================
 
-        return unavailable
+    return {
+        "success": False,
+        "status": "UNAVAILABLE",
+        "source": "cricketbz",
+        "score": None,
+        "scoreboard": None,
+        "scores": [],
+        "data": None,
+        "message": "Live score is currently unavailable",
+    }
+
+
 # =========================================================
 # RESULT
 # =========================================================

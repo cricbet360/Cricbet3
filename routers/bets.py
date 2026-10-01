@@ -28,11 +28,9 @@ router = APIRouter(
 class PlaceBetRequest(BaseModel):
     game_id: str
     event_id: str | None = None
-    event_name: str | None = None
     market_id: str
     market_type: str | None = None
     market_name: str | None = None
-    line: str | None = None
     selection_id: str
     selection_name: str
     side: str
@@ -577,13 +575,11 @@ async def place_bet(
 
             side=side,
 
-            line=payload.line,
-
             price=float(odds),
 
             market_name=market_name,
 
-            event_name=payload.event_name,
+            event_name=None,
         )
 
         db.add(
@@ -860,11 +856,6 @@ async def my_bets(
 
                         "runner_name":
                             selection.runner_name,
-
-                        
-
-                        "line":
-                            selection.line,
 
                         "side":
                             selection.side,
