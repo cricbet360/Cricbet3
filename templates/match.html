@@ -4952,7 +4952,29 @@
               return;
             }
 
-            const record = getScoreRecord(result.payload);
+            const backendData =
+              result.payload &&
+              result.payload.data &&
+              typeof result.payload.data === "object"
+                ? result.payload.data
+                : null;
+
+            if (
+              backendData &&
+              backendData.success === false
+            ) {
+              console.warn(
+                "[SCOREBOARD] score unavailable for",
+                id,
+                backendData.message || backendData.status || "NoData",
+              );
+
+              continue;
+            }
+
+            const record = getScoreRecord(
+              backendData || result.payload
+            );
 
             if (record) {
               workingScoreId = id;
