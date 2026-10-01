@@ -3450,6 +3450,7 @@
               market_type: String(item.marketType || "").toUpperCase(),
               market_name: String(item.marketName || ""),
               selection_id: String(item.selectionId),
+              line: item.line != null ? String(item.line) : null,
               selection_name: String(item.selectionName),
               side: String(item.side || "BACK").toUpperCase(),
               odds: Number(item.odds),
