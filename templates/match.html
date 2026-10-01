@@ -2520,18 +2520,6 @@
             html += '<div class="runner-name">' + escapeHtml(name) + "</div>";
 
             html += createOddBox(
-              runner.back,
-              runner.back_size,
-              "back-box",
-              "MATCH_ODDS",
-              market.name || "Match Odds",
-              name,
-              selectionId,
-              "BACK",
-              market.id || market.market_id || market.marketId || marketId,
-            );
-
-            html += createOddBox(
               runner.lay,
               runner.lay_size,
               "lay-box",
@@ -2540,6 +2528,18 @@
               name,
               selectionId,
               "LAY",
+              market.id || market.market_id || market.marketId || marketId,
+            );
+
+            html += createOddBox(
+              runner.back,
+              runner.back_size,
+              "back-box",
+              "MATCH_ODDS",
+              market.name || "Match Odds",
+              name,
+              selectionId,
+              "BACK",
               market.id || market.market_id || market.marketId || marketId,
             );
 
@@ -2594,18 +2594,6 @@
             html += '<div class="runner-name">' + escapeHtml(name) + "</div>";
 
             html += createOddBox(
-              runner.back,
-              runner.back_size,
-              "back-box",
-              "BOOKMAKER",
-              market.name || "Bookmaker",
-              name,
-              selectionId,
-              "BACK",
-              market.id || market.market_id || market.marketId || marketId,
-            );
-
-            html += createOddBox(
               runner.lay,
               runner.lay_size,
               "lay-box",
@@ -2614,6 +2602,18 @@
               name,
               selectionId,
               "LAY",
+              market.id || market.market_id || market.marketId || marketId,
+            );
+
+            html += createOddBox(
+              runner.back,
+              runner.back_size,
+              "back-box",
+              "BOOKMAKER",
+              market.name || "Bookmaker",
+              name,
+              selectionId,
+              "BACK",
               market.id || market.market_id || market.marketId || marketId,
             );
 
@@ -2699,19 +2699,6 @@
             html += '<div class="runner-name">' + escapeHtml(name) + "</div>";
 
             html += createOddBox(
-              yes,
-              yesSize,
-              "fancy-yes",
-              marketType,
-              rawName,
-              name,
-              selectionId,
-              "BACK",
-              market.id || market.market_id || market.marketId || marketId,
-              fancyLine,
-            );
-
-            html += createOddBox(
               no,
               noSize,
               "fancy-no",
@@ -2720,6 +2707,19 @@
               name,
               selectionId,
               "LAY",
+              market.id || market.market_id || market.marketId || marketId,
+              fancyLine,
+            );
+
+            html += createOddBox(
+              yes,
+              yesSize,
+              "fancy-yes",
+              marketType,
+              rawName,
+              name,
+              selectionId,
+              "BACK",
               market.id || market.market_id || market.marketId || marketId,
               fancyLine,
             );
@@ -2766,18 +2766,6 @@
           html += '<div class="runner-name">' + escapeHtml(name) + "</div>";
 
           html += createOddBox(
-            runner.back,
-            runner.back_size,
-            "back-box",
-            "MATCH_ODDS",
-            market.name || "Other Market",
-            name,
-            selectionId,
-            "BACK",
-            market.id || market.market_id || market.marketId || marketId,
-          );
-
-          html += createOddBox(
             runner.lay,
             runner.lay_size,
             "lay-box",
@@ -2786,6 +2774,18 @@
             name,
             selectionId,
             "LAY",
+            market.id || market.market_id || market.marketId || marketId,
+          );
+
+          html += createOddBox(
+            runner.back,
+            runner.back_size,
+            "back-box",
+            "MATCH_ODDS",
+            market.name || "Other Market",
+            name,
+            selectionId,
+            "BACK",
             market.id || market.market_id || market.marketId || marketId,
           );
 
