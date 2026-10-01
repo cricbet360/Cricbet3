@@ -3621,55 +3621,167 @@
          * (shallowest first) until we find an object that looks like it.
          */
 
-        if (!payload || typeof payload !== "object") {
-          return null;
-        }
-
-        const queue = [
-          {
-            node: payload,
-            depth: 0,
-          },
-        ];
-
-        const seen = new Set();
-
-        while (queue.length) {
-          const current = queue.shift();
-
-          const node = current.node;
-
-          if (!node || typeof node !== "object" || seen.has(node)) {
-            continue;
+          if (!payload || typeof payload !== "object") {
+            return null;
           }
 
-          seen.add(node);
+          const backendData =
+            payload.data &&
+            typeof payload.data === "object"
+              ? payload.data
+              : null;
 
-          if (!Array.isArray(node) && looksLikeScoreRecord(node)) {
-            return node;
+          const scoreboard =
+            backendData &&
+            backendData.scoreboard &&
+            typeof backendData.scoreboard === "object"
+              ? backendData.scoreboard
+              : null;
+
+          const rawScore =
+            scoreboard &&
+            scoreboard.raw_score &&
+            typeof scoreboard.raw_score === "object"
+              ? scoreboard.raw_score
+              : null;
+
+          if (
+            rawScore &&
+            (
+              Object.prototype.hasOwnProperty.call(rawScore, "Team1Name") ||
+              Object.prototype.hasOwnProperty.call(rawScore, "Team2Name") ||
+              Object.prototype.hasOwnProperty.call(rawScore, "Team1Score") ||
+              Object.prototype.hasOwnProperty.call(rawScore, "Team2Score")
+            )
+          ) {
+            return rawScore
           }
+  /*
+   * =========================================================
+   * 2. OTHER BACKEND LOCATIONS
+   * =========================================================
+   */
 
-          if (current.depth >= 7) {
-            continue;
-          }
+          const directCandidates = [
+            backendData && backendData.score,
+            backendData && backendData.data,
+            backendData && backendData.scoreboard,
+            payload.score,
+            payload.scoreboard,
+            payload.data,
+          ];
 
-          const children = Array.isArray(node)
-            ? node.slice(0, 20)
-            : Object.values(node);
+          for (const candidate of directCandidates) {
+            if (
+              candidate &&
+              typeof candidate === "object" &&
+              !Array.isArray(candidate)
+            ) {
+              if (
+                Object.prototype.hasOwnProperty.call(candidate, "Team1Name") ||
+                Object.prototype.hasOwnProperty.call(candidate, "Team2Name") ||
+                Object.prototype.hasOwnProperty.call(candidate, "Team1Score") ||
+                Object.prototype.hasOwnProperty.call(candidate, "Team2Score")
+              ) {
+                return candidate;
+              }
 
-          children.forEach((child) => {
-            if (child && typeof child === "object") {
-              queue.push({
-                node: child,
-                depth: current.depth + 1,
-              });
+      /*
+       * A normalized scoreboard may itself contain raw_score.
+       */
+              if (
+                candidate.raw_score &&
+                typeof candidate.raw_score === "object" &&
+                (
+                  Object.prototype.hasOwnProperty.call(
+                    candidate.raw_score,
+                    "Team1Name",
+                  ) ||
+                  Object.prototype.hasOwnProperty.call(
+                    candidate.raw_score,
+                    "Team2Name",
+                  ) ||
+                  Object.prototype.hasOwnProperty.call(
+                    candidate.raw_score,
+                    "Team1Score",
+                  ) ||
+                  Object.prototype.hasOwnProperty.call(
+                    candidate.raw_score,
+                    "Team2Score",
+                  )
+                )
+              ) {
+                return candidate.raw_score;
+              }
             }
-          });
-        }
+          }
 
-        return null;
+  /*
+   * =========================================================
+   * 3. FINAL RECURSIVE FALLBACK
+   * =========================================================
+   *
+   * Keep this so older response formats continue to work.
+   */
+
+          const queue = [
+            {
+              node: payload,
+              depth: 0,
+            },
+          ];
+
+          const seen = new Set();
+
+          while (queue.length) {
+            const current = queue.shift();
+            const node = current.node;
+
+            if (
+              !node ||
+              typeof node !== "object" ||
+              seen.has(node)
+            ) {
+              continue;
+            }
+
+            seen.add(node);
+
+            if (
+              !Array.isArray(node) &&
+              (
+                Object.prototype.hasOwnProperty.call(node, "Team1Name") ||
+                Object.prototype.hasOwnProperty.call(node, "Team2Name") ||
+                Object.prototype.hasOwnProperty.call(node, "Team1Score") ||
+                Object.prototype.hasOwnProperty.call(node, "Team2Score")
+              )
+            ) {
+              return node;
+            }
+
+            if (current.depth >= 7) {
+              continue;
+            }
+
+            const children = Array.isArray(node)
+              ? node.slice(0, 20)
+              : Object.values(node);
+
+            children.forEach((child) => {
+              if (
+                child &&
+                typeof child === "object"
+              ) {
+                queue.push({
+                  node: child,
+                  depth: current.depth + 1,
+                });
+              }
+            });
+          }
+
+          return null;
       }
-
       /* =========================================================
    SCORE STATUS
 ========================================================= */
