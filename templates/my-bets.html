@@ -306,10 +306,24 @@
 
                         <div class="bet-selection-market">
                             {{ market_label }}
-                            {% if selection.market_name %}
-                                • {{ selection.market_name }}
-                            {% endif %}
+                            
                         </div>
+
+                        {% if selection.market_name %}
+                        <div class="bet-selection-market">
+                            Market: {{ selection.market_name }}
+                        </div>
+                        {% endif %}
+
+                        {% if is_fancy %}
+                        <div class="fancy-line"></div>
+                            <span>Runs / Line</span>
+                            <strong>
+                                {{ selection.runner_name }}
+                            </strong>
+                        </div>
+                        {% endif %}
+
 
                     </div>
 

@@ -1640,7 +1640,11 @@ function createOddsButton({
     team,
     side,
     price,
-    className
+    className,
+    marketType,
+    marketName,
+    line,
+    eventName
 }) {
 
     const numericPrice =
@@ -1665,6 +1669,10 @@ function createOddsButton({
             data-event-id="${escapeHtml(eventId)}"
             data-market-id="${escapeHtml(marketId)}"
             data-selection-id="${escapeHtml(selectionId || "")}"
+            data-market-type="${escapeHtml(marketType || "MATCH_ODDS")}"
+            data-market-name="${escapeHtml(marketName || "Match Odds")}"
+            data-line="${escapeHtml(line || "")}"
+            data-event-name="${escapeHtml(eventName || "")}"
             data-team="${escapeHtml(team)}"
             data-side="${escapeHtml(side)}"
             data-price="${
@@ -1888,7 +1896,16 @@ function createMatchRow(match) {
                     team1Back,
 
                 className:
-                    "odds-team-1"
+                    "odds-team-1",
+
+                marketType:
+                    "MATCH_ODDS",
+
+                marketName:
+                    "Match Odds",
+
+                eventName:
+                    eventName
 
             })}
 
@@ -1916,9 +1933,18 @@ function createMatchRow(match) {
                     team2Lay,
 
                 className:
-                    "odds-team-2"
+                    "odds-team-2",
 
-            })}
+                marketType:
+                    "MATCH_ODDS",
+                    
+                marketName:
+                    "Match Odds",
+                
+                eventName:
+                    eventName
+
+                })}
 
 
             <!-- DRAW / THIRD RUNNER -->
@@ -1949,7 +1975,16 @@ function createMatchRow(match) {
                             drawBack,
 
                         className:
-                            "odds-draw"
+                            "odds-draw",
+
+                        marketType:
+                            "MATCH_ODDS",
+                    
+                        marketName:
+                            "Match Odds",
+                
+                        eventName:
+                            eventName
 
                     })
                     : `
@@ -3113,19 +3148,42 @@ function renderPlacedBet(bet) {
         );
 
 
+    const marketType =
+        String(
+            selection?.market_type ||
+            "MATCH_ODDS"
+        ).toUpperCase();
+
+    const isFancy =
+        marketType === "FANCY" ||
+        marketType === "SESSION";
+
     const marketName =
         selection?.market_name ||
-        "Match Odds";
-
+        (
+            marketType === "BOOKMAKER"
+                ? "Bookmaker"
+                : isFancy
+                    ? "Fancy"
+                    : "Match Odds"
+        );
 
     const selectionName =
         selection?.runner_name ||
         "Selection";
 
-
     const eventName =
         selection?.event_name ||
+        bet.event_name ||
         "Cricket Match";
+
+    const fancyLine =
+        isFancy
+            ? (
+                selection?.line ||
+                selectionName
+            )
+            : "";
 
 
     return `
@@ -3185,6 +3243,43 @@ function renderPlacedBet(bet) {
                 )}
 
             </div>
+
+            ${
+                isFancy
+                    ? `
+                        <div class="betslip-fancy-details">
+
+                            <div>
+                                <span>MARKET</span>
+                                <strong>
+                                    ${escapeHtml(marketName)}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span>RUNS / LINE</span>
+                                <strong>
+                                    ${escapeHtml(fancyLine)}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span>SELECTION</span>
+                                <strong>
+                                    ${escapeHtml(
+                                        side === "BACK"
+                                            ? "YES"
+                                            : side === "LAY"
+                                                ? "NO"
+                                                : selectionName
+                                    )}
+                                </strong>
+                            </div>
+
+                        </div>
+                    `
+                    : ""
+            }
 
 
             <div class="betslip-details-grid">
@@ -3616,7 +3711,19 @@ document.addEventListener(
             side:
                 button.dataset.side,
 
-            price
+            price,
+
+            marketType:
+                button.dataset.marketType ||
+                "MATCH_ODDS",
+
+            line:
+                button.dataset.line ||
+                "",
+
+            eventName:
+                button.dataset.eventName ||
+                ""
 
         };
 
@@ -3643,23 +3750,7 @@ document.addEventListener(
         );
 
 
-        /*
-         * Dashboard compact odds are not the full
-         * bet placement interface.
-         *
-         * Open the detailed match page where the
-         * complete market/betslip is available.
-         */
-
-        if (
-            selection.gameId
-        ) {
-
-            window.location.href =
-                `/match/${encodeURIComponent(
-                    selection.gameId
-                )}`;
-        }
+      
 
     }
 );

@@ -494,6 +494,28 @@
         text-transform: uppercase;
       }
 
+      .slip-fancy-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-top: 6px;
+        padding: 7px 9px;
+        border-radius: 6px;
+        background: rgba(0, 210, 106, 0.08);
+        border: 1px solid rgba(0, 210, 106, 0.18);
+        font-size: 12px;
+      }
+
+      .slip-fancy-label {
+          color: #9aa9a1;
+      }
+
+      .slip-fancy-value {
+          color: #00d26a;
+          font-weight: 700;
+      }
+
       .score-stat-value {
         margin-top: 3px;
         color: #ffffff;
@@ -2867,7 +2889,12 @@
           escapeAttribute(side) +
           '"' +
           ' data-bet-line="' +
-          escapeAttribute(numericPrice) +
+          escapeAttribute(
+            normalizedMarketType === "FANCY" ||
+            normalizedMarketType === "SESSION"
+              ? selection
+              : numericPrice
+            ) +
           '"' +
           ' data-bet-payout-percent="' +
           escapeAttribute(
@@ -2941,6 +2968,8 @@
               side: String(box.dataset.betSide).toUpperCase(),
 
               odds: odds,
+
+              line: String(box.dataset.betLine || ""),
 
               payoutPercent:
                 (
@@ -3128,15 +3157,40 @@
                     ? "Bookmaker"
                     : "Match Odds";
 
+            const isFancyMarket =
+              item.marketType === "FANCY" ||
+              item.marketType === "SESSION";
+
+            const fancyLine =
+              isFancyMarket && item.line
+                ? item.line
+                : "";
+
             html += '<div class="slip-selection">';
 
             html += '<div class="slip-selection-top">';
 
-            html +=
-              '<div class="slip-selection-name">' +
-              escapeHtml(item.selectionName) +
-              "</div>";
+            if (isFancyMarket) {
+              html +=
+                '<div class="slip-selection-name">'+
+                escapeHtml(item.selectionName || "Fancy") +
+                "</div>";
 
+              if (fancyLine) {
+                html +=
+                  '<div class="slip-fancy-line">' +
+                  '<span class="slip-fancy-label">Runs / Line</span>' +
+                  '<span class="slip-fancy-value">' +
+                  escapeHtml(fancyLine) +
+                  "</span>" +
+                  "</div>";
+              }
+            } else {
+              html +=
+                '<div class="slip-selection-name">' +
+                escapeHtml(item.selectionName) +
+                 "</div>";
+            }
             html +=
               "<button " +
               'type="button" ' +
