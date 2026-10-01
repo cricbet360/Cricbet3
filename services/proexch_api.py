@@ -1299,7 +1299,6 @@ def parse_bookmaker_odds(
 # =========================================================
 # FANCY ODDS
 # =========================================================
-
 def parse_fancy_odds(
     data: Any,
 ) -> List[Dict[str, Any]]:
@@ -1374,6 +1373,26 @@ def parse_fancy_odds(
             ):
                 continue
 
+            # -------------------------------------------------
+            # Fancy line / runs / point
+            # -------------------------------------------------
+
+            line_value = _first_value(
+                runner,
+                "line",
+                "lineValue",
+                "line_value",
+                "runs",
+                "run",
+                "point",
+                "points",
+                "rate",
+                "value",
+                "odds",
+                "srno",
+                default="",
+            )
+
             runners.append(
                 {
                     "id": str(
@@ -1398,6 +1417,15 @@ def parse_fancy_odds(
                             "name",
                             default="",
                         )
+                    ),
+
+                    "line": (
+                        str(line_value)
+                        if line_value not in (
+                            None,
+                            "",
+                        )
+                        else ""
                     ),
 
                     "back": _safe_float(
@@ -1473,7 +1501,6 @@ def parse_fancy_odds(
         )
 
     return result
-
 
 # =========================================================
 # NORMALIZE ODDS

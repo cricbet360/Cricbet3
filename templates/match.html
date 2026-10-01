@@ -2502,8 +2502,8 @@
         html +=
           '<div class="market-columns">' +
           "<div>Runner</div>" +
-          "<div>Back</div>" +
           "<div>Lay</div>" +
+          "<div>Back</div>" +
           "</div>";
 
         if (!runners.length) {
@@ -2574,8 +2574,8 @@
         html +=
           '<div class="market-columns">' +
           "<div>Runner</div>" +
-          "<div>Back</div>" +
           "<div>Lay</div>" +
+          "<div>Back</div>" +
           "</div>";
 
         if (!runners.length) {
@@ -2666,8 +2666,8 @@
           "<div>" +
           (marketType === "SESSION" ? "Session" : "Fancy") +
           "</div>" +
-          "<div>Yes</div>" +
           "<div>No</div>" +
+          "<div>Yes</div>" +
           "</div>";
 
         if (!rows.length) {
@@ -2693,6 +2693,16 @@
             const no = row.no ?? row.lay ?? row.l1;
 
             const noSize = row.no_size ?? row.lay_size ?? row.ls1;
+
+            const fancyLine =
+              row.line ??
+              row.lineValue ??
+              row.line_value ??
+              row.runs ??
+              row.run ??
+              row.point ??
+              row.points ??
+              "";
 
             html += '<div class="runner">';
 
