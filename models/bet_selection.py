@@ -53,7 +53,7 @@ class BetSelection(Base):
     )
 
     line = Column(
-    String(255),
+    Float,
     nullable=True,
     )
 

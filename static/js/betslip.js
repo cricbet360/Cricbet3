@@ -260,7 +260,8 @@ function addSelection(button) {
                 selectionId,
                 runnerName,
                 side,
-                price
+                price,
+                line : line
 
             };
 
@@ -274,7 +275,8 @@ function addSelection(button) {
             selectionId,
             runnerName,
             side,
-            price
+            price,
+            line : line
 
         });
 

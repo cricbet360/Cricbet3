@@ -2708,6 +2708,7 @@
               selectionId,
               "BACK",
               market.id || market.market_id || market.marketId || marketId,
+              fancyLine,
             );
 
             html += createOddBox(
@@ -2720,6 +2721,7 @@
               selectionId,
               "LAY",
               market.id || market.market_id || market.marketId || marketId,
+              fancyLine,
             );
 
             html += "</div>";
@@ -2822,6 +2824,7 @@
         selectionId,
         side,
         marketIdValue = "",
+        fancyLine = "",
       ) {
         const numericPrice = Number(price);
 
