@@ -2938,6 +2938,12 @@
 
               selectionName: String(box.dataset.betSelection || ""),
 
+              line: ["FANCY", "SESSION"].includes(
+                String(box.dataset.betMarketType || "").toUpperCase()
+              )
+                ? String(box.dataset.betLine || "")
+                : null,
+
               side: String(box.dataset.betSide).toUpperCase(),
 
               odds: odds,
@@ -3394,6 +3400,11 @@
               market_name: String(item.marketName || ""),
               selection_id: String(item.selectionId),
               selection_name: String(item.selectionName),
+              selection_line: ["FANCY", "SESSION"].includes(
+                String(item.marketType || "").toUpperCase()
+              )
+                ? String(item.line ?? "")
+                : null,
               side: String(item.side || "BACK").toUpperCase(),
               odds: Number(item.odds),
               payout_percent:
