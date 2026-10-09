@@ -217,20 +217,12 @@ async def place_bet(
         payload.selection_name or ""
     ).strip()
 
-        # Extract the Fancy line from the selection name.
-    # Example: "45 over run BAN" -> "45"
+   
+    # Only accept an explicitly supplied betting line.
+    # Never infer it from the runner's display name.
     selection_line = str(
         payload.selection_line or ""
     ).strip()
-
-    if not selection_line:
-        line_match = re.search(
-            r"(?<!\d)(\d+(?:\.\d+)?)(?!\d)",
-            selection_name,
-        )
-
-        if line_match:
-            selection_line = line_match.group(1)
 
     # =====================================================
     # REQUIRED FIELDS
