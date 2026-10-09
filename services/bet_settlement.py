@@ -577,92 +577,47 @@ def _settle_fancy(
     result_text: str,
 ) -> Optional[str]:
 
-    result_value = _to_float(
-        result_text
-    )
+    result_value = _to_float(result_text)
 
     if result_value is None:
         return None
 
-    runner_name = _clean(
-        getattr(
-            selection,
-            "runner_name",
-            "",
-        )
-    )
-
-    line = _extract_line(
-        runner_name
-    )
+    # Never infer a betting threshold from runner_name.
+    # For example, "35 over run BAN" contains an over number,
+    # which is not necessarily the selected betting threshold.
+    raw_line = getattr(selection, "line", None)
+    line = _to_float(raw_line)
 
     if line is None:
-
-        line = _extract_line(
-            getattr(
-                selection,
-                "market_name",
-                "",
-            )
-        )
-
-    if line is None:
-
         print(
-            "[SETTLEMENT] Could not determine Fancy line:",
-            runner_name,
-            getattr(
-                selection,
-                "market_id",
-                "",
-            ),
+            "[SETTLEMENT] Refusing Fancy settlement: "
+            "explicit betting line is missing.",
+            "bet_id=",
+            getattr(selection, "bet_id", None),
+            "runner=",
+            getattr(selection, "runner_name", ""),
+            "market_id=",
+            getattr(selection, "market_id", ""),
         )
-
         return None
 
-    side = _clean(
-        getattr(
-            selection,
-            "side",
-            "",
-        )
-    ).upper()
+    side = str(
+        getattr(selection, "side", "") or ""
+    ).strip().upper()
 
-    # -----------------------------------------------------
-    # RESULT ABOVE LINE
-    # -----------------------------------------------------
+    if side not in {"BACK", "LAY"}:
+        return None
 
     if result_value > line:
-
-        if side == "BACK":
-            return "won"
-
-        if side == "LAY":
-            return "lost"
-
-    # -----------------------------------------------------
-    # RESULT BELOW LINE
-    # -----------------------------------------------------
+        return "won" if side == "BACK" else "lost"
 
     if result_value < line:
+        return "lost" if side == "BACK" else "won"
 
-        if side == "BACK":
-            return "lost"
-
-        if side == "LAY":
-            return "won"
-
-    # -----------------------------------------------------
-    # RESULT EQUAL TO LINE
-    # -----------------------------------------------------
-
-    if result_value == line:
-
-        if FANCY_EQUAL_ACTION == "void":
-            return "void"
+    if FANCY_EQUAL_ACTION == "void":
+        return "void"
 
     return None
-
 
 # =========================================================
 # STANDARD RESULT MATCHING

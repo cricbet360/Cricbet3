@@ -33,6 +33,7 @@ class PlaceBetRequest(BaseModel):
     market_name: str | None = None
     selection_id: str
     selection_name: str
+    selection_line: str | None = None
     side: str
     odds: float
     stake: float
@@ -215,6 +216,21 @@ async def place_bet(
     selection_name = str(
         payload.selection_name or ""
     ).strip()
+
+        # Extract the Fancy line from the selection name.
+    # Example: "45 over run BAN" -> "45"
+    selection_line = str(
+        payload.selection_line or ""
+    ).strip()
+
+    if not selection_line:
+        line_match = re.search(
+            r"(?<!\d)(\d+(?:\.\d+)?)(?!\d)",
+            selection_name,
+        )
+
+        if line_match:
+            selection_line = line_match.group(1)
 
     # =====================================================
     # REQUIRED FIELDS
@@ -580,7 +596,15 @@ async def place_bet(
             market_name=market_name,
 
             event_name=None,
+             
+            line=(
+                selection_line
+                if market_type in {"FANCY", "SESSION"}
+                and selection_line
+                else None
+            ),
         )
+        
 
         db.add(
             bet_selection

@@ -71,7 +71,11 @@ class BetSelection(Base):
         String(255),
         nullable=True,
     )
-
+    line = Column(
+        String(255),
+        nullable=True,
+    )
+    
     bet = relationship(
         "Bet",
         back_populates="selections",
